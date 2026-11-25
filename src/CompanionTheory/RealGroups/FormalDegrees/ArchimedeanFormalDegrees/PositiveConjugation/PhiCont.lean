@@ -6,6 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficien
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.ExpInPPosDef
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.LocalA
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.PhiFacts
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.HaarVolumes.JacobianNearOneOfSmall
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.PolarBasic
 
 @[expose] public section
 
@@ -22,8 +24,8 @@ variable {n : ℕ}
 
 theorem continuous_pP (ε : Fin n → Bool) : Continuous fun g : UJ ε => pP (toM g) := by
   have h : Continuous fun g : UJ ε => PolarDecomposition.polar_L (toM g) :=
-    (lcA_polarL_continuousOn ε).comp_continuous (continuous_toM ε) (fun g => g.2)
-  exact continuous_matrix_exp_alt.comp h
+    (polarL_continuousOn ε).comp_continuous (continuous_toM ε) (fun g => g.2)
+  exact kd_exp_continuous.comp h
 
 theorem pP_posDef {ε : Fin n → Bool} (g : UJ ε) : (pP (toM g)).PosDef :=
   exp_noncompactPart_posDef (PolarDecomposition.polar_L_inP (ε := ε) g.2)
@@ -37,7 +39,7 @@ theorem phiCont : PhiCont := by
   have hpd := posDef_conj_toMK z.2 (pP_posDef z.1)
   have hΩ : toMK z.2⁻¹ * pP (toM z.1) * toMK z.2 ∈ OmegaSet n := posSet_subset_omega hpd
   have hc : ContinuousAt (PhiM μ) (toMK z.2⁻¹ * pP (toM z.1) * toMK z.2) :=
-    ((phiM_differentiableOn μ).continuousOn).continuousAt (isOpen_omega.mem_nhds hΩ)
+    ((phiM_differentiableOn μ).continuousOn).continuousAt (Ps1.isOpen_omega'.mem_nhds hΩ)
   show ContinuousAt (fun z : UJ ε × KG ε => (PhiM μ (toMK z.2⁻¹ * pP (toM z.1) * toMK z.2)).re) z
   exact Complex.continuous_re.continuousAt.comp
     (hc.comp (f := fun z : UJ ε × KG ε => toMK z.2⁻¹ * pP (toM z.1) * toMK z.2) hY.continuousAt)

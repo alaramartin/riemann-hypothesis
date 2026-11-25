@@ -3,6 +3,8 @@ module
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.CountData
 import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicHaarMeasureScaling
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardAdelicCharacter
 
 @[expose] public section
 
@@ -18,11 +20,11 @@ variable {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι] [Decidabl
 def toA (x : ι → F) : ι → A F := fun j => algebraMap F (A F) (x j)
 
 theorem oh_add {x y : A F} (hx : x ∈ Oh F) (hy : y ∈ Oh F) : x + y ∈ Oh F :=
-  fun v => add_mem (hx v) (hy v)
+  StdChar.add_mem_Oh hx hy
 
-theorem oh_zero : (0 : A F) ∈ Oh F := fun _ => zero_mem _
+theorem oh_zero : (0 : A F) ∈ Oh F := by intros; apply StdChar.zero_mem_Oh <;> assumption
 
-theorem oh_neg {x : A F} (hx : x ∈ Oh F) : -x ∈ Oh F := fun v => neg_mem (hx v)
+theorem oh_neg {x : A F} (hx : x ∈ Oh F) : -x ∈ Oh F := Scale.neg_mem_Oh hx
 
 
 variable (ι F) in

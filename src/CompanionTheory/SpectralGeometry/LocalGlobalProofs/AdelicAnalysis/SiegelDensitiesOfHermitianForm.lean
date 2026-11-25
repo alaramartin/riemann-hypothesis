@@ -52,7 +52,7 @@ theorem siegelDensities (F E : Type) [Field F] [NumberField F] [Field E] [Number
     (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) :
     SiegelDensities F E σ M J := by
   intro n hn T hT hdet d b Φ Φinf Φf Φv hc _ hsm hpure hprod
-  have hfv : FinVol F E σ M J := GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hCM M J hJ
+  have hfv : FinVol F E σ M J := CompanionTheory.SWFin.finVol F E σ hCM M J hJ
   refine ⟨hfv.1, fun μ hμ => ⟨(hfv.2 μ hμ).1, fun 𝓕 h𝓕 =>
     ⟨GlobalTheory.CompanionTheory.SW.CharEx.exists_isCharAF F, fun ψ hψ => ?_⟩⟩⟩
   obtain ⟨⟨laminf, hli⟩, hlv⟩ := _root_.GlobalTheory.CompanionTheory.SW.StdEx.exists_std F
@@ -96,7 +96,7 @@ theorem siegelDensities (F E : Type) [Field F] [NumberField F] [Field E] [Number
   have hE := _root_.GlobalTheory.CompanionTheory.SW.AllFrames.swMeas_all F E σ hCM n M J hJ hnM T hT hdet d b laminf lam hli hlam μ 𝓕 hμ h𝓕 minf m hmi hm
   obtain ⟨hmeas, hint, hmul, hI⟩ := _root_.GlobalTheory.CompanionTheory.SW.EulerInt.euler_int F E σ hCM d b n M _ _ _ hE (hfi _) (fun v => hf v _)
     Φ Φinf Φf Φv hc hsm.1 hpure hprod
-  have hθ := _root_.GlobalTheory.CompanionTheory.SW.ThetaMean.mean_thetaS_eq_integral F E σ hCM M J hJ μ 𝓕 hμ h𝓕 n _ Φ hmeas hint
+  have hθ := CompanionTheory.PlacePermOperatorBicommutantSpan.theta_int F E σ hCM M J hJ μ 𝓕 hμ h𝓕 n _ Φ hmeas hint
   obtain ⟨r1, r2⟩ := rescale_tprod (ci / ei) (fun v => c v / e v) hdiv.1 hdiv.2
     (∫ X, Φinf X ∂(minf (hermOf (Ainf F) σ T hT))) _ hmul
   refine ⟨fun S => (ci / ei) • ∫ X, Φinf X ∂(minf S), fun v S => (c v / e v) • ∫ X, Φv v X ∂(m v S),

@@ -3,6 +3,7 @@ module
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.IsDSOfIsDG
 public import Development.AbelianVarietyTheory.Counterexamples.JetSurvey.ExistsIsCayleyUIff
 import Mathlib.Tactic.Lemma
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.CayleyExistsAndAny
 
 @[expose] public section
 
@@ -130,23 +131,6 @@ theorem isDS_transfer (T : H ≃ₗᵢ[ℂ] H) (h : ∀ g ∈ UJset ε, ∀ v, T
       rw [← h _ g.2, T.inner_map_map]
     rw [this]; exact c5 _ _
 
-theorem isDS_conj {lam : Fin n → ℝ} (hσ : IsDS ε lam σ) {u u' : Matrix (Fin n) (Fin n) ℂ}
-    (hu : u ∈ UJset ε) (hu' : u' ∈ UJset ε) (h1 : u * u' = 1) :
-    IsDS ε lam (fun g => σ (u' * g * u)) := by
-  obtain ⟨⟨r1, r2⟩, r3, -⟩ := hσ.2.2.1
-  have hs : ∀ v, σ u (σ u' v) = v := by
-    intro v
-    have := r2 u hu u' hu'
-    rw [h1, r1] at this
-    simpa using (congrArg (fun A : H →L[ℂ] H => A v) this).symm
-  let T : H ≃ₗᵢ[ℂ] H := LinearIsometryEquiv.ofSurjective
-    { toLinearMap := (σ u : H →ₗ[ℂ] H), norm_map' := r3 u hu } (fun v => ⟨σ u' v, hs v⟩)
-  refine isDS_transfer T ?_ hσ
-  intro g hg v
-  show σ u (σ (u' * g * u) v) = σ g (σ u v)
-  rw [r2 _ (UJ_mul hu' hg) u hu, r2 u' hu' g hg]
-  simp [hs]
-
 lemma card_even (r : ℕ) : ((range (2 * r + 2)).filter fun m => m % 2 = 0).card = r + 1 := by
   induction r with
   | zero => decide
@@ -191,7 +175,7 @@ theorem cayley_exists_and_any : ∀ (k r : ℕ), (1 ≤ k → ∃ Q, PI.UpqRep.I
           simp only [conjTranspose_mul, conjTranspose_conjTranspose, Matrix.mul_assoc]
       _ = (B * Bᴴ) * Jm ε * (B * Bᴴ) := by rw [hAB]; simp only [Matrix.mul_assoc]
       _ = Jm ε := by rw [hB]; simp
-  have key := isDS_conj hD (gen Q P p2 (hQ.trans hP.symm)) (gen P Q q2 (hP.trans hQ.symm)) (by
+  have key := CayleyChoice.isDS_conj hD (gen Q P p2 (hQ.trans hP.symm)) (gen P Q q2 (hP.trans hQ.symm)) (by
     calc Q * Pᴴ * (P * Qᴴ) = Q * (Pᴴ * P) * Qᴴ := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [p1, Matrix.mul_one, q2])
   have e : (fun g => R.σ (Q⁻¹ * g * Q)) = fun g => R.σ (P⁻¹ * (P * Qᴴ * g * (Q * Pᴴ)) * P) := by

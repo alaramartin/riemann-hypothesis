@@ -23,6 +23,7 @@ import Formalism.HermitianCurvature.HermitianCurvatureProofs.VectorVanishesBigCe
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Algebra.Order.Star.Int
 import Mathlib.Analysis.Complex.ExponentialBounds
+import CompanionTheory.AutomorphicTheory.BesselWaveGrids.WaveBallEstimateWeightedDualAlt
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.BesselWaveGrids.SpanBall, CompanionTheory.AutomorphicTheory.BesselWaveGrids.CoefOfOfWsp, CompanionTheory.AutomorphicTheory.BesselWaveGrids.PowFourLeRpowNineHalves
@@ -328,9 +329,9 @@ theorem coefOf_of_wsp (hU : UniqG) (hK : PI.KFinSmooth) {ε : Fin (2 * r + k + 1
 theorem bound_of_inCC {A : ℝ} {m : ℕ} {F : B.Mat k r → (Wq →L[ℂ] Wp)} (h : B.InCC A m F) :
     ContinuousOn F (B.GV k r) ∧ ∃ c, 0 ≤ c ∧ ∀ g ∈ B.GV k r, ‖F g‖ ≤ c * B.gN g ^ (-A) := by
   obtain ⟨c, hc1, hc2⟩ := h
-  refine ⟨GlobalTheory.CoefZero.continuousOn_of_ckOn hc1, max c 0, le_max_right _ _, fun g hg => ?_⟩
+  refine ⟨Gp91.GlobalTheory.CoefZero.continuousOn_of_ckOn hc1, max c 0, le_max_right _ _, fun g hg => ?_⟩
   have h1 : B.gN g ^ A * ‖F g‖ ≤ c := hc2 [] [] (by simp) (by simp) (by simp) g hg
-  have hp := BetaSesquilinearity.gN_pos hg
+  have hp := B6.gN_pos hg
   rw [Real.rpow_neg hp.le, ← div_eq_mul_inv, le_div_iff₀ (Real.rpow_pos_of_pos hp _), mul_comm]
   exact h1.trans (le_max_left _ _)
 
@@ -421,7 +422,7 @@ theorem V_dmin (p : KB.Pl P Wp Wq) {f F₀ : B.Mat P.k P.r → (Wq →L[ℂ] Wp)
   unfold KB.Pl.V D.vecV
   split_ifs with h1 h2
   · apply TBBx4.orbJ_smul_ae _ _ _ _ _ _ h0
-    filter_upwards [TBBx2.ae_inSS p.T.base] with q hq
+    filter_upwards [B6.ae_inSS p.T.base] with q hq
     have hGq : Dmin P.k P.r p.T.base.z p.T.base.z' (B.sgs q h2.choose) ⟨j + 1, by omega⟩ = mnr hj γ := by
       rw [BigCellZetaMinors.dmin_sgs _ hq]
       unfold Dmin mnr
@@ -465,7 +466,7 @@ theorem V_sum : ∃ c₃ : ℝ, ∀ (P : M.Par) (Wp Wq : Type) [NormedAddCommGro
       rw [Finset.sum_apply]
     obtain ⟨h1, c1, hc1, b1⟩ := bound_of_inCC (hF i (Finset.mem_insert_self _ _))
     obtain ⟨h2, c2, hc2, b2⟩ := bound_of_inCC hS
-    have hpos : ∀ g ∈ B.GPos p.T.base, 0 ≤ B.gN g ^ (-A) := fun g hg => Real.rpow_nonneg (BetaSesquilinearity.gN_pos hg.1).le _
+    have hpos : ∀ g ∈ B.GPos p.T.base, 0 ≤ B.gN g ^ (-A) := fun g hg => Real.rpow_nonneg (B6.gN_pos hg.1).le _
     have key := H P.k P.r Wp Wq p.T.base p.ν' p.m₀ γ A hA (F i) (∑ j ∈ S, F j) (c1 + c2) (by linarith)
       (h1.mono fun g hg => hg.1) (h2.mono fun g hg => hg.1)
       (fun g hg => (b1 g hg.1).trans (mul_le_mul_of_nonneg_right (by linarith) (hpos g hg)))

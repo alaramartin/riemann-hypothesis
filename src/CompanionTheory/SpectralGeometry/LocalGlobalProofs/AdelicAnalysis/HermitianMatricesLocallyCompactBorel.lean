@@ -5,6 +5,7 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 
 @[expose] public section
 
@@ -47,9 +48,7 @@ variable [TopologicalSpace R] [IsTopologicalRing R]
 
 theorem isModTop : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
 
-theorem isTopRing [Module.Finite F E] : IsTopologicalRing (R ⊗[F] E) :=
-  haveI := isModTop (F := F) (E := E) R
-  IsModuleTopology.isTopologicalRing R (R ⊗[F] E)
+theorem isTopRing [Module.Finite F E] : IsTopologicalRing (R ⊗[F] E) := TopK.isTopRing _
 
 theorem exists_homeo [Module.Finite F E] :
     Nonempty ((R ⊗[F] E) ≃ₜ (Fin (Module.finrank F E) → R)) := by

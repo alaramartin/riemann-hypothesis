@@ -8,6 +8,7 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.Tactic.Lemma
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardAdelicCharacter
 
 @[expose] public section
 
@@ -20,14 +21,13 @@ namespace GlobalTheory.CompanionTheory.SW.Core.Scale
 
 variable {F : Type} [Field F] [NumberField F]
 
-lemma add_mem_Oh {x y : A F} (hx : x ∈ Oh F) (hy : y ∈ Oh F) : x + y ∈ Oh F := fun v =>
-  add_mem (hx v) (hy v)
+lemma add_mem_Oh {x y : A F} (hx : x ∈ Oh F) (hy : y ∈ Oh F) : x + y ∈ Oh F :=
+  StdChar.add_mem_Oh hx hy
 
 lemma neg_mem_Oh {x : A F} (hx : x ∈ Oh F) : -x ∈ Oh F := fun v =>
   neg_mem (hx v)
 
-lemma zero_mem_Oh : (0 : A F) ∈ Oh F := fun v =>
-  (v.adicCompletionIntegers F).zero_mem
+lemma zero_mem_Oh : (0 : A F) ∈ Oh F := by intros; apply StdChar.zero_mem_Oh <;> assumption
 
 def OhSub (F : Type) [Field F] [NumberField F] : AddSubgroup (A F) where
   carrier := Oh F
@@ -78,7 +78,7 @@ theorem mass_of_subgroup [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measur
         hHo.preimage (continuous_id.sub continuous_const)
       obtain ⟨f, hf⟩ := hd.exists_mem_open hop ⟨x, by simpa using H.zero_mem⟩
       have hfO : algebraMap F (A F) f ∈ Oh F := by
-        have := add_mem_Oh (hHs _ hf) hx
+        have := StdChar.add_mem_Oh (hHs _ hf) hx
         simpa using this
       obtain ⟨r, rfl⟩ := (hint f).1 hfO
       refine ⟨Ideal.Quotient.mk I r, ?_⟩
@@ -92,7 +92,7 @@ theorem mass_of_subgroup [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measur
       simp only [ι]
       abel
     · rintro ⟨t, ht⟩
-      have := add_mem_Oh (hHs _ ht) (ι_mem (rep t))
+      have := StdChar.add_mem_Oh (hHs _ ht) (ι_mem (rep t))
       simpa using this
   have hsum : (1 : ℝ≥0∞) = (Ideal.absNorm I : ℝ≥0∞) * lf (H : Set (A F)) := by
     rw [← h1, hU, measure_iUnion hdisj hCm, tsum_fintype]

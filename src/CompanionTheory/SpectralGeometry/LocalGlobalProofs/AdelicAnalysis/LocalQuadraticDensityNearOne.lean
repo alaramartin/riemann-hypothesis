@@ -57,11 +57,10 @@ local notation "𝒪" => v.adicCompletionIntegers F
 local notation "𝓴" => IsLocalRing.ResidueField 𝒪
 local notation "res" => IsLocalRing.residue 𝒪
 
-theorem res_eq_zero_iff (a : 𝒪) : res a = 0 ↔ Valued.v (a : Fv F v) < 1 := by
-  apply GlobalTheory.PlaceRed.mem_max_iff
+theorem res_eq_zero_iff (a : 𝒪) : res a = 0 ↔ Valued.v (a : Fv F v) < 1 := PlaceRed.mem_max_iff a
 
 theorem res_eq_iff (a b : 𝒪) : res a = res b ↔ Valued.v ((a : Fv F v) - b) < 1 := by
-  rw [← sub_eq_zero, ← map_sub, res_eq_zero_iff]
+  rw [← sub_eq_zero, ← map_sub, PlaceRed.mem_max_iff]
   rfl
 
 def lift (y : 𝓴) : 𝒪 := Function.surjInv IsLocalRing.residue_surjective y
@@ -77,7 +76,7 @@ theorem cover {ι : Type} (x : ι → Fv F v) :
   · rintro ⟨hx, i₀, hi₀⟩
     refine ⟨fun i => res ⟨x i, hx i⟩, ?_, fun i => ?_⟩
     · intro h0
-      have h1 := (res_eq_zero_iff (⟨x i₀, hx i₀⟩ : 𝒪)).1 (congrFun h0 i₀)
+      have h1 := (PlaceRed.mem_max_iff (⟨x i₀, hx i₀⟩ : 𝒪)).1 (congrFun h0 i₀)
       exact absurd hi₀ (ne_of_lt h1)
     · exact (res_eq_iff (⟨x i, hx i⟩ : 𝒪) (lift _)).1 (res_lift _).symm
   · rintro ⟨y, hy, h⟩
@@ -93,7 +92,7 @@ theorem cover {ι : Type} (x : ι → Fv F v) :
     have e : res (⟨x i, hx i⟩ : 𝒪) = y i := by
       rw [(res_eq_iff (⟨x i, hx i⟩ : 𝒪) (lift (y i))).2 (h i), res_lift]
     rw [← e]
-    exact (res_eq_zero_iff _).2 hlt
+    exact (PlaceRed.mem_max_iff _).2 hlt
 
 theorem eq_of_close {ι : Type} (x : ι → Fv F v) (y y' : ι → 𝓴)
     (h : ∀ i, Valued.v (x i - lf y i) < 1) (h' : ∀ i, Valued.v (x i - lf y' i) < 1) : y = y' := by
@@ -179,12 +178,12 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
     intro h0
     have e : res BO.det = (BO.map res).det := RingHom.map_det res BO
     rw [← e] at h0
-    have h3 := (res_eq_zero_iff _).1 h0
+    have h3 := (PlaceRed.mem_max_iff _).1 h0
     have e2 : ((BO.det : 𝒪) : Fv F v) = (BO.map phi).det := RingHom.map_det phi BO
     rw [e2, hBdet] at h3
     exact lt_irrefl _ h3
   set sb : 𝓴 := res (⟨s, hs⟩ : 𝒪) with hsb
-  have hcount := _root_.GlobalTheory.CompanionTheory.SW.QuadricCount.quadric_count_even 𝓴 hchar ι M hM hM1 (BO.map res) hBks hBkdet sb
+  have hcount := QuadricCount.card_quadric_even 𝓴 hchar ι M hM hM1 (BO.map res) hBks hBkdet sb
   let qk : (ι → 𝓴) → 𝓴 := fun y => (2 : 𝓴)⁻¹ * (y ⬝ᵥ ((BO.map res) *ᵥ y))
   let Fl : Finset (ι → 𝓴) := Finset.univ.filter fun y => qk y = sb
   let T : Finset (ι → 𝓴) := Fl.filter fun y => y ≠ 0
@@ -281,8 +280,7 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
     push_cast [ENNReal.coe_inv hq0']
     rw [mul_assoc]
 
-theorem density_primitive : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)), IsStdV v lam → Valued.v (2 : Fv F v) = 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι (Fv F v)), B.IsSymm → (∀ i j, B i j ∈ v.adicCompletionIntegers F) → Valued.v B.det = 1 → ∀ M : ℕ, Fintype.card ι = 2 * M → 1 ≤ M → ∀ s : Fv F v, s ∈ v.adicCompletionIntegers F → ∃ D : ℝ≥0, |(D : ℝ) - 1| ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1) + 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (2 * M - 1) ∧ ∀ A : Set (Fv F v), MeasurableSet A → A ⊆ {z | Valued.v (z - s) < 1} → (Measure.pi fun _ : ι => lam) {x | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧ (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) ∈ A} = (D : ℝ≥0∞) * lam A := by
-  intro F _ _ v lam hlam h2 ι _ _ B hBs hBint hBdet M hM hM1 s hs
-  exact core lam hlam h2 ι B hBs hBint hBdet M hM hM1 s hs
+theorem density_primitive : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)), IsStdV v lam → Valued.v (2 : Fv F v) = 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι (Fv F v)), B.IsSymm → (∀ i j, B i j ∈ v.adicCompletionIntegers F) → Valued.v B.det = 1 → ∀ M : ℕ, Fintype.card ι = 2 * M → 1 ≤ M → ∀ s : Fv F v, s ∈ v.adicCompletionIntegers F → ∃ D : ℝ≥0, |(D : ℝ) - 1| ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1) + 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (2 * M - 1) ∧ ∀ A : Set (Fv F v), MeasurableSet A → A ⊆ {z | Valued.v (z - s) < 1} → (Measure.pi fun _ : ι => lam) {x | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧ (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) ∈ A} = (D : ℝ≥0∞) * lam A :=
+  @core
 
 end GlobalTheory.CompanionTheory.SW.LGPrim

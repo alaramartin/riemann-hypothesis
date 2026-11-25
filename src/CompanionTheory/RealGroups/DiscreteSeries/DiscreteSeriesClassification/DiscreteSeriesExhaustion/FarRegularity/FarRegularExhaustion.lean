@@ -51,6 +51,7 @@ import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.Is
 import Development.AutomorphicArithmetic.IntegralCasts.IsOpenStabOfMemNhds
 import Formalism.RealPlaceAnalysis.StatementA
 import Mathlib.RingTheory.Finiteness.Lattice
+import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.CapelliEigenvalues.CoefEigOfInfChar
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CasApplyOfScalChar, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.DominantOfKHighest, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.InjROfVanKG, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.NumKG, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FiniteTypeAlgebraCommonEigencharacter, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FreeAlgebraActionOnSubquotient, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.HighestWeightClassBoundaryAndWeight, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LevelWeightSumBound, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.SumOfLevelSizesEq, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.SubChar, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.TotalBound, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.VNormSqRenum, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.VanKGOf, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.FarRegularity.FarRegularExhaustion
@@ -686,13 +687,6 @@ theorem sg_erase (i : Pos n) (B : Finset (Pos n)) : CompanionTheory.D.LK.sg i (B
   · exact fun h => ⟨h.1.2, h.2⟩
   · exact fun h => ⟨⟨fun e => by subst e; exact lt_irrefl _ h.2, h.1⟩, h.2⟩
 
-theorem cre_ann (i : Pos n) (x : Cn n V) (B : Finset (Pos n)) :
-    cre i (ann i x) B = if i ∈ B then x B else 0 := by
-  rw [_root_.CompanionTheory.D.LK.Car.cre_apply]
-  split_ifs with h
-  · rw [_root_.CompanionTheory.D.LK.Car.ann_apply, if_neg (notMem_erase i B), insert_erase h, sg_erase, smul_smul, _root_.CompanionTheory.D.LK.Car.sg_mul_self, one_smul]
-  · rfl
-
 theorem adC_self (a : Fin n) (i k : Pos n) :
     adC a a i k = if k = i then ((if i.1.1 = a then 1 else 0) - (if i.1.2 = a then 1 else 0) : ℂ) else 0 := by
   unfold adC
@@ -759,7 +753,7 @@ theorem top_cycle_weight : ∀ (n : ℕ) (ε : Fin n → Bool) (lev : Fin n → 
   · funext B
     show E a a ((Pi.single (omU ε lev) u : Cn n V) B) + adL a a (Pi.single (omU ε lev) u) B = _
     rw [adL_self_apply]
-    simp only [cre_ann]
+    simp only [CompanionTheory.D.LK.cre_ann_apply]
     by_cases e : B = omU ε lev
     · subst e
       rw [Pi.single_eq_same, hu.1 a, Pi.smul_apply, Pi.single_eq_same]
@@ -1166,7 +1160,7 @@ theorem coBlock : InjU → GenCOU → COBlock := by
       rw [map_list_prod, List.map_ofFn]
       congr 2
       funext i
-      simpa [Function.comp_def, Xq, hs] using (map_qdet ρ _ (Y + shift (sz lev M) i)).symm
+      simpa [Function.comp_def, Xq, hs] using (CompanionTheory.CapEig.algHom_qdet ρ _ (Y + shift (sz lev M) i)).symm
     rw [e1]
     refine Submodule.linearMap_qext _ (LinearMap.ext fun z => ?_)
     obtain ⟨hz, e⟩ := hρ (fb (sz lev M) h Y) z
@@ -1176,7 +1170,7 @@ theorem coBlock : InjU → GenCOU → COBlock := by
       (fun V _ _ E hE => _root_.GlobalTheory.CompanionTheory.RgCOBlock.co_hyp n M lev (sz lev M) h Y hmono hlev V E hE) V E hE dg z z.2.1 z.2.2.1 z.2.2.2
     have hq : ev E (fa n Y) = Formalism.QuantumDeterminants.capP χ Y • (1 : Module.End ℂ V) := by
       unfold fa
-      rw [map_qdet]
+      rw [CompanionTheory.CapEig.algHom_qdet]
       have := hSC Y
       simp only [ev, lt, FreeAlgebra.lift_ι_apply]
       exact this
@@ -1620,7 +1614,7 @@ open CompanionTheory.D.DSIC (KRel KUnit KStab)
 theorem vanKG_of (hN : NumKG) : VanKG := by
   have hC : COK := cok_of hGenCO
   have hP : WtProj := GlobalTheory.CompanionTheory.LKWtProj.wtProj
-  have hM : WtMajor := GlobalTheory.CompanionTheory.KWeightMajor.wtMajor_of CompanionTheory.D.DSIC.hLowSpan
+  have hM : WtMajor := GlobalTheory.CompanionTheory.KWeightMajor.wtMajor_of KLowSpan.lowSpan_holds
   intro n ε γ lev V _ _ E hg hE hU hF hmin B j z hB hBU hz hwt hb
   set τ := xv ε γ with hτ
   apply exists_boundary_of_weight_obstruction hC hP hM ε E hE hU hF B j τ z hz hwt hb

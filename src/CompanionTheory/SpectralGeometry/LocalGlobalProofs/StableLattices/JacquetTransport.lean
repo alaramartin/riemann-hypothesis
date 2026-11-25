@@ -22,6 +22,7 @@ import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.RingTheory.SimpleRing.Principal
 import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.IsSimpleTriv
 import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.KeepsMul
+import Development.AutomorphicSpectrum.Proofs.GlobalProofs.DerEndMemLeftInv
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LeviSubspaceInvariantUnderBlocks, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.QuantumDeterminantBlockEigenvalue, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CommutingLocallyNilpotentCommonKernel, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.TensorQuotientQuantumDeterminantEigen, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.JacquetTransport
@@ -310,7 +311,7 @@ theorem exists_raised : StepChar → TensDecomp → ∀ {m : ℕ} (M : GMod m) (
     exact (Submodule.mem_bot ℂ).1 this
   have hsh : ∀ Y x, f ((qdet (step M (χ r)).E (Y + ((m : ℂ) - 1) / 2) -
       Formalism.QuantumDeterminants.capP (χ + Pi.single r 1) Y • (1 : Module.End ℂ (step M (χ r)).V)) x) = D Y (f x) := fun Y x =>
-    shift_lin f _ _ (fun y => qdet_lin f (step M (χ r)).E E hf _ y) _ x
+    shift_lin f _ _ (fun y => Hypotheses₂.LeviPart.MonicBlock.qdet_intertwine f (step M (χ r)).E E hf _ y) _ x
   have hcomm : ∀ Y Y', Commute (D Y) (D Y') := by
     intro Y Y'
     have h0 : Commute (qdet E (Y + ((m : ℂ) - 1) / 2)) (qdet E (Y' + ((m : ℂ) - 1) / 2)) :=
@@ -532,7 +533,7 @@ theorem block_raise (hS : StepChar) (hT : TensDecomp) (P Q : GMod n) (d : Fin 3 
     refine ⟨1, fun Y => ?_⟩
     rw [pow_one]
     refine LinearMap.ext fun x => Subtype.ext ?_
-    have h1 := qdet_lin (leviSub P d h χ L).subtype M.E (bops P d h k) (fun a b x => rfl) (Y + ((d k : ℂ) - 1) / 2) x
+    have h1 := Hypotheses₂.LeviPart.MonicBlock.qdet_intertwine (leviSub P d h χ L).subtype M.E (bops P d h k) (fun a b x => rfl) (Y + ((d k : ℂ) - 1) / 2) x
     have h2 := x.2.2 k (Y + c)
     have h3 : Qd P d h k (Y + c) = qdet (bops P d h k) (Y + ((d k : ℂ) - 1) / 2) := by
       unfold Qd
@@ -622,7 +623,7 @@ theorem block_raise (hS : StepChar) (hT : TensDecomp) (P Q : GMod n) (d : Fin 3 
 
       rw [h8, hΦa, map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun p _ => ?_
-      have h9 := qdet_lin (θ (ι p)) (bops P d h i) (bops Q d h i) (fun a b y => by
+      have h9 := Hypotheses₂.LeviPart.MonicBlock.qdet_intertwine (θ (ι p)) (bops P d h i) (bops Q d h i) (fun a b y => by
         simp only [bops]
         rw [hθ, if_neg, add_zero]
         intro h0

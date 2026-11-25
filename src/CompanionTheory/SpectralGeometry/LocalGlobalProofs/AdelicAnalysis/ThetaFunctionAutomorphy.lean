@@ -621,7 +621,7 @@ theorem gauss_orth {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι]
 end GlobalTheory.CompanionTheory.SW.ThW.GaussOrth
 
 theorem GlobalTheory.CompanionTheory.SW.ThW.gauss_orth_closed : ∀ (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι F) (ρ : NumberField.InfinitePlace F → (F →+* ℝ)) (P : NumberField.InfinitePlace F → Matrix ι ι ℝ) (gi : NumberField.InfinitePlace F → Matrix ι ι ℝ), B.det ≠ 0 → (∀ w, (gi w).transpose * B.map (ρ w) * gi w = B.map (ρ w)) → (∀ (τ : NumberField.InfinitePlace F → ℂ) (x : NumberField.InfinitePlace F → ι → ℝ), GlobalTheory.CompanionTheory.SW.Core.gauss B ρ P τ (fun w => (gi w).mulVec (x w)) = GlobalTheory.CompanionTheory.SW.Core.gauss B ρ (fun w => (gi w).transpose * P w * gi w) τ x) ∧ ∀ τ : NumberField.InfinitePlace F → ℂ, GlobalTheory.CompanionTheory.SW.Core.cG B ρ (fun w => (gi w).transpose * P w * gi w) τ = GlobalTheory.CompanionTheory.SW.Core.cG B ρ P τ :=
-  fun _ _ _ _ _ _ B ρ P gi hB hg => GlobalTheory.CompanionTheory.SW.ThW.GaussOrth.gauss_orth B ρ P gi hB hg
+  @GaussOrth.gauss_orth
 end -- clump:auto
 end -- clump:auto
 end -- clump:auto
@@ -898,8 +898,7 @@ theorem abs_det_gM_all : ∀ (F : Type) [Field F] [NumberField F] (ι : Type) [F
     (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) →
     ∀ (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F)) (N : ℕ),
     |(gM (ι := ι) ρ (fun v => b v) N).det| =
-      ((N : ℝ) ^ Module.finrank ℚ F * Real.sqrt |(discr F : ℝ)|) ^ Fintype.card ι :=
-  fun _ _ _ _ _ _ _ _ hT hρ b N => abs_det_gM hT hρ b N
+      ((N : ℝ) ^ Module.finrank ℚ F * Real.sqrt |(discr F : ℝ)|) ^ Fintype.card ι := @abs_det_gM
 
 end GlobalTheory.CompanionTheory.SW.ThW
 end -- clump:auto

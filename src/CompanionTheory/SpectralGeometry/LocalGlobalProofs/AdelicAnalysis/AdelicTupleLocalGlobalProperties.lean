@@ -4,6 +4,7 @@ public import Formalism.UnipotentAdelicQuotients.SWXSDefs
 import Mathlib.Topology.Connected.Separation
 import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicTupleProjections
 
 @[expose] public section
 
@@ -68,7 +69,7 @@ def pV (v : HeightOneSpectrum (𝓞 F)) : AF F →ₐ[F] Fv F v := (evalV F v).c
 theorem continuous_pV (v : HeightOneSpectrum (𝓞 F)) : Continuous (pV (F := F) v) :=
   (RestrictedProduct.continuous_eval v).comp continuous_snd
 
-theorem continuous_fstA : Continuous (fstA F) := continuous_fst
+theorem continuous_fstA : Continuous (fstA F) := MeasProj.continuous_fstA
 
 variable {d M n : ℕ} (b : Module.Basis (Fin d) F E)
 
@@ -237,7 +238,7 @@ theorem isCompact_glue (Cinf : Set (Fin n → Fin M → Ainf F ⊗[F] E))
       projInf X ∈ Cinf ∧ ∀ v, projV v (projFin X) ∈ Cv v} := by
     have c1 : Continuous (projInf : (Fin n → Fin M → AF F ⊗[F] E) → _) :=
       continuous_pi fun a => continuous_pi fun i =>
-        (continuous_map (AF F) (fstA F) continuous_fstA b).comp
+        (continuous_map (AF F) (fstA F) MeasProj.continuous_fstA b).comp
           ((continuous_apply i).comp (continuous_apply a))
     have c2 : ∀ v : HeightOneSpectrum (𝓞 F), Continuous
         (fun X : Fin n → Fin M → AF F ⊗[F] E => projV v (projFin X)) := fun v => by

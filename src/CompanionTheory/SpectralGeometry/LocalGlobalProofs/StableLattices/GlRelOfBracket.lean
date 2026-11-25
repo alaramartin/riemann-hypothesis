@@ -8,6 +8,7 @@ import Mathlib.Tactic.TypeStar
 public import Mathlib.Analysis.Calculus.Deriv.Add
 public import Mathlib.Analysis.Calculus.Deriv.Comp
 public import Mathlib.Analysis.Calculus.Deriv.Mul
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.LieOperatorConjHolds
 
 @[expose] public section
 
@@ -82,23 +83,18 @@ def re (ε : Fin n → Bool) (Y : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (
 def im (ε : Fin n → Bool) (Y : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
   (1 / (2 * Complex.I)) • (Y - thetaJ ε Y)
 
-theorem inv_two_I : (1 / (2 * Complex.I) : ℂ) = -(1 / 2) * Complex.I := by
-  have := Complex.I_ne_zero
-  field_simp
-  simp
-
 theorem inG_re (Y : Matrix (Fin n) (Fin n) ℂ) : inG ε (re ε Y) := by
   rw [inG_iff, re, theta_smul, theta_add, theta_theta, add_comm]
   congr 1
   simp [Complex.conj_ofNat]
 
 theorem inG_im (Y : Matrix (Fin n) (Fin n) ℂ) : inG ε (im ε Y) := by
-  rw [inG_iff, im, theta_smul, theta_sub, theta_theta, ← neg_sub Y, smul_neg, ← neg_smul, inv_two_I]
+  rw [inG_iff, im, theta_smul, theta_sub, theta_theta, ← neg_sub Y, smul_neg, ← neg_smul, Formalism.REAL.p0auxiliary_half_I]
   congr 1
   simp [Complex.conj_ofNat]
 
 theorem re_add_im (Y : Matrix (Fin n) (Fin n) ℂ) : re ε Y + Complex.I • im ε Y = Y := by
-  rw [re, im, inv_two_I, smul_smul]
+  rw [re, im, Formalism.REAL.p0auxiliary_half_I, smul_smul]
   have : Complex.I * (-(1 / 2) * Complex.I) = 1 / 2 := by
     linear_combination (-(1 / 2) : ℂ) * Complex.I_mul_I
   rw [this]; module
@@ -113,7 +109,7 @@ theorem re_pair {A B : Matrix (Fin n) (Fin n) ℂ} (hA : inG ε A) (hB : inG ε 
 
 theorem im_pair {A B : Matrix (Fin n) (Fin n) ℂ} (hA : inG ε A) (hB : inG ε B) :
     im ε (A + Complex.I • B) = B := by
-  rw [im, theta_pair hA hB, inv_two_I]
+  rw [im, theta_pair hA hB, Formalism.REAL.p0auxiliary_half_I]
   have h : A + Complex.I • B - (A - Complex.I • B) = (2 * Complex.I) • B := by module
   have : (-(1 / 2) * Complex.I) * (2 * Complex.I) = 1 := by
     linear_combination (-1 : ℂ) * Complex.I_mul_I

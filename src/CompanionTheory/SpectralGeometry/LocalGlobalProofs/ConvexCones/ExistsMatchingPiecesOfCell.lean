@@ -297,7 +297,7 @@ theorem inRCone_pullAdd_of_isCell : ∀ (O : Type) [CommRing O] [IsDedekindDomai
     have : t j = 0 := le_antisymm (not_lt.1 fun h => hj (hmem j h)) (ht j)
     rw [this, zero_smul]
   obtain ⟨j, rfl⟩ := hmem i hi
-  exact _root_.GlobalTheory.PolFan.inRCone_of_interior_linearOn' bar φ δ (fun j => pullAdd f (u (s j))) hδ (fun j => (hu _ (hs j)).2.1) (fun j => (hu _ (hs j)).2.2) h3
+  exact inRCone_of_interior_linearOn bar φ δ (fun j => pullAdd f (u (s j))) hδ (fun j => (hu _ (hs j)).2.1) (fun j => (hu _ (hs j)).2.2) h3
     β c (fun j => t (s j)) hc hs hβc hsum j
 
 end GlobalTheory.CompanionTheory.Ar.Fan.PullbackInCellCone

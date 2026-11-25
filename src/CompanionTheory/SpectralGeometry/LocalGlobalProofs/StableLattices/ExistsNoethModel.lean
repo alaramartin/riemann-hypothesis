@@ -46,7 +46,7 @@ theorem exists_good_notMem {R S : Type} [CommRing R] [CommRing S] [IsNoetherianR
   rw [hw] at hX
   have h₀ : Out.RelAmple ((Over.pullback (spMap a)).obj B) (M.pull (pullback.fst B.hom (spMap a))) :=
     GlobalTheory.FibreAmple.relAmple_of_fieldExtension hM i (IsPullback.of_hasPullback B.hom (spMap a)) hX
-      (pull_isLB hM _) (GlobalTheory.lbIso_refl (pull_isLB hM _)) h₂
+      (pull_isLB hM _) (PolBaseChange.lbIso_refl (pull_isLB hM _)) h₂
   obtain ⟨r, hr, hr'⟩ := GlobalTheory.ProperFinite.relAmple_near_fibre B hM a
     (GlobalTheory.FibreAmple.residueField_fraction p₀) h₀
   exact ⟨r, hr', fun hp => hr (Ideal.algebraMap_residueField_eq_zero.2 hp)⟩
@@ -89,7 +89,7 @@ theorem relAmple_of_span {S S' : Type} [CommRing S] [CommRing S'] (τ : S →+* 
   have hU := (isPullback_morphismRestrict f U).flip
   have a₁ : Out.RelAmple (Over.mk (f ∣_ U)) (M.pull ((f ⁻¹ᵁ U).ι ≫ pullback.fst B.hom (spMap τ))) :=
     GlobalTheory.FibreAmple.relAmple_of_factor hM (IsPullback.of_hasPullback B.hom D.ι) (hU.paste_horiz hB) u hu
-      (pull_isLB hM _) (GlobalTheory.lbIso_refl (pull_isLB hM _)) (hT hr)
+      (pull_isLB hM _) (PolBaseChange.lbIso_refl (pull_isLB hM _)) (hT hr)
   exact GlobalTheory.FibreAmple.relAmple_of_factor (pull_isLB hM _) hU hU (𝟙 _) (Category.id_comp _) (pull_isLB hM _)
     (GlobalTheory.FibreAmple.lbIso_pull_pull hM _ _).symm a₁
 

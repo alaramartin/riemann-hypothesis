@@ -5,6 +5,7 @@ import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OneVectorCcOfSiegelWeil
 
 @[expose] public section
 
@@ -106,24 +107,13 @@ section Ring
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} (R : Type) [CommRing R] [Algebra F R]
 
-theorem trace_tmul (r : R) (e : E) :
-    Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] e) = r * algebraMap F R (Algebra.trace F E e) := by
-  haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
-  have h1 : r ⊗ₜ[F] e = r • ((1 : R) ⊗ₜ[F] e) := by simp [TensorProduct.smul_tmul']
-  have h2 : Algebra.lmul R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] e) = (Algebra.lmul F E e).baseChange R := by
-    ext z
-    simp
-  rw [h1, map_smul, smul_eq_mul, Algebra.trace_apply, Algebra.trace_apply]
-  show r * LinearMap.trace R _ (Algebra.lmul R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] e)) = _
-  rw [h2, LinearMap.trace_baseChange]
-
 theorem add_sigR_eq_trace (hcm : IsCMExt F E σ) (z : R ⊗[F] E) :
     z + sigR R σ z = (Algebra.trace R (R ⊗[F] E) z) ⊗ₜ[F] (1 : E) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul r e =>
     have h1 : sigR R σ (r ⊗ₜ[F] e) = r ⊗ₜ[F] σ e := by simp [sigR]
-    rw [h1, ← TensorProduct.tmul_add, add_sig_eq_trace hcm, trace_tmul,
+    rw [h1, ← TensorProduct.tmul_add, add_sig_eq_trace hcm, GaussMean.OneVec.trace_tmul,
       Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul, TensorProduct.smul_tmul',
       Algebra.smul_def, mul_comm]
   | add a c ha hc =>
@@ -148,7 +138,7 @@ theorem tH_hermScal (hcm : IsCMExt F E σ) (r : R) : tH R σ (hermScal R σ r) =
     rw [← map_mul]
     norm_num
   show algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] (1 : E)) = r
-  rw [trace_tmul, h1]
+  rw [GaussMean.OneVec.trace_tmul, h1]
   linear_combination r * h2
 
 theorem hermScal_tH (hcm : IsCMExt F E σ) (S : HermR R σ 1) : hermScal R σ (tH R σ S) = S := by

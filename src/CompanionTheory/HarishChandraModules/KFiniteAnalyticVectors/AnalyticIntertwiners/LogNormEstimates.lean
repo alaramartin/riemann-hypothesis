@@ -7,6 +7,9 @@ import Mathlib.Algebra.Order.Star.Real
 public import Mathlib.Analysis.InnerProductSpace.Rayleigh
 public import Mathlib.LinearAlgebra.Eigenspace.Minpoly
 import Mathlib.RingTheory.PiTensorProduct
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.FiniteDimKStableSubspaceKFiniteLie
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DerivedAdjoint
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DoublingIntegralJointHarmonicPos
 
 @[expose] public section
 
@@ -29,18 +32,11 @@ theorem Jm_eq_diagD : Jm p q = diagonal (sgD (p := p) (q := q)) := by
   unfold Jm sgD
   exact Formalism.UG.P.Jpq_eq_diagonal p q
 
-theorem Jm_mul_selfD : Jm p q * Jm p q = 1 := Formalism.UG.P.Jpq_mul_self p q
+theorem Jm_mul_selfD : Jm p q * Jm p q = 1 :=
+  by intros; apply GlobalTheory.RealPar.KStabLie.Jm_sq <;> assumption
 
-theorem Jm_hermD : (Jm p q)ᴴ = Jm p q := by
-  simp [Jm, Formalism.UG.Jpq, Matrix.fromBlocks_conjTranspose]
-
-theorem adjZ_adjZD (Z : Mat p q) : adjZ (adjZ Z) = Z := by
-  have h := Jm_mul_selfD (p := p) (q := q)
-  simp only [adjZ, conjTranspose_mul, conjTranspose_conjTranspose, Jm_hermD, ← Matrix.mul_assoc, h, Matrix.one_mul]
-  rw [Matrix.mul_assoc, h, Matrix.mul_one]
-
-theorem adjZ_addD (X Y : Mat p q) : adjZ (X + Y) = adjZ X + adjZ Y := by
-  simp [adjZ, conjTranspose_add, Matrix.mul_add, Matrix.add_mul]
+theorem Jm_hermD : (Jm p q)ᴴ = Jm p q :=
+  by intros; apply GlobalTheory.RealPar.KStabLie.Jm_ct <;> assumption
 
 theorem adjZ_smulD (c : ℂ) (X : Mat p q) : adjZ (c • X) = star c • adjZ X := by
   simp [adjZ, conjTranspose_smul]
@@ -52,27 +48,10 @@ theorem mem_upq_of_adjZD {Y : Mat p q} (h : adjZ Y = -Y) : Y ∈ upq p q := by
     simp only [adjZ, ← Matrix.mul_assoc, Jm_mul_selfD, Matrix.one_mul]
   rw [← h3, h2, neg_add_cancel]
 
-theorem adjZ_singleD (a b : Ix p q) (h : sameBlock a b) : adjZ (Eab a b) = Eab b a := by
-  ext i j
-  simp only [adjZ, Eab, Jm_eq_diagD, conjTranspose_single, star_one, mul_diagonal, diagonal_mul, single_apply]
-  split_ifs with hij
-  · obtain ⟨rfl, rfl⟩ := hij
-    rcases a with a | a <;> rcases b with b | b <;> simp_all [sgD, sameBlock]
-  · simp
-
-theorem sameBlock_symmD {a b : Ix p q} (h : sameBlock a b) : sameBlock b a := by
-  rcases a with a | a <;> rcases b with b | b <;> simp_all [sameBlock]
+theorem adjZ_singleD (a b : Ix p q) (h : sameBlock a b) : adjZ (Eab a b) = Eab b a :=
+  by intros; apply GlobalTheory.InvFormUnique.adjZ_Eab <;> assumption
 
 theorem sameBlock_reflD (a : Ix p q) : sameBlock a a := by rcases a with a | a <;> trivial
-
-theorem sameBlock_of_posCD {a b : Ix p q} (h : posC a b) : sameBlock a b := by
-  rcases a with a | a <;> rcases b with b | b <;> simp_all [posC, sameBlock]
-
-theorem isKC_EabD {a b : Ix p q} (h : sameBlock a b) : IsKC (Eab a b) := fun c d hcd => by
-  simp only [Eab, single_apply]
-  split_ifs with h1
-  · obtain ⟨rfl, rfl⟩ := h1; exact absurd h hcd
-  · rfl
 
 end Adj
 
@@ -92,11 +71,11 @@ theorem adj_ruleD {ι : M.V →ₗ[ℂ] H₁} (h : SkewD M ι) (Z : Mat p q) (v 
   have hs : ∀ X : Mat p q, adjZ (-X) = -adjZ X := fun X => by
     rw [show -X = (-1 : ℂ) • X by simp, adjZ_smulD]; simp
   have h1 : adjZ Y₁ = -Y₁ := by
-    simp only [Y₁, adjZ_smulD, sub_eq_add_neg, adjZ_addD, hs, adjZ_adjZD]
+    simp only [Y₁, adjZ_smulD, sub_eq_add_neg, GlobalTheory.RealPar.DerivedAdjoint.adjZ_add, hs, GlobalTheory.RealPar.DerivedAdjoint.adjZ_adjZ]
     rw [show star (1 / 2 : ℂ) = 1 / 2 by simp]
     rw [← smul_neg]; congr 1; abel
   have h2 : adjZ Y₂ = -Y₂ := by
-    simp only [Y₂, adjZ_smulD, adjZ_addD, adjZ_adjZD]
+    simp only [Y₂, adjZ_smulD, GlobalTheory.RealPar.DerivedAdjoint.adjZ_add, GlobalTheory.RealPar.DerivedAdjoint.adjZ_adjZ]
     rw [show star (-Complex.I / 2) = Complex.I / 2 by simp [Complex.conj_I], add_comm (adjZ Z)]
     module
   have eZ : Z = Y₁ + Complex.I • Y₂ := by
@@ -105,7 +84,7 @@ theorem adj_ruleD {ι : M.V →ₗ[ℂ] H₁} (h : SkewD M ι) (Z : Mat p q) (v 
     rw [show Z - adjZ Z + (Z + adjZ Z) = (2 : ℂ) • Z by rw [two_smul]; abel, smul_smul]; norm_num
   clear_value Y₁ Y₂
   have eA : adjZ Z = -Y₁ + Complex.I • Y₂ := by
-    rw [eZ, adjZ_addD, adjZ_smulD, h1, h2, show star Complex.I = -Complex.I from Complex.conj_I]
+    rw [eZ, GlobalTheory.RealPar.DerivedAdjoint.adjZ_add, adjZ_smulD, h1, h2, show star Complex.I = -Complex.I from Complex.conj_I]
     simp [neg_smul, smul_neg]
   rw [eA]
   conv_lhs => rw [eZ]
@@ -180,7 +159,7 @@ theorem exists_hwD (hn : Nontrivial M.V) : ∃ μ, ∃ y ∈ hwSub M.act μ, y �
   let L : Module.End ℂ M.V := ∑ a, ((cwD a : ℚ) : ℂ) • M.act (Eab a a)
   have hLW : ∀ w ∈ W, L w ∈ W := fun w hw => by
     simp only [L, LinearMap.sum_apply, LinearMap.smul_apply]
-    exact W.sum_mem fun a _ => W.smul_mem _ (hWs _ (isKC_EabD (sameBlock_reflD a)) w hw)
+    exact W.sum_mem fun a _ => W.smul_mem _ (hWs _ (GlobalTheory.TensorHW.isKC_Eab (sameBlock_reflD a)) w hw)
   have hLwt : ∀ ν, ∀ y ∈ wtSub M.act ν, L y = ((ellD ν : ℚ) : ℂ) • y := fun ν y hy => by
     rw [mem_wtSubD] at hy
     simp only [L, LinearMap.sum_apply, LinearMap.smul_apply, hy, smul_smul]
@@ -204,7 +183,7 @@ theorem exists_hwD (hn : Nontrivial M.V) : ∃ μ, ∃ y ∈ hwSub M.act μ, y �
   simp only [hwSub, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker]
   refine ⟨hy, fun a b hab => ?_⟩
   by_contra hz
-  have h1 := hmax ⟨shD ν a b, _, hWs _ (isKC_EabD (sameBlock_of_posCD hab)) y hyW, raiseD hy a b, hz, rfl⟩
+  have h1 := hmax ⟨shD ν a b, _, hWs _ (GlobalTheory.TensorHW.isKC_Eab (GlobalTheory.TensorHW.same_of_pos hab)) y hyW, raiseD hy a b, hz, rfl⟩
   rw [ellD_shD] at h1
   have := cwD_lt hab
   have h2 : ellD ν + cwD a - cwD b ≤ ellD ν := h1 (by linarith)
@@ -275,9 +254,9 @@ theorem form_propD (ι₁ : M.V →ₗ[ℂ] H₁) (ι₂ : M.V →ₗ[ℂ] H₂)
   have hFZ : ∀ Z w, F (M.act Z w) = ⟪ι₂ (M.act (adjZ Z) (v₀ : M.V)), ι₂ w⟫_ℂ -
       (lam : ℂ) * ⟪ι₁ (M.act (adjZ Z) (v₀ : M.V)), ι₁ w⟫_ℂ := fun Z w => by
     simp only [F, LinearMap.coe_mk, AddHom.coe_mk]
-    rw [adj_ruleD s₂, adj_ruleD s₁, adjZ_adjZD]
+    rw [adj_ruleD s₂, adj_ruleD s₁, GlobalTheory.RealPar.DerivedAdjoint.adjZ_adjZ]
   have hR : ∀ a b, posC a b → ∀ u, F (M.act (Eab b a) u) = 0 := fun a b hab u => by
-    rw [hFZ, adjZ_singleD b a (sameBlock_symmD (sameBlock_of_posCD hab)), hv₀hw a b hab]
+    rw [hFZ, adjZ_singleD b a (GlobalTheory.DSProj.sameBlock_symm (GlobalTheory.TensorHW.same_of_pos hab)), hv₀hw a b hab]
     simp
   have hne : ∀ ν, ν ≠ μ → ∀ w ∈ wtSub M.act ν, F w = 0 := by
     intro ν hν w hw
@@ -312,14 +291,14 @@ theorem form_propD (ι₁ : M.V →ₗ[ℂ] H₁) (ι₂ : M.V →ₗ[ℂ] H₂)
       simp only [hwSub, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker]
       refine ⟨hywt, fun a b hab => ?_⟩
       set z := M.act (Eab a b) (w - l)
-      have hzW : z ∈ W := hWs _ (isKC_EabD (sameBlock_of_posCD hab)) _ hyW
+      have hzW : z ∈ W := hWs _ (GlobalTheory.TensorHW.isKC_Eab (GlobalTheory.TensorHW.same_of_pos hab)) _ hyW
       have hbz : M.act (Eab b a) z ∈ Lw := by
-        refine Submodule.mem_inf.2 ⟨Submodule.mem_inf.2 ⟨hWs _ (isKC_EabD (sameBlock_symmD (sameBlock_of_posCD hab))) _ hzW, ?_⟩,
+        refine Submodule.mem_inf.2 ⟨Submodule.mem_inf.2 ⟨hWs _ (GlobalTheory.TensorHW.isKC_Eab (GlobalTheory.DSProj.sameBlock_symm (GlobalTheory.TensorHW.same_of_pos hab))) _ hzW, ?_⟩,
           Submodule.subset_span ⟨a, b, hab, z, hzW, rfl⟩⟩
         have := raiseD (raiseD hywt a b) b a
         rwa [shD_shD] at this
       have h0 : ⟪ι₁ z, ι₁ z⟫_ℂ = 0 := by
-        rw [adj_ruleD s₁, adjZ_singleD a b (sameBlock_of_posCD hab)]
+        rw [adj_ruleD s₁, adjZ_singleD a b (GlobalTheory.TensorHW.same_of_pos hab)]
         exact hperp _ hbz
       exact h₁ ((inner_self_eq_zero.1 h0).trans (map_zero ι₁).symm)
     have hFl : F l = 0 := by

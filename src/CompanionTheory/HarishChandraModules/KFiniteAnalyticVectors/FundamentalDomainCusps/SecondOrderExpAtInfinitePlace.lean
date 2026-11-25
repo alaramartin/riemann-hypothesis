@@ -5,6 +5,10 @@ public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.Fundam
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.KoszulLowersPower
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.RingTheory.PiTensorProduct
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.LogBallEstimates
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.LogNormEstimates
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviMaxCompactClosedSubgroups
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SmallFundamentalSetRealUnipotent
 
 @[expose] public section
 
@@ -26,33 +30,19 @@ theorem Jm_det (ε : Fin n → Bool) : IsUnit (Formalism.REAL.Jm ε).det := by
   intro a _
   by_cases h : ε a <;> simp [h]
 
-theorem uMat_mul' (g h : Formalism.REAL.UJ ε) : uMat (g * h) = uMat g * uMat h := rfl
-
-theorem uMat_inv_mulC (g : Formalism.REAL.UJ ε) : uMat g⁻¹ * uMat g = 1 := by
-  rw [← uMat_mul', inv_mul_cancel]; rfl
-
-theorem uMat_mul_invC (g : Formalism.REAL.UJ ε) : uMat g * uMat g⁻¹ = 1 := by
-  rw [← uMat_mul', mul_inv_cancel]; rfl
-
-theorem hf_uMatC (g : Formalism.REAL.UJ ε) (a z : Fin n → ℂ) :
-    hf (Formalism.REAL.Jm ε) (uMat g *ᵥ a) (uMat g *ᵥ z) = hf (Formalism.REAL.Jm ε) a z := by
-  have h : (uMat g)ᴴ * Formalism.REAL.Jm ε * uMat g = Formalism.REAL.Jm ε := g.2
-  unfold hf
-  rw [star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, h]
-
 theorem conj_xw (g : Formalism.REAL.UJ ε) (w b : Fin n → ℂ) :
     uMat g⁻¹ * xw (Formalism.REAL.Jm ε) w b * uMat g = xw (Formalism.REAL.Jm ε) (uMat g⁻¹ *ᵥ w) (uMat g⁻¹ *ᵥ b) := by
   have key : ∀ a z, hf (Formalism.REAL.Jm ε) (uMat g⁻¹ *ᵥ a) z = hf (Formalism.REAL.Jm ε) a (uMat g *ᵥ z) := fun a z => by
-    rw [← hf_uMatC g, mulVec_mulVec, uMat_mul_invC, one_mulVec]
-  refine mat_extC fun z => ?_
+    rw [← hf_unitary g, mulVec_mulVec, GlobalTheory.FlagLeviGroup.uMat_mul_inv, one_mulVec]
+  refine GlobalTheory.NilLie.ext_mulVec fun z => ?_
   rw [← mulVec_mulVec, ← mulVec_mulVec, xw_mulVec, xw_mulVec, key, key, mulVec_sub, mulVec_smul, mulVec_smul]
 
 theorem second_order_exp_conj (g : Formalism.REAL.UJ ε) (X : Matrix (Fin n) (Fin n) ℂ) :
     uMat g⁻¹ * ex2 X * uMat g = ex2 (uMat g⁻¹ * X * uMat g) := by
   have : uMat g⁻¹ * X * uMat g * (uMat g⁻¹ * X * uMat g) = uMat g⁻¹ * (X * X) * uMat g := by
     calc _ = uMat g⁻¹ * X * (uMat g * uMat g⁻¹) * X * uMat g := by simp only [Matrix.mul_assoc]
-      _ = _ := by rw [uMat_mul_invC, Matrix.mul_one, Matrix.mul_assoc (uMat g⁻¹) X X]
-  simp only [ex2, this, mul_add, add_mul, Matrix.mul_one, uMat_inv_mulC, mul_smul_comm, smul_mul_assoc]
+      _ = _ := by rw [GlobalTheory.FlagLeviGroup.uMat_mul_inv, Matrix.mul_one, Matrix.mul_assoc (uMat g⁻¹) X X]
+  simp only [ex2, this, mul_add, add_mul, Matrix.mul_one, GlobalTheory.FlagLeviGroup.uMat_inv_mul, mul_smul_comm, smul_mul_assoc]
 
 theorem norm_xw_le (w b : Fin n → ℂ) (i j : Fin n) : ‖xw (Formalism.REAL.Jm ε) w b i j‖ ≤ 2 * (‖w‖ * ‖b‖) := by
   have h1 : ‖(if ε j then 1 else -1 : ℂ)‖ = 1 := by split_ifs <;> simp
@@ -86,11 +76,11 @@ section XW
 variable {K : Type} [Field K] [StarRing K] {n : ℕ} (J : Matrix (Fin n) (Fin n) K)
 
 theorem xw_add (w b b' : Fin n → K) : xw J w (b + b') = xw J w b + xw J w b' :=
-  mat_extC fun z => by
+  GlobalTheory.NilLie.ext_mulVec fun z => by
     rw [add_mulVec, xw_mulVec, xw_mulVec, xw_mulVec, hf_add_leftC, add_smul, smul_add]; abel
 
 theorem xw_nat (w b : Fin n → K) (k : ℕ) : xw J w ((k : K) • b) = (k : K) • xw J w b :=
-  mat_extC fun z => by
+  GlobalTheory.NilLie.ext_mulVec fun z => by
     rw [smul_mulVec, xw_mulVec, xw_mulVec, hf_smul_leftC, star_natCast, smul_sub, smul_smul, smul_smul, smul_smul,
       mul_comm (hf J w z)]
 
@@ -128,14 +118,8 @@ theorem second_order_exp_at_infinite_place (v : InfinitePlace I.F) (X : Matrix (
     simp only [atM, this, mul_smul_comm, smul_mul_assoc]
   rw [ex2, atM_add, atM_add, h1, h3, h2, ex2]
 
-theorem atV_addC (v : InfinitePlace I.F) (a b : Fin I.n → I.E) : atV I v (a + b) = atV I v a + atV I v b := by
-  simp only [atV, ← mulVec_add]; congr 1; funext i; simp
-
-theorem atV_smulC (v : InfinitePlace I.F) (c : I.E) (a : Fin I.n → I.E) : atV I v (c • a) = I.φ v c • atV I v a := by
-  simp only [atV, ← mulVec_smul]; congr 1; funext i; simp
-
 theorem atV_zero (v : InfinitePlace I.F) : atV I v 0 = 0 := by
-  simpa using atV_smulC I v 0 0
+  simpa using PE.atV_smul I v 0 0
 
 theorem Wv_span (v : InfinitePlace I.F) {ι : Type} (w : ι → Fin I.n → I.E) :
     Submodule.span ℂ (Set.range fun i => atV I v (w i)) = Wv I (Submodule.span I.E (Set.range w)) v := by
@@ -146,8 +130,8 @@ theorem Wv_span (v : InfinitePlace I.F) {ι : Type} (w : ι → Fin I.n → I.E)
     induction hu using Submodule.span_induction with
     | mem x hx => obtain ⟨i, rfl⟩ := hx; exact Submodule.subset_span ⟨i, rfl⟩
     | zero => rw [atV_zero]; exact Submodule.zero_mem _
-    | add a b _ _ ha hb => rw [atV_addC]; exact Submodule.add_mem _ ha hb
-    | smul c a _ ha => rw [atV_smulC]; exact Submodule.smul_mem _ _ ha
+    | add a b _ _ ha hb => rw [PE.atV_add]; exact Submodule.add_mem _ ha hb
+    | smul c a _ ha => rw [PE.atV_smul]; exact Submodule.smul_mem _ _ ha
 
 theorem exists_denC : ∃ c : ℕ, 1 ≤ c ∧ ∀ i j, IsIntegral ℤ (((c : I.E) • I.J) i j) := by
   classical
@@ -212,7 +196,7 @@ theorem exists_gam (hT : Transp) (M c : ℕ) (hc : ∀ i j, IsIntegral ℤ (((c 
     exact second_order_exp_congruence I M hY
   · rw [hg]
     show atM I v (ex2 (-X)) = _
-    simp only [second_order_exp_at_infinite_place, atM_neg, X, atM_sum, hxw, atV_smulC, map_natCast]
+    simp only [second_order_exp_at_infinite_place, atM_neg, X, atM_sum, hxw, PE.atV_smul, map_natCast]
 
 theorem split_cov {y : I.Ginf} {S : Submodule I.E (Fin I.n → I.E)} {ρ : ℝ} (h : Covers I y S ρ) {k : ℕ} (hk : k ≠ 0)
     {d : ℕ} (b : InfinitePlace I.F → Fin d → Fin I.n → ℂ) (hb : ∀ v i, b v i ∈ Wv I S v) :

@@ -2,6 +2,9 @@ module
 
 public import CompanionTheory.AutomorphicTheory.BesselOrbitBounds.BesselMapUniqueness.BesselMapUniqGap
 import Mathlib.Tactic.TypeStar
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.HeisenbergLeviConjugationMeasure
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.HermitianLeviVectorBaseOrthogonal
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.SettingConstruction
 
 @[expose] public section
 
@@ -15,15 +18,6 @@ section general
 
 variable {ι : Type*} [Fintype ι]
 
-theorem herm_add_left (H : Matrix ι ι ℂ) (x y w : ι → ℂ) : herm H (x + y) w = herm H x w + herm H y w := by
-  simp [herm, mulVec_add, dotProduct_add]
-
-theorem herm_sub_left (H : Matrix ι ι ℂ) (x y w : ι → ℂ) : herm H (x - y) w = herm H x w - herm H y w := by
-  simp [herm, mulVec_sub, dotProduct_sub]
-
-theorem herm_smul_left (H : Matrix ι ι ℂ) (a : ℂ) (x w : ι → ℂ) : herm H (a • x) w = a * herm H x w := by
-  simp [herm, mulVec_smul, dotProduct_smul]
-
 theorem herm_add_right (H : Matrix ι ι ℂ) (x y w : ι → ℂ) : herm H w (x + y) = herm H w x + herm H w y := by
   simp [herm, add_dotProduct]
 
@@ -34,20 +28,11 @@ theorem herm_smul_right (H : Matrix ι ι ℂ) (a : ℂ) (x w : ι → ℂ) :
     herm H w (a • x) = star a * herm H w x := by
   simp [herm, smul_dotProduct]
 
-theorem herm_neg_left (H : Matrix ι ι ℂ) (x w : ι → ℂ) : herm H (-x) w = - herm H x w := by
-  simp [herm, mulVec_neg]
-
 theorem herm_neg_right (H : Matrix ι ι ℂ) (x w : ι → ℂ) : herm H w (-x) = - herm H w x := by
   simp [herm]
 
-theorem star_herm {H : Matrix ι ι ℂ} (hH : Hᴴ = H) (x y : ι → ℂ) : star (herm H x y) = herm H y x := by
-  unfold herm
-  rw [← star_dotProduct_star, star_star, star_mulVec, hH, ← dotProduct_mulVec]
-
-theorem herm_mulVec (H g : Matrix ι ι ℂ) (x y : ι → ℂ) :
-    herm H (g *ᵥ x) (g *ᵥ y) = herm (gᴴ * H * g) x y := by
-  unfold herm
-  rw [star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec]
+theorem star_herm {H : Matrix ι ι ℂ} (hH : Hᴴ = H) (x y : ι → ℂ) : star (herm H x y) = herm H y x :=
+  Formalism.FourierDecayAlt.P.SettingConstruction.herm_symm H hH x y
 
 variable [DecidableEq ι]
 
@@ -57,13 +42,13 @@ theorem herm_single (H : Matrix ι ι ℂ) (i j : ι) : herm H (Pi.single j 1) (
 theorem mem_UH_of_herm {H g : Matrix ι ι ℂ} (h : ∀ x y, herm H (g *ᵥ x) (g *ᵥ y) = herm H x y) :
     gᴴ * H * g = H := by
   ext i j
-  rw [← herm_single (gᴴ * H * g), ← herm_mulVec, h, herm_single]
+  rw [← herm_single (gᴴ * H * g), ← Formalism.FourierDecayAlt.P.SettingConstruction.herm_mulVec, h, herm_single]
 
 theorem refl_iso {H : Matrix ι ι ℂ} (hH : Hᴴ = H) (v : ι → ℂ) (c : ℂ) (hc : c ≠ 0)
     (hvv : herm H v v = c + star c) (x y : ι → ℂ) :
     herm H (x - (c⁻¹ * herm H x v) • v) (y - (c⁻¹ * herm H y v) • v) = herm H x y := by
   have hd : star c ≠ 0 := by simpa using hc
-  simp only [herm_sub_left, herm_sub_right, herm_smul_left, herm_smul_right]
+  simp only [Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, herm_sub_right, Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, herm_smul_right]
   rw [hvv, star_mul', star_herm hH, star_inv₀]
   generalize herm H x v = t
   generalize herm H v y = w
@@ -82,7 +67,7 @@ theorem exists_refl {H : Matrix ι ι ℂ} (hH : Hᴴ = H) (u z : ι → ℂ) (h
   have hsc0 : star c ≠ 0 := by simpa using hc0
   have hvv : herm H v v = c + star c := by
     rw [hcdef, star_herm hH, hv]
-    simp only [herm_sub_left, herm_sub_right]
+    simp only [Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, herm_sub_right]
     rw [huz]; ring
   have act : ∀ x, (1 - c⁻¹ • vecMulVec v (star v ᵥ* H)) *ᵥ x = x - (c⁻¹ * herm H x v) • v := by
     intro x
@@ -105,11 +90,11 @@ theorem exists_move {H : Matrix ι ι ℂ} (hH : Hᴴ = H) (u z : ι → ℂ) (h
     ∃ γ : Matrix ι ι ℂ, γᴴ * H * γ = H ∧ γ *ᵥ u = z ∧
       ∀ x, herm H x u = 0 → herm H x z = 0 → γ *ᵥ x = x := by
   by_cases hc : herm H u u - herm H u z = 0
-  · obtain ⟨γ₁, a1, b1, c1⟩ := exists_refl hH u (-u) (by rw [herm_neg_left, herm_neg_right, neg_neg])
+  · obtain ⟨γ₁, a1, b1, c1⟩ := exists_refl hH u (-u) (by rw [Formalism.FourierDecayAlt.P.B2x5.herm_neg_left, herm_neg_right, neg_neg])
       (by rw [herm_neg_right]; intro h; apply h0; linear_combination h / 2)
-    obtain ⟨γ₂, a2, b2, c2⟩ := exists_refl hH (-u) z (by rw [herm_neg_left, herm_neg_right, neg_neg, huz])
+    obtain ⟨γ₂, a2, b2, c2⟩ := exists_refl hH (-u) z (by rw [Formalism.FourierDecayAlt.P.B2x5.herm_neg_left, herm_neg_right, neg_neg, huz])
       (by
-        rw [herm_neg_left, herm_neg_left, herm_neg_right]; intro h; apply h0
+        rw [Formalism.FourierDecayAlt.P.B2x5.herm_neg_left, Formalism.FourierDecayAlt.P.B2x5.herm_neg_left, herm_neg_right]; intro h; apply h0
         linear_combination h / 2 + hc / 2)
     refine ⟨γ₂ * γ₁, ?_, ?_, ?_⟩
     · rw [conjTranspose_mul]
@@ -143,12 +128,9 @@ theorem unitary_adapted_basis_apply_basis (k r : ℕ) (j : Fin (2 * r + k + 1)) 
   ext i
   simp [G0, bvec]
 
-theorem herm_bvec {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (i j : Fin m) : herm H (bvec j) (bvec i) = H i j :=
-  herm_single H i j
-
 theorem unitary_adapted_basis_entry (k r : ℕ) (H : Mat (2 * r + k + 1)) (i j : Fin (2 * r + k + 1)) :
     ((G0 k r)ᴴ * H * G0 k r) i j = herm H (col k r j) (col k r i) := by
-  rw [← herm_bvec ((G0 k r)ᴴ * H * G0 k r), ← herm_mulVec, unitary_adapted_basis_apply_basis, unitary_adapted_basis_apply_basis]
+  rw [← Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec ((G0 k r)ᴴ * H * G0 k r), ← Formalism.FourierDecayAlt.P.SettingConstruction.herm_mulVec, unitary_adapted_basis_apply_basis, unitary_adapted_basis_apply_basis]
 
 theorem unitary_adapted_basis_is_unitary (k r : ℕ) (hk : 1 ≤ k) : (G0 k r)ᴴ * G0 k r = 1 := by
   have : (G0 k r)ᴴ * G0 k r = (G0 k r)ᴴ * 1 * G0 k r := by rw [Matrix.mul_one]
@@ -158,8 +140,8 @@ theorem unitary_adapted_basis_is_unitary (k r : ℕ) (hk : 1 ≤ k) : (G0 k r)�
   have hs := inv_sqrt_two_mul_self_bis
   unfold col
   split_ifs <;>
-    simp only [herm_smul_left, herm_smul_right, herm_add_left, herm_add_right, herm_sub_left, herm_sub_right,
-      herm_bvec, star_inv_sqrt_two_bis, Matrix.one_apply, Fin.ext_iff, wI, Fin.val_zero, Fin.val_last] <;>
+    simp only [Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, herm_smul_right, Formalism.FourierDecayAlt.P.B2x5.herm_add_left, herm_add_right, Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, herm_sub_right,
+      Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, star_inv_sqrt_two_bis, Matrix.one_apply, Fin.ext_iff, wI, Fin.val_zero, Fin.val_last] <;>
     split_ifs <;>
     first
       | (exfalso; omega)
@@ -254,45 +236,45 @@ theorem unitary_adapted_basis_transforms_form (k r : ℕ) (hk : 1 ≤ k) : (G0 k
     by_cases hip : i.val = r
     · rw [col_p hip]
       have q : Hq k r i j = 0 := Q_pz hip (by omega)
-      simp only [herm_smul_left, herm_smul_right, herm_add_left, herm_add_right, herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
+      simp only [Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, herm_smul_right, Formalism.FourierDecayAlt.P.B2x5.herm_add_left, herm_add_right, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
       ring
     · by_cases hiq : i.val = r + k
       · rw [col_q hk hiq]
         have q : Hq k r i j = 1 := Q_qp hiq hjp
-        simp only [herm_smul_left, herm_smul_right, herm_add_left, herm_sub_right, herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
+        simp only [Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, herm_smul_right, Formalism.FourierDecayAlt.P.B2x5.herm_add_left, herm_sub_right, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
         linear_combination 2 * hs
       · rw [col_o hip hiq]
         have q : Hq k r i j = 0 := Q_zp hiq hip hjp
-        simp only [herm_smul_left, herm_add_left, herm_bvec, A_zp hk hip hP, A_zq hk hiq hQ, q]
+        simp only [Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, Formalism.FourierDecayAlt.P.B2x5.herm_add_left, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, A_zp hk hip hP, A_zq hk hiq hQ, q]
         ring
   · by_cases hjq : j.val = r + k
     · rw [col_q hk hjq]
       by_cases hip : i.val = r
       · rw [col_p hip]
         have q : Hq k r i j = 1 := Q_pq hip hjq
-        simp only [herm_smul_left, herm_smul_right, herm_sub_left, herm_add_right, herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
+        simp only [Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, herm_smul_right, Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, herm_add_right, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
         linear_combination 2 * hs
       · by_cases hiq : i.val = r + k
         · rw [col_q hk hiq]
           have q : Hq k r i j = 0 := Q_qz hiq hjp
-          simp only [herm_smul_left, herm_smul_right, herm_sub_left, herm_sub_right, herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
+          simp only [Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, herm_smul_right, Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, herm_sub_right, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, star_inv_sqrt_two_bis, e1, e2, e3, e4, q]
           ring
         · rw [col_o hip hiq]
           have q : Hq k r i j = 0 := Q_zq hip hiq hjq
-          simp only [herm_smul_left, herm_sub_left, herm_bvec, A_zp hk hip hP, A_zq hk hiq hQ, q]
+          simp only [Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, A_zp hk hip hP, A_zq hk hiq hQ, q]
           ring
     · rw [col_o hjp hjq]
       by_cases hip : i.val = r
       · rw [col_p hip]
         have q : Hq k r i j = 0 := Q_pz hip hjq
-        simp only [herm_smul_right, herm_add_right, herm_bvec, star_inv_sqrt_two_bis, A_pz hk hP hjp, A_qz hk hQ hjq, q]
+        simp only [herm_smul_right, herm_add_right, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, star_inv_sqrt_two_bis, A_pz hk hP hjp, A_qz hk hQ hjq, q]
         ring
       · by_cases hiq : i.val = r + k
         · rw [col_q hk hiq]
           have q : Hq k r i j = 0 := Q_qz hiq hjp
-          simp only [herm_smul_right, herm_sub_right, herm_bvec, star_inv_sqrt_two_bis, A_pz hk hP hjp, A_qz hk hQ hjq, q]
+          simp only [herm_smul_right, herm_sub_right, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, star_inv_sqrt_two_bis, A_pz hk hP hjp, A_qz hk hQ hjq, q]
           ring
-        · rw [col_o hip hiq, herm_bvec, Q_eq_A hip hiq hjp hjq]
+        · rw [col_o hip hiq, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, Q_eq_A hip hiq hjp hjq]
 
 theorem Hpk_herm (k r : ℕ) : (Hpk k r)ᴴ = Hpk k r := by
   ext i j
@@ -331,7 +313,7 @@ theorem adaptExists : AdaptExists := by
   have huu : herm (Hpk k r) u u = -(Tz k r z : ℂ) := by
     have h2 : star (2 : ℂ) = 2 := by simp
     have h3 : star (ρ : ℂ) = ρ := by simp
-    rw [hu, herm_smul_left, herm_smul_right, herm_bvec, hww, star_mul', star_mul', star_inv_sqrt_two_bis, h2, h3]
+    rw [hu, Formalism.FourierDecayAlt.P.B2x5.herm_smul_left, herm_smul_right, Formalism.FourierDecayAlt.P.B2x9.S1.herm_bvec, hww, star_mul', star_mul', star_inv_sqrt_two_bis, h2, h3]
     linear_combination (-4 * (ρ : ℂ) * ρ) * inv_sqrt_two_mul_self_bis - 2 * hρ2
   have huW : inWb k r u := by
     intro i hi

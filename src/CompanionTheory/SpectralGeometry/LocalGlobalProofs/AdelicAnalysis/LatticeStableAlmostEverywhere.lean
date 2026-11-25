@@ -1,6 +1,7 @@
 module
 
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramRightMulActionLaws
 
 @[expose] public section
 
@@ -67,16 +68,12 @@ theorem eventually_good_matrix {d m : ℕ} (b : Module.Basis (Fin d) F E) (g : M
 
 omit [NumberField F] in
 theorem rmul_rmul (R : Type) [CommRing R] [Algebra F R] {M n : ℕ} (X : Fin n → Fin M → R ⊗[F] E)
-    (A B : Matrix (Fin n) (Fin n) (R ⊗[F] E)) : rmul R (rmul R X A) B = rmul R X (A * B) := by
-  funext a i
-  simp only [rmul, Matrix.mul_apply, Finset.sum_mul, Finset.mul_sum, mul_assoc]
-  exact Finset.sum_comm
+    (A B : Matrix (Fin n) (Fin n) (R ⊗[F] E)) : rmul R (rmul R X A) B = rmul R X (A * B) :=
+  RMulGram.rmul_rmul R X A B
 
 omit [NumberField F] in
 theorem rmul_one (R : Type) [CommRing R] [Algebra F R] {M n : ℕ} (X : Fin n → Fin M → R ⊗[F] E) :
-    rmul R X 1 = X := by
-  funext a i
-  simp [rmul, Matrix.one_apply]
+    rmul R X 1 = X := RMulGram.rmul_one R X
 
 theorem rmul_mem {d M n : ℕ} {b : Module.Basis (Fin d) F E} {v : HeightOneSpectrum (𝓞 F)}
     {g : Matrix (Fin n) (Fin n) E} (hg : ∀ i j, Good b v (g i j))
@@ -139,7 +136,7 @@ theorem latV_rational : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
       rw [← Matrix.map_mul, Matrix.mul_nonsing_inv g (isUnit_iff_ne_zero.2 hg),
         Matrix.map_one _ (map_zero _) (map_one _)]
     have := rmul_mem h2 hX
-    rwa [rmul_rmul, hmul, rmul_one] at this
+    rwa [RMulGram.rmul_rmul, hmul, RMulGram.rmul_one] at this
   · filter_upwards [eventually_good_matrix b (g : Matrix (Fin M) (Fin M) E),
       eventually_good_matrix b ((g⁻¹ : GL (Fin M) E) : Matrix (Fin M) (Fin M) E)] with v h1 h2 X
     refine ⟨fun hX => ?_, actTup_mem h1⟩

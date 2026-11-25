@@ -25,6 +25,8 @@ public import Mathlib.LinearAlgebra.Dimension.Constructions
 public import Mathlib.LinearAlgebra.Dimension.Finite
 public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.LogNormEstimates
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SmallFundamentalSetRealUnipotent
 
 @[expose] public section
 
@@ -36,13 +38,9 @@ namespace CompanionTheory.D.gk.RF
 
 variable {K : Type} [Field K] [StarRing K] {n : ℕ} {J : Matrix (Fin n) (Fin n) K} {W : Submodule K (Fin n → K)}
 
-omit [StarRing K] in
-theorem mat_extC {A B : Matrix (Fin n) (Fin n) K} (h : ∀ z, A *ᵥ z = B *ᵥ z) : A = B :=
-  Matrix.ext fun i j => by simpa using congrFun (h (Pi.single j 1)) i
-
 theorem Lowers.triple {A B C : Matrix (Fin n) (Fin n) K} (hA : Lowers J W A) (hB : Lowers J W B)
     (hC : Lowers J W C) : A * (B * C) = 0 :=
-  mat_extC fun z => by rw [← mulVec_mulVec, ← mulVec_mulVec, hA.1 _ (hB.2.1 _ (hC.2.2 z)), zero_mulVec]
+  GlobalTheory.NilLie.ext_mulVec fun z => by rw [← mulVec_mulVec, ← mulVec_mulVec, hA.1 _ (hB.2.1 _ (hC.2.2 z)), zero_mulVec]
 
 theorem Lowers.add {A B : Matrix (Fin n) (Fin n) K} (hA : Lowers J W A) (hB : Lowers J W B) : Lowers J W (A + B) :=
   ⟨fun w hw => by rw [add_mulVec, hA.1 w hw, hB.1 w hw, add_zero],
@@ -158,8 +156,8 @@ theorem nilpotent_lie_algebra : NilpAlg := by
   · rw [conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg, ← neg_add, hZ.1, neg_zero]
   · rw [neg_mulVec, hZ.2.1 z hz, neg_zero]
   · rw [neg_mulVec]; exact W.neg_mem (hZ.2.2 z)
-  · exact mat_extC fun z => by rw [← mulVec_mulVec, hZ.2.1 _ (hX.2.2.2 z), zero_mulVec]
-  · exact mat_extC fun z => by rw [← mulVec_mulVec, hX.2.1 _ (hZ.2.2 z), zero_mulVec]
+  · exact GlobalTheory.NilLie.ext_mulVec fun z => by rw [← mulVec_mulVec, hZ.2.1 _ (hX.2.2.2 z), zero_mulVec]
+  · exact GlobalTheory.NilLie.ext_mulVec fun z => by rw [← mulVec_mulVec, hX.2.1 _ (hZ.2.2 z), zero_mulVec]
 
 end CompanionTheory.D.gk.RF
 
@@ -184,14 +182,14 @@ theorem hf_sum_right {ι : Type} (s : Finset ι) (x : Fin n → K) (y : ι → F
     hf J x (∑ i ∈ s, y i) = ∑ i ∈ s, hf J x (y i) := by
   simp only [hf, mulVec_sum, dotProduct_sum]
 
-theorem hf_add_leftC (x y z : Fin n → K) : hf J (x + y) z = hf J x z + hf J y z := by
-  simp only [hf, star_add, add_dotProduct]
+theorem hf_add_leftC (x y z : Fin n → K) : hf J (x + y) z = hf J x z + hf J y z :=
+  by intros; apply hf_add_leftD <;> assumption
 
 theorem hf_neg_left (x z : Fin n → K) : hf J (-x) z = -hf J x z := by
   simp only [hf, star_neg, neg_dotProduct]
 
-theorem hf_smul_leftC (c : K) (x y : Fin n → K) : hf J (c • x) y = star c * hf J x y := by
-  simp only [hf, star_smul, smul_dotProduct, smul_eq_mul]
+theorem hf_smul_leftC (c : K) (x y : Fin n → K) : hf J (c • x) y = star c * hf J x y :=
+  by intros; apply hf_smul_leftD <;> assumption
 
 theorem hf_sum_left {ι : Type} (s : Finset ι) (x : ι → Fin n → K) (y : Fin n → K) :
     hf J (∑ i ∈ s, x i) y = ∑ i ∈ s, hf J (x i) y := by
@@ -293,7 +291,7 @@ theorem rep_basis [CharZero K] (hJ : Jᴴ = J) (hd : IsUnit J.det) (hW : Isot J 
       Finset.mem_univ, if_true]
     simp only [b]
     abel
-  refine mat_extC fun z => ?_
+  refine GlobalTheory.NilLie.ext_mulVec fun z => ?_
   have hz : z - ∑ j, hf J (v j) z • u j ∈ perp J W := by
     rw [← hs]
     refine mem_perp_spanC fun i => ?_

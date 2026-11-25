@@ -13,6 +13,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LeviIrre
 import Development.AutomorphicSpectrum.Proofs.GlobalProofs.BernsteinZelevinskyFiniteness
 import GroundTheory.LocalFields.PadicLogSeries
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsIrreducibleIffOfLinearEquiv
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SplitPlaceLocalComponentExistsUniqueClass
+import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.ComplementarySeries.SegmentJacquetSubquotients.SrMult
 
 @[expose] public section
 
@@ -118,8 +120,8 @@ theorem base (hc : Continuous ψ) (h1 : ψ ≠ 1) (Y : Representation ℂ (GL (F
   classical
   let τ : IrrRep (Levi k fun a : Fin 2 => Fin (![n, t] a)) :=
     ⟨V, Y.comp (phi n t), isSmooth_comp hYs _ (phi_continuous n t),
-      GlobalTheory.FinGL.Transport.isIrreducible_comp Y _ (phi_surjective n t) hYi⟩
-  obtain ⟨σ, ⟨E⟩⟩ := GlobalTheory.CompanionTheory.LeviTensor.nonempty_equiv_piTensor GlobalTheory.CompanionTheory.BZCuspPair.irrAdm ![n, t] τ
+      GlobalTheory.LocCompSplit.isIrreducible_comp_of_surjective Y _ (phi_surjective n t) hYi⟩
+  obtain ⟨σ, ⟨E⟩⟩ := GlobalTheory.CompanionTheory.LeviTensor.nonempty_equiv_piTensor PositivityTheory.RgGu.SRC.SrMult.irrAdm ![n, t] τ
   let A := (σ 0).rep.V
   let B := (σ 1).rep.V
   let α : Representation ℂ (GL (Fin n) k) A := (σ 0).rep.ρ

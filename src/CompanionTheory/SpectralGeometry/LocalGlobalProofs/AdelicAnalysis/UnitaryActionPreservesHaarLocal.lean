@@ -180,9 +180,6 @@ theorem map_toMatrix_mulVec (K : Type) [CommRing K] [TopologicalSpace K] [IsTopo
 
 end GlobalTheory.CompanionTheory.SW.Transv
 
-theorem GlobalTheory.CompanionTheory.SW.transvection_map_addHaar : ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K] [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K] (ι : Type) [Fintype ι] [DecidableEq ι] (μ : Measure (ι → K)) [μ.IsAddHaarMeasure] (t : Matrix.TransvectionStruct ι K), μ.map (fun x => t.toMatrix *ᵥ x) = μ := by
-  intro K _ _ _ _ _ _ _ _ ι _ _ μ _ t
-  exact GlobalTheory.CompanionTheory.SW.Transv.map_toMatrix_mulVec K ι μ t
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HaarInvariantUnderTransvection =====
@@ -252,7 +249,7 @@ theorem map_transvections {ι : Type} [Fintype ι] [DecidableEq ι] (μ : Measur
       funext x
       simp [Matrix.mulVec_mulVec]
     rw [e, ← Measure.map_map (hm _) (hm _), ih]
-    exact _root_.GlobalTheory.CompanionTheory.SW.transvection_map_addHaar K ι μ t
+    exact Transv.map_toMatrix_mulVec K ι μ t
 
 theorem det_transvections {ι : Type} [Fintype ι] [DecidableEq ι]
     (L : List (Matrix.TransvectionStruct ι K)) :

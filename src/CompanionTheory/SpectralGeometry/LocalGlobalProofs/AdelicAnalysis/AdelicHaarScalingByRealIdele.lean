@@ -6,6 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 import Mathlib.Algebra.Order.Archimedean.Real.Hom
 import Mathlib.RingTheory.TotallySplit
 import Mathlib.Tactic.TypeStar
+import Development.WeilBound.ThetaLifts.Reductions.SiegelAbs
 
 @[expose] public section
 
@@ -102,9 +103,7 @@ theorem coord_theta [IsTotallyReal F] (θ : ℝ →+* InfiniteAdeleRing F) (t : 
   exact DFunLike.congr_fun h t
 
 theorem card_places [IsTotallyReal F] :
-    Fintype.card (InfinitePlace F) = Module.finrank ℚ F := by
-  rw [InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
-    IsTotallyReal.nrComplexPlaces_eq_zero, add_zero, IsTotallyReal.finrank]
+    Fintype.card (InfinitePlace F) = Module.finrank ℚ F := PositivityTheory.ThKR.card_infinitePlace
 
 end Adelic
 

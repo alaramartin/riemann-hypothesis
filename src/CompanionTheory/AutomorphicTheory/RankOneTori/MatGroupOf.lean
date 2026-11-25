@@ -36,6 +36,9 @@ import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedPairingV
 import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.QuotMeasExists
 import Formalism.SharpRestriction.CuspSpanNormBounds.SpanMemOfImage
 import Mathlib.Topology.Separation.CompletelyRegular
+import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.HeightRpowNegDistortionContraction
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.MultiplicityOne.JDiagExists
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.MultiplicityOne.SigIntIntegrable
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.RankOneTori.RpowNegLe, CompanionTheory.AutomorphicTheory.RankOneTori.MatGroupOf
@@ -54,14 +57,6 @@ namespace Formalism.MainStatements.RankOne
 
 variable {k r : ℕ}
 
-theorem rpow_neg_le {x y C b : ℝ} (hx : 0 < x) (hy : 0 < y) (hC : 0 < C) (hb : 0 ≤ b) (h : y ≤ C * x) :
-    x ^ (-b) ≤ C ^ b * y ^ (-b) := by
-  rw [Real.rpow_neg hx.le, Real.rpow_neg hy.le, ← Real.inv_rpow hx.le, ← Real.inv_rpow hy.le,
-    ← Real.mul_rpow hC.le (inv_nonneg.mpr hy.le)]
-  apply Real.rpow_le_rpow (inv_nonneg.mpr hx.le) _ hb
-  rw [← div_eq_mul_inv, inv_eq_one_div, div_le_div_iff₀ hx hy]
-  linarith
-
 theorem exists_pos (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (hc : ∀ a, c a ≠ 0) :
     ∃ μ₁ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ, μ₁ᴴ * Hb k * μ₁ = Hb k ∧
       C2.PosPt k r L.z L.z' (bigCell k r c μ₁) ∧ C2.IsMonomial (Formalism.QuantumDeterminants.Zhat k r L.z L.z' (bigCell k r c μ₁)) := by
@@ -78,7 +73,7 @@ theorem exists_pos (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (hc : 
   have e1 : (fun i => d i.castSucc) = c := by funext i; simp [hd]
   have e2 : d (Fin.last r) = ζ := by simp [hd]
   rw [e1, e2, hz, hz'] at hZ
-  refine ⟨D.μsec ζ, hsec.1, ⟨bigCellMem k r c _ hc hsec.1, ?_⟩, 1, d, fun a => ?_, ?_⟩
+  refine ⟨D.μsec ζ, hsec.1, ⟨big_cell_mem_holds k r c _ hc hsec.1, ?_⟩, 1, d, fun a => ?_, ?_⟩
   · have := hdom.2.2
     rw [hz, hz'] at this
     exact this
@@ -103,7 +98,7 @@ theorem big_bound (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (μ : M
   have hNI := P.norm_inverse_bound k r
   set γ₁ := bigCell k r c μ₁ with hγ₁
   set γ := bigCell k r c μ with hγ
-  have hγU : γ ∈ UH (Hpk k r) := bigCellMem k r c μ hc hμ
+  have hγU : γ ∈ UH (Hpk k r) := big_cell_mem_holds k r c μ hc hμ
   set T : ℝ := B.gN (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) with hT
   have hT1 : 1 ≤ T := (hNI.2 1 WeylGroupFacts.uh_one).2
   obtain ⟨ρh, hρh⟩ := et_equiv L hstd hpos hmono T
@@ -130,15 +125,15 @@ theorem big_bound (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (μ : M
   have m1 := P.TwoByOneBlock.emb_mem_UWb (r := r) hμ₁
   have w0 : B2.embWb k r μ ∈ UWset k r 0 := ⟨m0.1, m0.2, by simp⟩
   have w1 : B2.embWb k r μ₁ ∈ UWset k r 0 := ⟨m1.1, m1.2, by simp⟩
-  have hW := P.weyl_subgroup_closed k r 0
+  have hW := P.B2x3.closedW k r 0
   set ρ := (B2.embWb k r μ₁)⁻¹ * B2.embWb k r μ with hρ
   have hρW : ρ ∈ UWset k r 0 := hW.mul_mem _ (hW.inv_mem _ w1) _ w0
   have hρU : ρ ∈ UH (Hpk k r) := hρW.1
-  have hρu := uh_isUnit hρU
+  have hρu := WeylGroupFacts.isUnit_of_uh hρU
   have hfac : γ = γ₁ * ρ := by
-    rw [hγ, hγ₁, (P.bruhat_big_cell_factorization k r c μ).1, (P.bruhat_big_cell_factorization k r c μ₁).1, hρ, Matrix.mul_assoc,
-      ← Matrix.mul_assoc (B2.embWb k r μ₁), Matrix.mul_nonsing_inv _ (uh_isUnit w1.1), Matrix.one_mul]
-  obtain ⟨cW, hcW1, hcW⟩ := P.WeakDominationMajorants.Asm.uw_bound L.z' L.hz'.1 L.hz'.2
+    rw [hγ, hγ₁, (P.TwoByOneBlock.bigCellFactor k r c μ).1, (P.TwoByOneBlock.bigCellFactor k r c μ₁).1, hρ, Matrix.mul_assoc,
+      ← Matrix.mul_assoc (B2.embWb k r μ₁), Matrix.mul_nonsing_inv _ (WeylGroupFacts.isUnit_of_uh w1.1), Matrix.one_mul]
+  obtain ⟨cW, hcW1, hcW⟩ := P.Dx3.UW_bound L.z' L.hz'.1 L.hz'.2
   set Γ := B.gN ρ with hΓ
   have hΓ1 : 1 ≤ Γ := (hNI.2 ρ hρU).2
   have hΓ0 : 0 < Γ := lt_of_lt_of_le one_pos hΓ1
@@ -156,7 +151,7 @@ theorem big_bound (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (μ : M
   set h' := Matrix.of x.2.1
   set m := ρ * n' * ρ⁻¹ with hm
   have hmN : m ∈ Nset k r := PI.QuotSetU.UnitaryGroupMassFormula.SW.uw_conj_N hρW hn'
-  have h1W : (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) ∈ UWset k r L.z' := (P.weyl_subgroup_closed k r L.z').one_mem
+  have h1W : (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) ∈ UWset k r L.z' := (P.B2x3.closedW k r L.z').one_mem
   have hb1 := hbd (x.1, ((1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ), m)) ⟨hn, hmN, hh, h1W⟩ (hET _ hn)
   have hb2 : B.gN (h⁻¹ * n⁻¹ * γ₁ * m * 1) ^ (-b) ≤ K * (B.gN (n * h) ^ (-β) * B.gN (m * 1) ^ (-β)) := hb1
   rw [Matrix.mul_one, Matrix.mul_one] at hb2
@@ -167,13 +162,13 @@ theorem big_bound (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (μ : M
   have e1 : h⁻¹ * n⁻¹ * γ₁ * m = h⁻¹ * n⁻¹ * γ * n' * h' * (h'⁻¹ * ρ⁻¹) := by
     rw [hfac, hm]
     simp only [Matrix.mul_assoc]
-    rw [← Matrix.mul_assoc h' h'⁻¹, Matrix.mul_nonsing_inv _ (uh_isUnit hh'.1), Matrix.one_mul]
+    rw [← Matrix.mul_assoc h' h'⁻¹, Matrix.mul_nonsing_inv _ (WeylGroupFacts.isUnit_of_uh hh'.1), Matrix.one_mul]
   have e2 : n' * h' = ρ⁻¹ * m * ρ * h' := by
     rw [hm]
     simp only [Matrix.mul_assoc]
     rw [← Matrix.mul_assoc ρ⁻¹ ρ h', Matrix.nonsing_inv_mul _ hρu, Matrix.one_mul, ← Matrix.mul_assoc ρ⁻¹ ρ,
       Matrix.nonsing_inv_mul _ hρu, Matrix.one_mul]
-  have g0 : ∀ y : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ, 0 ≤ B.gN y := fun y => P.gN_nonneg_bessel_integrability y
+  have g0 : ∀ y : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ, 0 ≤ B.gN y := fun y => P.B6.gN_nonneg y
   have hh'c : B.gN h' ≤ cW := hcW h' hh'
   have i1 : B.gN (h⁻¹ * n⁻¹ * γ₁ * m) ≤ (cW * Γ) * B.gN (h⁻¹ * n⁻¹ * γ * n' * h') := by
     rw [e1]
@@ -191,9 +186,9 @@ theorem big_bound (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (μ : M
     calc _ ≤ B.gN (ρ⁻¹ * m * ρ) * B.gN h' := hNI.1 _ _
       _ ≤ Γ * B.gN m * Γ * cW := mul_le_mul j2 hh'c (g0 _) (mul_nonneg (mul_nonneg hΓ0.le (g0 m)) hΓ0.le)
       _ = _ := by ring
-  have p1 := rpow_neg_le (lt_of_lt_of_le one_pos (hNI.2 _ hMU).2) (lt_of_lt_of_le one_pos (hNI.2 _ hM1U).2)
+  have p1 := GlobalTheory.rpow_neg_le_of_le_mul (lt_of_lt_of_le one_pos (hNI.2 _ hMU).2) (lt_of_lt_of_le one_pos (hNI.2 _ hM1U).2)
     hA0 hb i1
-  have p2 := rpow_neg_le (lt_of_lt_of_le one_pos (hNI.2 _ hmN.1).2)
+  have p2 := GlobalTheory.rpow_neg_le_of_le_mul (lt_of_lt_of_le one_pos (hNI.2 _ hmN.1).2)
     (lt_of_lt_of_le one_pos (hNI.2 _ (WeylGroupFacts.uh_mul hn'.1 hh'.1)).2) hB0 hβ0 i2
   show B.gN (h⁻¹ * n⁻¹ * γ * n' * h') ^ (-b) ≤ _
   have q0 : 0 ≤ B.gN (n * h) ^ (-β) := Real.rpow_nonneg (g0 _) _
@@ -222,7 +217,7 @@ theorem big_int (hk : 1 ≤ k) (L : LocBessel k r) (h0 : L.κN ≠ 0) (h1 : L.κ
   rw [hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall (pairMaj_nonneg _ b))]
   have hm1 : Measurable (fun p : Mt k r × Mt k r =>
       ENNReal.ofReal (B.gN (Matrix.of p.2 * Matrix.of p.1) ^ (-β))) :=
-    ((P.s3dx1S_gNc.comp (PI.WUN.continuous_of.comp continuous_snd |>.matrix_mul
+    ((ReciprocityTheory.ChartRestriction.DS.Mult1.TopH.gN_cont.comp (PI.WUN.continuous_of.comp continuous_snd |>.matrix_mul
       (PI.WUN.continuous_of.comp continuous_fst))).measurable.pow_const _).ennreal_ofReal
   have hfm : Measurable (fun x : PairSp k r =>
       ENNReal.ofReal (B.gN (Matrix.of x.1.2 * Matrix.of x.1.1) ^ (-β)) *
@@ -232,11 +227,11 @@ theorem big_int (hk : 1 ≤ k) (L : LocBessel k r) (h0 : L.κN ≠ 0) (h1 : L.κ
       ENNReal.ofReal K * (ENNReal.ofReal (B.gN (Matrix.of x.1.2 * Matrix.of x.1.1) ^ (-β)) *
         ENNReal.ofReal (B.gN (Matrix.of x.2.2 * Matrix.of x.2.1) ^ (-β))) := by
     refine hPgood.mono fun x hx => ?_
-    rw [← ENNReal.ofReal_mul (Real.rpow_nonneg (P.gN_nonneg_bessel_integrability _) _), ← ENNReal.ofReal_mul hK.le]
+    rw [← ENNReal.ofReal_mul (Real.rpow_nonneg (P.B6.gN_nonneg _) _), ← ENNReal.ofReal_mul hK.le]
     exact ENNReal.ofReal_le_ofReal (hbound x hx)
   refine (lintegral_mono_ae hpt).trans_lt ?_
   rw [lintegral_const_mul _ hfm]
-  have : SFinite L.μN := sfin_muN L
+  have : SFinite L.μN := PI.WBL.Cv.sfinite_muN L
   have : SigmaFinite L.μW := L.hμW.1.1
   have : SigmaFinite L.μW' := L.hμW'.1.1
   have hprod : ∫⁻ x, ENNReal.ofReal (B.gN (Matrix.of x.1.2 * Matrix.of x.1.1) ^ (-β)) *
@@ -298,7 +293,7 @@ theorem lr_lr' {γ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (h�
 theorem quot_exists {γ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hγ : γ ∈ UH (Hpk k r)) {μG μR : Measure (Mt k r)} (hG : IsHaarOn (UH (Hpk k r)) μG)
     (hR : IsHaarOn (RStab k r γ) μR) :
     ∃ νR, PI.BesselPeriodGGP.IsQuotMeas μG (μR.map (fun x => fun i j => (γ⁻¹ * Matrix.of x * γ) i j)) νR := by
-  have hu := uh_isUnit hγ
+  have hu := WeylGroupFacts.isUnit_of_uh hγ
   have hRg : B2.IsClosedSubgroup (RStab k r γ) := P.Dx2.OrbJ.closedR (k := k) (r := r) hu
   let e : Mt k r ≃ᵐ Mt k r :=
     { toFun := lr γ⁻¹ γ, invFun := lr γ γ⁻¹, left_inv := lr_lr hu, right_inv := lr_lr' hu
@@ -322,7 +317,7 @@ theorem quot_exists {γ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ
     · show γ * a⁻¹ * γ⁻¹ ∈ RStab k r γ
       have := hRg.inv_mem _ ha
       rwa [Matrix.mul_inv_rev, Matrix.mul_inv_rev, Matrix.nonsing_inv_nonsing_inv _ hu, ← Matrix.mul_assoc] at this
-    · exact Matrix.mul_nonsing_inv a (uh_isUnit (hSG ha))
+    · exact Matrix.mul_nonsing_inv a (WeylGroupFacts.isUnit_of_uh (hSG ha))
   have : SigmaFinite μR := hR.1
   have hH : PI.IsHaarOnM S (μR.map e) := by
     refine ⟨e.sigmaFinite_map, fun h0 => hR.2.1 (e.measurableEmbedding.map_injective (by simpa using h0)), ?_,
@@ -339,7 +334,7 @@ theorem quot_exists {γ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ
         rw [← Matrix.mul_assoc γ⁻¹ γ, Matrix.nonsing_inv_mul _ hu, Matrix.one_mul]
       show (μR.map e).map (lmulM s) = μR.map e
       rw [Measure.map_map (hm s) e.measurable, e1, ← Measure.map_map e.measurable (hm _), hR.2.2.2 _ hs]
-  exact Formalism.L2.SG.Pf.QuotMeasExists.quotM_exists (matGroup_of (P.unitary_group_closed k r)) hSm hSG hG hH
+  exact Formalism.L2.SG.Pf.QuotMeasExists.quotM_exists (matGroup_of (P.B2x2.closedG k r)) hSm hSG hG hH
 
 def oneM (k r : ℕ) : Mt k r := fun i j => (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) i j
 
@@ -347,8 +342,8 @@ theorem cell_big (hk : 1 ≤ k) (L : LocBessel k r) (h0 : L.κN ≠ 0) (h1 : L.�
     (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (hc : ∀ a, c a ≠ 0) (hμ : μᴴ * Hb k * μ = Hb k) :
     Cell L (ThreeDimData.aOf r h - 1) (bigCell k r c μ) (Measure.dirac (oneM k r)) (pairMeas L) := by
   have hR : RStab k r (bigCell k r c μ) = {1} := Lem.orbRStabBig k r c μ hc hμ
-  have hγ := bigCellMem k r c μ hc hμ
-  have hu := uh_isUnit hγ
+  have hγ := big_cell_mem_holds k r c μ hc hμ
+  have hu := WeylGroupFacts.isUnit_of_uh hγ
   have hAS : 0 ≤ ThreeDimData.AS k r := by
     have hd : 0 ≤ ThreeDimData.dN k r := by
       unfold ThreeDimData.dN
@@ -362,8 +357,8 @@ theorem cell_big (hk : 1 ≤ k) (L : LocBessel k r) (h0 : L.κN ≠ 0) (h1 : L.�
     big_int hk L h0 h1 c μ hc hμ ?_⟩
   · rw [hR] at ha
     obtain rfl : a = 1 := ha
-    rw [Matrix.mul_one, Matrix.nonsing_inv_mul _ hu, Formalism.MainNotions.BigCellDensity.psi_one _ _ L.hz.1,
-      Formalism.MainNotions.BigCellDensity.psi_one _ _ L.hz'.1]
+    rw [Matrix.mul_one, Matrix.nonsing_inv_mul _ hu, BesselUnipotentEquiv.psi_one _ _ L.hz.1,
+      BesselUnipotentEquiv.psi_one _ _ L.hz'.1]
   · exact NeZero.ne _
   · rw [Measure.dirac_apply, Set.indicator_of_notMem]
     rw [hR]
@@ -404,9 +399,9 @@ theorem root_haar (hk : 1 ≤ k) (L : LocBessel k r) (hc : L.c ≠ 0) {γ : Poin
     congr 3
     field_simp
   have h1 := (Formalism.MainNotions.BigCellDensity.rootHaar_gen { L with c := cStd } γ g (t • μR) rfl hrep hroot').1
-  have h2 := _root_.Formalism.MainNotions.BridgeLemma₃.hu_smul h1 (ENNReal.inv_ne_zero.2 ht1) (ENNReal.inv_ne_top.2 ht0)
+  have h2 := ReciprocityTheory.ChartRestriction.DS.Mult1.isHaarOn_smul_of h1 (ENNReal.inv_ne_zero.2 ht1) (ENNReal.inv_ne_top.2 ht0)
   rw [smul_smul, ENNReal.inv_mul_cancel ht0 ht1, one_smul] at h2
-  exact ⟨P.B5.haar_sigmaFinite h2, h2.ne_zero, h2.conc, h2.left⟩
+  exact ⟨P.B2x9.sigmaFinite_of_haar h2, h2.ne_zero, h2.conc, h2.left⟩
 
 theorem cell_small (L : LocBessel k r) (hc : L.c ≠ 0) (h1 : L.κN ≠ ⊤) {h : ℝ} (hO : ThreeDimData.GapOK k r h)
     (hC : Pv.AmpDD.GapCell k r h) {γ : Point ℂ (r + 1)} {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} {μR : Measure (Mt k r)} {ν : Measure (PairSp k r)}
@@ -419,8 +414,8 @@ theorem cell_small (L : LocBessel k r) (hc : L.c ≠ 0) (h1 : L.κN ≠ ⊤) {h 
   have hpos : 0 < Gf k r L.z L.z' g := by
     refine lt_of_le_of_ne (gNonneg k r L.z L.z' L.hz.1 L.hz'.1 L.hz.2 L.hz'.2 g hrep.1) fun h0 => hG ?_
     rw [← Formalism.MainNotions.BigCellDensity.gTie k r L.z L.z' γ g hrep.1 hrep.2, ← h0]
-  obtain ⟨μG, hμG⟩ := P.unitary_group_haar_exists k r
-  have hGsk : IsHaarOn (UH (Hpk k r)) μG := ⟨P.B5.haar_sigmaFinite hμG, hμG.ne_zero, hμG.conc, hμG.left⟩
+  obtain ⟨μG, hμG⟩ := P.B2x3.haarG k r
+  have hGsk : IsHaarOn (UH (Hpk k r)) μG := ⟨P.B2x9.sigmaFinite_of_haar hμG, hμG.ne_zero, hμG.conc, hμG.left⟩
   obtain ⟨νR, hν⟩ := quot_exists hrep.1 hGsk hR
   exact ⟨hrep.1, hrel, hR, hq, ⟨P.B7.measurable_invM, rStabInv_of_k k r hO.1 L g μR hrep.1 hmono hR⟩,
     Pv.AmpDDPf.cell_convergence k r L h μG g μR νR ν h1 hO hC ⟨hrep.1, hpos, hmono, hrel, hR, hq, hν⟩ hmono⟩

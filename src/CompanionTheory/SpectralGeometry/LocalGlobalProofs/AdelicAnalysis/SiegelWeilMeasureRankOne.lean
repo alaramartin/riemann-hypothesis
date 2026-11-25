@@ -120,12 +120,9 @@ theorem continuous_size (b : Module.Basis (Fin d) F E) :
   simp only [← Module.Basis.coord_apply]
   exact continuous_norm.comp ((continuous_apply v).comp hk)
 
-theorem size_nonneg (b : Module.Basis (Fin d) F E) (y : Ainf F ⊗[F] E) : 0 ≤ sizeInf b y :=
-  Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _
-
 theorem tup_nonneg {M n : ℕ} (b : Module.Basis (Fin d) F E) (X : Fin n → Fin M → Ainf F ⊗[F] E) :
     0 ≤ sizeTup b X :=
-  Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => size_nonneg b _
+  Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => LatCount.sizeInf_nonneg b _
 
 theorem size_add_le (b : Module.Basis (Fin d) F E) (x y : Ainf F ⊗[F] E) :
     sizeInf b (x + y) ≤ sizeInf b x + sizeInf b y := by
@@ -207,7 +204,7 @@ theorem exists_size_mul_le (b : Module.Basis (Fin d) F E) :
           refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => ?_)
           rw [norm_mul, norm_mul]
           exact mul_le_mul (mul_le_mul_of_nonneg_left (coord_le_size b y j v) (norm_nonneg _))
-            (hs i j k v) (norm_nonneg _) (mul_nonneg (norm_nonneg _) (size_nonneg b y))
+            (hs i j k v) (norm_nonneg _) (mul_nonneg (norm_nonneg _) (LatCount.sizeInf_nonneg b y))
       _ = (d : ℝ) * S * sizeInf b y * ∑ i, ‖B.repr x i v‖ := by
           simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
             Finset.mul_sum]
@@ -235,7 +232,7 @@ theorem size_rmul_le : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   refine ⟨K * |D| + 1, by positivity, fun g hg X => ?_⟩
   have hg' : ∀ c, ∑ a, sizeInf b (g c a) ≤ |D| := fun c =>
     (Finset.single_le_sum (f := fun c => ∑ a, sizeInf b (g c a))
-      (fun _ _ => Finset.sum_nonneg fun _ _ => size_nonneg b _) (Finset.mem_univ c)).trans
+      (fun _ _ => Finset.sum_nonneg fun _ _ => LatCount.sizeInf_nonneg b _) (Finset.mem_univ c)).trans
       ((hD ⟨g, hg, rfl⟩).trans (le_abs_self _))
   calc sizeTup b (rmul (Ainf F) X g)
       = ∑ a, ∑ i, sizeInf b (∑ c, X c i * g c a) := rfl
@@ -249,7 +246,7 @@ theorem size_rmul_le : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
         exact Finset.sum_congr rfl fun c _ => (Finset.mul_sum _ _ _).symm
     _ ≤ ∑ i, ∑ c, K * sizeInf b (X c i) * |D| :=
         Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun c _ =>
-          mul_le_mul_of_nonneg_left (hg' c) (mul_nonneg hK0 (size_nonneg b _))
+          mul_le_mul_of_nonneg_left (hg' c) (mul_nonneg hK0 (LatCount.sizeInf_nonneg b _))
     _ = K * |D| * sizeTup b X := by
         unfold sizeTup
         rw [Finset.sum_comm, Finset.mul_sum]
@@ -746,9 +743,6 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW.Core
 
-theorem core_estimate : ∀ (F : Type) [Field F] [NumberField F], IsTotallyReal F → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (M : ℕ), Fintype.card ι = 2 * M → 3 ≤ M → ∀ (B : Matrix ι ι F), B.IsSymm → B.det ≠ 0 → ∀ (ρ : InfinitePlace F → (F →+* ℝ)), (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) → ∀ (Pm : InfinitePlace F → Matrix ι ι ℝ), (∀ w, (Pm w).PosDef) → (∀ w, Pm w * (B.map (ρ w))⁻¹ * Pm w = B.map (ρ w)) → ∀ [MeasurableSpace (FiniteAdeleRing (𝓞 F) F)] [BorelSpace (FiniteAdeleRing (𝓞 F) F)] (lf : Measure (FiniteAdeleRing (𝓞 F) F)), lf.IsAddHaarMeasure → lf {x | ∀ v, x v ∈ v.adicCompletionIntegers F} = 1 → ∀ (Ω : Type) [MeasurableSpace Ω] (Pr : Measure Ω) [IsProbabilityMeasure Pr] (ginf : Ω → InfinitePlace F → Matrix ι ι ℝ) (gf : Ω → Matrix ι ι (FiniteAdeleRing (𝓞 F) F)), (∀ w i j, Measurable fun ω => ginf ω w i j) → (∀ i j, Measurable fun ω => gf ω i j) → (∀ ω w, (ginf ω w)ᵀ * B.map (ρ w) * ginf ω w = B.map (ρ w)) → (∀ ω, (gf ω)ᵀ * B.map (algebraMap F (FiniteAdeleRing (𝓞 F) F)) * gf ω = B.map (algebraMap F (FiniteAdeleRing (𝓞 F) F))) → (∀ N : ℕ, 0 < N → ∃ C : ℝ, ∀ R : ℝ, 0 < R → ∫⁻ ω, ∑' x : {x : ι → F // x ≠ 0}, Set.indicator {x : ι → F | (∀ i v, ((N : FiniteAdeleRing (𝓞 F) F) * (gf ω *ᵥ fun j => algebraMap F (FiniteAdeleRing (𝓞 F) F) (x j)) i) v ∈ v.adicCompletionIntegers F) ∧ ∀ w, ‖ginf ω w *ᵥ fun j => ρ w (x j)‖ ≤ R} (fun _ => (1 : ℝ≥0∞)) x.1 ∂Pr ≤ ENNReal.ofReal (C * (R ^ (Module.finrank ℚ F * M) + R ^ (2 * Module.finrank ℚ F * M)))) → ∃ (C : ℝ) (Df : ℕ → FiniteAdeleRing (𝓞 F) F → ℝ) (Dinf : (InfinitePlace F → ℝ) → ℝ), (∀ a : ℕ, 0 < a → Continuous (Df a) ∧ (∀ y, 0 ≤ Df a y) ∧ ∀ U : Set (FiniteAdeleRing (𝓞 F) F), MeasurableSet U → (Measure.pi fun _ : ι => lf) {x | (∀ i v, ((a : FiniteAdeleRing (𝓞 F) F) * x i) v ∈ v.adicCompletionIntegers F) ∧ algebraMap F (FiniteAdeleRing (𝓞 F) F) (1 / 2) * (x ⬝ᵥ (B.map (algebraMap F (FiniteAdeleRing (𝓞 F) F)) *ᵥ x)) ∈ U} = ∫⁻ y in U, ENNReal.ofReal (Df a y) ∂lf) ∧ (Continuous Dinf ∧ (∀ y, 0 ≤ Dinf y) ∧ ∀ U : Set (InfinitePlace F → ℝ), MeasurableSet U → ∫⁻ x in {x : InfinitePlace F → ι → ℝ | (fun w => (1 / 2 : ℝ) * (x w ⬝ᵥ (B.map (ρ w) *ᵥ x w))) ∈ U}, ENNReal.ofReal (Real.exp (-Real.pi * ∑ w, x w ⬝ᵥ (Pm w *ᵥ x w))) = ∫⁻ y in U, ENNReal.ofReal (Dinf y)) ∧ ∀ a : ℕ, 0 < a → ∀ β : F, β ≠ 0 → ∃ I : ℝ≥0, ∫⁻ ω, ∑' x : {x : ι → F // (1 / 2 : F) * (x ⬝ᵥ (B *ᵥ x)) = β}, Set.indicator {x : ι → F | ∀ i v, ((a : FiniteAdeleRing (𝓞 F) F) * (gf ω *ᵥ fun j => algebraMap F (FiniteAdeleRing (𝓞 F) F) (x j)) i) v ∈ v.adicCompletionIntegers F} (fun x => ENNReal.ofReal (Real.exp (-Real.pi * ∑ w, (ginf ω w *ᵥ fun j => ρ w (x j)) ⬝ᵥ (Pm w *ᵥ (ginf ω w *ᵥ fun j => ρ w (x j)))))) x.1 ∂Pr = (I : ℝ≥0∞) ∧ |(I : ℝ) - (Real.sqrt |(discr F : ℝ)|)⁻¹ ^ (2 * M - 1) * Df a (algebraMap F (FiniteAdeleRing (𝓞 F) F) β) * Dinf (fun w => ρ w β)| ≤ C * (a : ℝ) ^ (Module.finrank ℚ F * M) :=
-  CompanionTheory.PlacePermOperatorBicommutantSpan.core
-
 end GlobalTheory.CompanionTheory.SW.Core
 end -- clump:auto
 end -- clump:auto
@@ -835,7 +829,7 @@ theorem bound_hermitian : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [
     (fun h => ((hBR (AF F)).2 h _ (fun p q => rfl)).1)
   have hcard : Fintype.card (Fin M × Fin d) = 2 * M := by simp [hd, mul_comm]
   obtain ⟨C, Df, Dinf, hDf, ⟨hDc, hD0, hDd⟩, hmain⟩ :=
-    _root_.GlobalTheory.CompanionTheory.SW.Core.core_estimate F hF (Fin M × Fin d) M hcard hM B hBs hBd ρ hρ Pm hPd hPm lf hlf hlf1
+    CompanionTheory.PlacePermOperatorBicommutantSpan.core F hF (Fin M × Fin d) M hcard hM B hBs hBd ρ hρ Pm hPd hPm lf hlf hlf1
       (HA (AF F) σ J) (prH μ 𝓕) (ginf e σ J b) (gfin σ J b) hgi hgf hii hif
       (fun N hN => _root_.GlobalTheory.CompanionTheory.SW.BB.CountHyp.main_bound F E σ hCM M J hJ hM d b ρ e he heρ hen μ 𝓕 hμ h𝓕 N hN)
   obtain ⟨hgc, hgr⟩ := _root_.GlobalTheory.CompanionTheory.SW.BB.gaussQ_continuous_rapidDecay F E σ hCM M d b e he hen Pm

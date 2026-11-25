@@ -13,6 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.DecayThreshol
 import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DiscreteSeriesUnitarySmoothBasic
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.NormDiagonalEntryDilationGeneratorLeOne
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.UnipotentCoordinatesMeasurePreserving
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.OrbSplitPt
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.BesselFormalDegreePairing, CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.BesselSettingUniformConstant
@@ -56,34 +57,13 @@ theorem besPhInt_rank {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace 
     inner_smul_right, inner_smul_left, inner_conj_symm]
   ring
 
-theorem besPhInt_xi {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] (D : B.RealPlaceData k r Wp Wq) (p : B.SS k r) :
-    B.xiTau D (1, 1) p = Formalism.QuantumDeterminants.psi k r D.z Formalism.QuantumDeterminants.cStd (Matrix.of p.1.2) *
-      star (Formalism.QuantumDeterminants.psi k r D.z' Formalism.QuantumDeterminants.cStd (Matrix.of p.2.2)) := by
-  unfold Formalism.FourierDecayAlt.B.xiTau Formalism.FourierDecayAlt.B.lam Formalism.QuantumDeterminants.psi
-  rw [Complex.star_def, ← Complex.exp_conj, ← Complex.exp_add]
-  congr 1
-  simp only [map_mul, Complex.conj_I, Complex.conj_ofReal]
-  push_cast
-  ring
-
-private theorem continuous_ell_matrix_of {k r : ℕ} (z : Fin (2 * r + k + 1) → ℂ) :
-    Continuous (fun q : Formalism.QuantumDeterminants.Mt k r => Formalism.QuantumDeterminants.ell k r z (Matrix.of q)) := by
-  unfold Formalism.QuantumDeterminants.ell
-  refine continuous_finsetSum _ (fun a _ => ?_)
-  by_cases h : (a : ℕ) + 1 < r
-  · simp only [dif_pos h, Matrix.of_apply]
-    fun_prop
-  · simp only [dif_neg h, Matrix.mulVec, dotProduct, Matrix.of_apply]
-    exact continuous_finsetSum _ (fun j _ => by fun_prop)
-
 theorem besPhInt_xi_cont {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
     [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] (D : B.RealPlaceData k r Wp Wq) :
     Continuous (B.xiTau D (1, 1)) := by
   have h1 : Continuous (fun p : B.SS k r => Formalism.QuantumDeterminants.ell k r D.z (Matrix.of p.1.2)) :=
-    (continuous_ell_matrix_of D.z).comp (continuous_snd.comp continuous_fst)
+    (P.B7.continuous_ell D.z).comp (continuous_snd.comp continuous_fst)
   have h2 : Continuous (fun p : B.SS k r => Formalism.QuantumDeterminants.ell k r D.z' (Matrix.of p.2.2)) :=
-    (continuous_ell_matrix_of D.z').comp (continuous_snd.comp continuous_snd)
+    (P.B7.continuous_ell D.z').comp (continuous_snd.comp continuous_snd)
   unfold Formalism.FourierDecayAlt.B.xiTau Formalism.FourierDecayAlt.B.lam
   exact Complex.continuous_exp.comp (continuous_const.mul (Complex.continuous_ofReal.comp
     ((continuous_const.mul (Complex.continuous_re.comp (continuous_const.mul h1))).sub
@@ -227,7 +207,7 @@ theorem integral_xi_mul_Ph : HypsG → ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1)
       B.xiTau D (1, 1) p * B.Ph D (fun g => ⟪x, R.σ g y⟫_ℂ • X) (fun g => ⟪x', R.σ g y'⟫_ℂ • X') p =
         (1 / (dd : ℂ)) * T (U p.1) (V p.2) := by
     intro p hp
-    rw [(_root_.Gp91.GlobalTheory.BesselPhi.Ph_coeff hH k r ε mu R Wp Wq D dd hDG hdd x y x' y' X X' p hp).2, besPhInt_xi,
+    rw [(_root_.Gp91.GlobalTheory.BesselPhi.Ph_coeff hH k r ε mu R Wp Wq D dd hDG hdd x y x' y' X X' p hp).2, P.VandermondePolynomialIntegral.xi11,
       hUd, hVd, map_smul, map_smul, _root_.smul_apply, hT, smul_eq_mul, smul_eq_mul]
     simp only [Formalism.FourierDecayAlt.JF.sL, Formalism.FourierDecayAlt.JF.sR]
     ring

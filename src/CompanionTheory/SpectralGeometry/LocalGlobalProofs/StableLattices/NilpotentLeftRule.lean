@@ -7,6 +7,7 @@ import Mathlib.RingTheory.PiTensorProduct
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.AnalyticVectors.ConjTransposeEqOfInG
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.SmoothA
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.LaplaceOperators.LaplaceFoundations.InvMulSelfOfMemIndefiniteUnitary
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.CasChainB
 
 @[expose] public section
 
@@ -207,7 +208,7 @@ theorem unit_rule (hσ : IsURepOn (UJset ε) σ) (hK : CompanionTheory.D.LK.IsKM
         ((if ε p = ε q then 1 else -1) * ⟪((E q p ξ : D) : H), σ g u⟫_ℂ) := by
   obtain ⟨X₁, X₂, h₁, h₂, hdec⟩ : ∃ X₁ X₂ : Matrix (Fin n) (Fin n) ℂ, inG ε X₁ ∧ inG ε X₂ ∧
       Matrix.single a b (1 : ℂ) = X₁ + Complex.I • X₂ :=
-    ⟨_, _, SmDerA.inG_cpart1 ε _, SmDerA.inG_cpart2 ε _, SmDerA.cpart_decomp ε _⟩
+    ⟨_, _, S7.ccb_inG_cpart1 ε _, S7.ccb_inG_cpart2 ε _, SmDerA.cpart_decomp ε _⟩
   have hz : ∀ c d, X₁ c d + Complex.I * X₂ c d = Matrix.single a b (1 : ℂ) c d := by
     intro c d
     rw [hdec]

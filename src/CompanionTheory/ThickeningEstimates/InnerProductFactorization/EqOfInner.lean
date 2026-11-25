@@ -5,6 +5,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IteratedLineDerivMemWeylAlg
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.MetaplecticRepresentation
 public import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSymplecticGroupMatrixOfPreservesPhaseSpace
 
 @[expose] public section
 
@@ -53,8 +54,5 @@ theorem exists_ne_zero (x : EuclideanSpace ℝ l) : ∃ φ : Sch l, φ x ≠ 0 :
 
 theorem Impl.scalar {S : Sch l →ₗ[ℂ] Sch l} (h : Impl id S) (hs : Function.Surjective S) : ∃ c : ℂ, ∀ f, S f = c • f :=
   PositivityTheory.ThKF.E.Impl.scalar (Impl.toPositivity h) hs
-
-theorem sympl_eq (w u : l ⊕ l → ℝ) : sympl w u = -(w ⬝ᵥ Matrix.J l ℝ *ᵥ u) :=
-  PositivityTheory.ThKF.E.sympl_eq w u
 
 end CompanionTheory.ThKF.E

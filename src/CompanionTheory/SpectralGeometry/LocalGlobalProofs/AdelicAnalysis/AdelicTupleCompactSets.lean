@@ -6,6 +6,7 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsCompactAdeleRingModNumberField
 import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicTupleProjections
 
 @[expose] public section
 
@@ -71,8 +72,8 @@ theorem latN_mono {N N' : ℕ} (h : N ∣ N') : latN F N ⊆ latN F N' := by
   ring
 
 theorem exists_nat_mul_mem (v : HeightOneSpectrum (𝓞 F)) (x : v.adicCompletion F) :
-    ∃ N : ℕ, 0 < N ∧ (N : v.adicCompletion F) * x ∈ v.adicCompletionIntegers F := by
-  apply PI.AdCpctDenWork.exists_nat_local
+    ∃ N : ℕ, 0 < N ∧ (N : v.adicCompletion F) * x ∈ v.adicCompletionIntegers F :=
+  PI.AdCpctDenWork.exists_nat_local v x
 
 theorem exists_mem_latN (y : Af F) : ∃ N : ℕ, 0 < N ∧ y ∈ latN F N := by
   classical
@@ -163,10 +164,6 @@ theorem size_eq {d n M : ℕ} (b : Module.Basis (Fin d) F E) (X : Fin n → Fin 
     sizeTup b (projInf X) = sizeA (coordA b X) := by
   simp only [sizeTup, sizeInf, sizeA, projInf, coordA, repr_map]
 
-theorem continuous_fstA : Continuous (fstA F) := continuous_fst
-
-theorem continuous_sndA : Continuous (sndA F) := continuous_snd
-
 theorem continuous_coord {d n M : ℕ} (a : Fin n) (i : Fin M) (k : Fin d) :
     Continuous fun Z : Fin n → Fin M → Fin d → AF F => Z a i k :=
   (continuous_apply k).comp ((continuous_apply i).comp (continuous_apply a))
@@ -176,7 +173,7 @@ theorem continuous_sizeA {d n M : ℕ} :
   unfold sizeA
   refine continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun i _ =>
     continuous_finsetSum _ fun k _ => continuous_finsetSum _ fun v _ => ?_
-  exact (((continuous_apply v).comp (continuous_fstA.comp
+  exact (((continuous_apply v).comp (MeasProj.continuous_fstA.comp
     (continuous_coord a i k)))).norm
 
 theorem norm_le_sizeA {d n M : ℕ} (Z : Fin n → Fin M → Fin d → AF F) (a i k)
@@ -220,7 +217,7 @@ theorem isCompact_boxT (d n M N : ℕ) (r : ℝ) (hN : 0 < N) : IsCompact (boxT 
   · have h1 : IsClosed {Z : Fin n → Fin M → Fin d → AF F | ∀ a i k, sndA F (Z a i k) ∈ latN F N} := by
       simp only [Set.ofPred_forall]
       refine isClosed_iInter fun a => isClosed_iInter fun i => isClosed_iInter fun k => ?_
-      exact (isCompact_latN F N hN).isClosed.preimage (continuous_sndA.comp
+      exact (isCompact_latN F N hN).isClosed.preimage (MeasProj.continuous_sndA.comp
         (continuous_coord a i k))
     exact h1.inter (isClosed_le continuous_sizeA continuous_const)
   · rintro Z ⟨h1, h2⟩ a - i - k -
@@ -251,7 +248,7 @@ theorem compact_tuples : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [N
     have hK' : IsCompact (e '' K) := hK.image e.continuous
     have hL : IsCompact (⋃ a, ⋃ i, ⋃ k, (fun Z : Fin n → Fin M → Fin d → AF F => sndA F (Z a i k)) '' (e '' K)) :=
       isCompact_iUnion fun a => isCompact_iUnion fun i => isCompact_iUnion fun k =>
-        hK'.image (continuous_sndA.comp
+        hK'.image (MeasProj.continuous_sndA.comp
           (continuous_coord a i k))
     obtain ⟨N, hN, hNL⟩ := exists_latN_of_isCompact F hL
     obtain ⟨r, hr⟩ := (hK'.image continuous_sizeA).bddAbove

@@ -3,6 +3,7 @@ module
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GaussQ
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ExistsTraceFormGramMatrixInBasis
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SiegelEisensteinUnfoldingIdentity
 
 @[expose] public section
 
@@ -20,12 +21,7 @@ variable {F E : Type} [Field F] [Field E] [Algebra F E]
 theorem repr_map {R S : Type} [CommRing R] [Algebra F R] [CommRing S] [Algebra F S]
     (f : R →ₐ[F] S) {d : ℕ} (b : Module.Basis (Fin d) F E) (y : R ⊗[F] E) (k : Fin d) :
     (Algebra.TensorProduct.basis S b).repr (Algebra.TensorProduct.map f (AlgHom.id F E) y) k =
-      f ((Algebra.TensorProduct.basis R b).repr y k) := by
-  induction y using TensorProduct.induction_on with
-  | zero => simp
-  | tmul r m =>
-    simp [Algebra.TensorProduct.basis_repr_tmul]
-  | add a c ha hc => simp only [map_add (f := _), Finsupp.add_apply, ha, hc]
+      f ((Algebra.TensorProduct.basis R b).repr y k) := SiegelND.Coef.Lim.repr_map f b y k
 
 theorem cv_ratTup (R : Type) [CommRing R] [Algebra F R] {d M : ℕ}
     (b : Module.Basis (Fin d) F E) (x : Fin M × Fin d → F) :
@@ -65,7 +61,7 @@ theorem coords_ratTup : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
     have h1 : xw e b (projInf Y) w p = φ ((Algebra.TensorProduct.basis (AF F) b).repr (Y 0 p.1) p.2) := by
       change e ((Algebra.TensorProduct.basis (Ainf F) b).repr
         (Algebra.TensorProduct.map (fstA F) (AlgHom.id F E) (Y 0 p.1)) p.2) w = _
-      rw [repr_map]
+      rw [SiegelND.Coef.Lim.repr_map]
       rfl
     rw [h1, hc, RingHom.map_mulVec]
     have h2 : (φ ∘ fun j => algebraMap F (AF F) (x j)) = fun j => ρ w (x j) := by
@@ -79,7 +75,7 @@ theorem coords_ratTup : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
         (sndA F : AF F →+* Af F) ((Algebra.TensorProduct.basis (AF F) b).repr (Y 0 p.1) p.2) := by
       change (Algebra.TensorProduct.basis (Af F) b).repr
         (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E) (Y 0 p.1)) p.2 = _
-      rw [repr_map]
+      rw [SiegelND.Coef.Lim.repr_map]
       rfl
     rw [h1, hc, RingHom.map_mulVec]
     have h2 : ((sndA F : AF F →+* Af F) ∘ fun j => algebraMap F (AF F) (x j)) =

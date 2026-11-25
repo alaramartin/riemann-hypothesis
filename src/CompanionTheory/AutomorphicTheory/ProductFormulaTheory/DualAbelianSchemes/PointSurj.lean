@@ -32,6 +32,8 @@ import Mathlib.RingTheory.Coalgebra.IsFrobenius
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.FinrankSectionsPrincipalPolarisationEqOne
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BlowupDivisorTrivialOnFibers
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechComplexTrivialLineBundleNotAcyclic, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechComplexTrivialLineBundleNotAcyclicStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FibreAcyclicityOfSections, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FibreAcyclicityOfSectionsStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.AffineCoverOfProductFibresStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.AffineCoverSeparatingFiniteClosedPoints, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.AffineCoverSeparatingFiniteClosedPointsStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FlatBoundedAcyclicBaseChange, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FlatBoundedAcyclicBaseChangeStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechAcyclicityOverAffineBase, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechAcyclicityOverAffineBaseStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechSliceAcyclicOfTruncation, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechSliceAcyclicOfTruncationStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FibrewiseAcyclicityBaseChangeStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FibreAcyclicityOutsideFiniteSet, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FibreAcyclicityOutsideFiniteSetStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.PicardGroupOfFieldTrivial, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.PicardGroupOfFieldTrivialStatement, CompanionTheory.AutomorphicTheory.ProductFormulaTheory.DualAbelianSchemes.PointSurj
@@ -147,8 +149,8 @@ theorem fibAc_comp_of_fibres : ∀ {k : Type} [Field k] [IsAlgClosed k] {X T Z :
   have : T.IsSeparated := ⟨by rw [← terminal.comp_from b]; infer_instance⟩
   have : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace a
   have : CompactSpace T := QuasiCompact.compactSpace_of_compactSpace b
-  obtain ⟨m, B, hB, hBc⟩ := GlobalTheory.PicZeroVan.exists_fin_affine_cover X
-  obtain ⟨r, E, hE, hEc⟩ := GlobalTheory.PicZeroVan.exists_fin_affine_cover T
+  obtain ⟨m, B, hB, hBc⟩ := PrincipalSections.exists_fin_affine_cover X
+  obtain ⟨r, E, hE, hEc⟩ := PrincipalSections.exists_fin_affine_cover T
   let V : Fin (r + 1) → T.Opens := Fin.cons ⊥ E
   have hV : ∀ j, IsAffineOpen (V j) := fun j => by
     refine Fin.cases ?_ (fun j => ?_) j
@@ -773,7 +775,7 @@ theorem exists_acyclic_cechLB_fibre : ∀ {k : Type} [Field k] [IsAlgClosed k] {
       (by simp only [U]; rw [← Scheme.Hom.preimage_iSup, hBc, Scheme.Hom.preimage_top])
       (by simp only [W]; rw [← Scheme.Hom.preimage_iSup, hVc, Scheme.Hom.preimage_top])
       (fun i _ h => _root_.GlobalTheory.AbLaw.isAffineOpen_preimage_inf_of_isSeparated _ (hB i) h)
-      (fun j _ h => GlobalTheory.MumfordCohom.isAffineOpen_preimage_inf _ (hV j) h)
+      (fun j _ h => isAffineOpen_preimage_inf_of_isSeparated _ (hV j) h)
       (fun i j => (GlobalTheory.T.affine_cover_of_product_fibres a b p q H (hV j) B hB hBc G hG).1 i) n
     have hz := ((htot _ D hD hDc) n).isZero_homology
     have := ModuleCat.subsingleton_of_isZero hz
@@ -869,21 +871,6 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.PicField
 
-theorem pic_eq_zero (k : Type) [Field k] (c : Pic (Sp k)) : c = 0 := by
-  obtain ⟨p⟩ : Nonempty (Sp k) := inferInstance
-  obtain ⟨V, hV, hc⟩ := GlobalTheory.AbDual.exists_pull_eq_zero c p
-  have hV' : V = ⊤ := by
-    have hs : Subsingleton (Sp k) := by
-      unfold Sp; infer_instance
-    ext x
-    simp only [TopologicalSpace.Opens.coe_top, Set.mem_univ, iff_true]
-    exact (Subsingleton.elim x p) ▸ hV
-  subst hV'
-  have : IsIso (⊤ : (Sp k).Opens).ι := (Sp k).topIso.isIso_hom
-  have e : c = CechPic.pull (inv (⊤ : (Sp k).Opens).ι) (CechPic.pull (⊤ : (Sp k).Opens).ι c) := by
-    rw [← pull_comp, IsIso.inv_hom_id, pull_id]
-  rw [e, hc, map_zero]
-
 end GlobalTheory.CompanionTheory.PicField
 end -- clump:auto
 end -- clump:auto
@@ -903,7 +890,7 @@ open GlobalTheory.CompanionTheory.PointSurjectivity
 
 
 theorem _root_.GlobalTheory.T.picard_group_of_field_trivial : ∀ (k : Type) [Field k] (c : Pic (Sp k)), c = 0 := by
-  first | exact @GlobalTheory.CompanionTheory.PicField.pic_eq_zero
+  first | exact @GlobalTheory.cechPic_sp_field_eq_zero
 end -- clump:auto
 end -- clump:auto
 -- ===== end clump member: CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.PicardGroupOfFieldTrivialStatement =====

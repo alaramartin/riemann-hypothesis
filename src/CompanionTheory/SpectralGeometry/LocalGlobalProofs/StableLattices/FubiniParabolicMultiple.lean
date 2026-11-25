@@ -13,6 +13,7 @@ import Development.AbelianVarietyTheory.Definitions.Foundations.MeasurePreservin
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviMaxCompactClosedSubgroups
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagUnipotentRadicalClosedSubgroupKeeps
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaDecompositionUnitaryIsotropicFlag
+import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.ExistsStandardIndModule
 
 @[expose] public section
 
@@ -110,7 +111,7 @@ theorem fub2 : Fub2 := by
     have aK : ∀ᵐ k ∂μK, k ∈ maxK ε := mem_ae_iff.2 hK0
     have e : ∫⁻ k, F (u * m * k) ∂μK = F (u * m) := by
       rw [lintegral_congr_ae (g := fun _ => F (u * m)) (aK.mono fun k hk => hinv _ k (by
-        rw [← SetLike.mem_coe, GlobalTheory.IwasawaShape.coe_KG]; exact hk))]
+        rw [← SetLike.mem_coe, RealInd.KG_eq]; exact hk))]
       simp [lintegral_const, hK1]
     rw [e]
     rfl
@@ -138,7 +139,7 @@ theorem fub2 : Fub2 := by
       simpa using hnorm1 l⁻¹ (M.inv_mem hl) v hv
     have hMN : ∀ l ∈ M, l ∈ N → l = 1 := fun l hl hlN =>
       huniq l ((mN l).1 hlN) l⁻¹ ((mM _).1 (M.inv_mem hl)) (by
-        rw [mul_inv_cancel, ← GlobalTheory.IwasawaShape.coe_KG]; exact (Formalism.REAL.KG ε).one_mem)
+        rw [mul_inv_cancel, ← RealInd.KG_eq]; exact (Formalism.REAL.KG ε).one_mem)
     have hMP : ∀ l ∈ M, ∀ v ∈ N, l * v ∈ P := fun l hl v hv =>
       (hPeq _).2 ⟨l * v * l⁻¹, (mN _).1 (hnorm1 l hl v hv), l, (mM l).1 hl, by group⟩
     have hdec : ∀ p ∈ P, ∃ l ∈ M, ∃ v ∈ N, p = l * v := by

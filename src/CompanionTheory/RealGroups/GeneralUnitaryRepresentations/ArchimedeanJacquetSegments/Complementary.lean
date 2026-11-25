@@ -2,6 +2,7 @@ module
 
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.UnipotentDerivatives.RightWhit
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.ColMatMulGlEmbMat
+import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.ComplementarySeries.Complementary
 
 @[expose] public section
 
@@ -71,7 +72,7 @@ def chi (d : ℕ) (s : ℝ) : Levi k (fun _ : Fin 2 => Fin d) →* ℂˣ :=
   ((detChar (Fin d) (absPow k (-(s : ℂ)))).comp (Pi.evalMonoidHom (fun _ : Fin 2 => GL (Fin d) k) 0)) *
     ((detChar (Fin d) (absPow k (s : ℂ))).comp (Pi.evalMonoidHom (fun _ : Fin 2 => GL (Fin d) k) 1))
 
-theorem sum_two (d : ℕ) : ∑ _a : Fin 2, d = d + d := by simp [two_mul]
+theorem sum_two (d : ℕ) : ∑ _a : Fin 2, d = d + d := PositivityTheory.RgGu.NR.sum_two d
 
 def blk2 (d : ℕ) : (Σ _ : Fin 2, Fin d) ≃ Fin (d + d) := stdBlocks (fun _ : Fin 2 => d) (sum_two d)
 

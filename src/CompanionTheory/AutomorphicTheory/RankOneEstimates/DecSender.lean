@@ -70,7 +70,7 @@ theorem decayM {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r
   refine ⟨C * (Ws.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) σ W v0‖).sum, Ws, fun W h1 X h2 => (hW W h1).2 X h2,
     fun b hba w hw x hx => ?_⟩
   have h1 := hb w hw v0 hv0 x hx
-  have hN : 1 ≤ B.gN x := PI.PolynomialProperness.GN.gN_ge_one hx
+  have hN : 1 ≤ B.gN x := P.BetaSesquilinearity.gN_ge_one hx
   have hp : B.gN x ^ b ≤ B.gN x ^ m := by
     rw [← Real.rpow_natCast]
     exact Real.rpow_le_rpow_of_exponent_le hN hba
@@ -99,13 +99,6 @@ theorem decay {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r 
     linarith
   obtain ⟨C, Ws, h1, h2⟩ := decayM hl hσ hg _ hm v0 hv0
   exact ⟨C, Ws, h1, fun b hb => h2 b (hb.trans (Nat.le_ceil _))⟩
-
-theorem decay_infinite_range : DecInf := by
-  intro k r ε lam h H _ _ _ σ hl hσ hg hok v0 hv0
-  obtain ⟨C, Ws, h1, h2⟩ := decay hl hσ hg hok.2.1 v0 (CompanionTheory.D.gk.admitted.k_finite_smooth k r ε lam H σ hl hσ v0 hv0)
-  refine ⟨C, Ws, h1, fun w hw x hx => ?_⟩
-  have := h2 (aOf r h - 1) (by linarith) w hw x hx
-  rwa [neg_sub] at this
 
 theorem decay_low_range : DecLow := by
   intro k r _ ε lam h H _ _ _ σ hl hσ hg hh P hP w₁ w₂ h₁ h₂

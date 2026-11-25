@@ -17,6 +17,7 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.Factorisation
 import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DiscreteSeriesUnitarySmoothBasic
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedPairingViaPhase
 import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.HermitianLeviVectorBaseOrthogonal
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.BesselSettingGapBoundDual, CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.BesselSettingGapBound, CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.BesselSettingGapDecay
@@ -40,7 +41,7 @@ namespace GlobalTheory
 
 theorem besselInner_haar {k r : ℕ} {U : Set (Mx k r)} {μ : Measure (Formalism.QuantumDeterminants.Mt k r)} (h : B.IsHaarOn U μ) :
     PI.BesselPeriodGGP.IsHaarOn U μ :=
-  ⟨Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite h, h.ne_zero, h.conc, h.left⟩
+  ⟨P.B2x9.sigmaFinite_of_haar h, h.ne_zero, h.conc, h.left⟩
 
 theorem besselInner_integral {k r : ℕ} (R : Rep k r) {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
     [CompleteSpace Wp] {Wq : Type} [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [CompleteSpace Wq]
@@ -124,9 +125,9 @@ theorem besselJ_coef_through_right : HypsG → ∀ (k r : ℕ) (ε : Fin (2 * r 
     ⟨1, fun _ => x, fun _ => y, fun _ => X, fun _ => ⟨hx, hy⟩, fun g _ => by simp, by simp⟩
   have hcc := (_root_.Gp91.GlobalTheory.isCoef_ckOn_inCC hH k r ε mu h R Wp Wq l l' _ _ hDS hgap hOK hcoef).2 0
   have hI := (Formalism.FourierDecayAlt.P.bessel_integral_converges k r Wp Wq D _ _ (_root_.GlobalTheory.thresholds_of_gapOK k r h hOK).1 hcc).1 γ hγ
-  haveI := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarW
-  haveI := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarN
-  haveI := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarW'
+  haveI := P.B2x9.sigmaFinite_of_haar D.haarW
+  haveI := P.B2x9.sigmaFinite_of_haar D.haarN
+  haveI := P.B2x9.sigmaFinite_of_haar D.haarW'
   have hJ : B.JF D (fun g => ⟪x, R.σ g y⟫_ℂ • X) γ =
       ∫ p, JF.integrand D (fun g => ⟪x, R.σ g y⟫_ℂ • X) γ p ∂((D.μW.prod D.μN).prod (D.μW'.prod D.μN)) := rfl
   have hI' : Integrable (JF.integrand D (fun g => ⟪x, R.σ g y⟫_ℂ • X) γ)
@@ -170,11 +171,6 @@ noncomputable section
 
 namespace GlobalTheory.BesselFirstLeft
 
-theorem sigmaFinite_of_haar {k r : ℕ} {U : Set (B.Mat k r)} {μ : Measure (Formalism.QuantumDeterminants.Mt k r)}
-    (h : B.IsHaarOn U μ) : SigmaFinite μ := by
-  haveI : IsFiniteMeasureOnCompacts μ := ⟨fun {K} hK => h.finite_compact K hK⟩
-  infer_instance
-
 theorem left_integral {k r : ℕ} (R : Rep k r) {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
     [CompleteSpace Wp] (z : Fin (2 * r + k + 1) → ℂ) (π : Mx k r → (Wp →L[ℂ] Wp))
     (μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)) (l : R.H → Wp) (hk : 1 ≤ k) (hz : Formalism.QuantumDeterminants.inWb k r z)
@@ -199,7 +195,7 @@ theorem left_integral {k r : ℕ} (R : Rep k r) {Wp : Type} [NormedAddCommGroup 
         ⟪x, R.σ ((Matrix.of p.1)⁻¹ * (Matrix.of p.2)⁻¹) Y⟫_ℂ) • π (Matrix.of p.1)) := by
     filter_upwards [hae] with p hp
     have h1 : ((Matrix.of p.1 : Mx k r)⁻¹)⁻¹ = Matrix.of p.1 :=
-      Matrix.nonsing_inv_nonsing_inv _ (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_unit (hU _ hp.1 _ hp.1).2.2)
+      Matrix.nonsing_inv_nonsing_inv _ (P.B2x8.al_unit (hU _ hp.1 _ hp.1).2.2)
     have h2 := (hψ _ hp.2).2
     change (⟪x, R.σ ((Matrix.of p.1 : Mx k r)⁻¹ * (Matrix.of p.2 : Mx k r)⁻¹) Y⟫_ℂ *
       star (Formalism.QuantumDeterminants.psi k r z Formalism.QuantumDeterminants.cStd (Matrix.of p.2 : Mx k r)⁻¹)) • π ((Matrix.of p.1 : Mx k r)⁻¹)⁻¹ = _
@@ -223,9 +219,9 @@ theorem bessel_integrate_left : HypsG → ∀ (k r : ℕ) (ε : Fin (2 * r + k +
     congr 1
     rw [starRingEnd_apply]; ring
   intro x hx y hy X c
-  haveI := sigmaFinite_of_haar D.haarW
-  haveI := sigmaFinite_of_haar D.haarW'
-  haveI := sigmaFinite_of_haar D.haarN
+  haveI := P.B2x9.sigmaFinite_of_haar D.haarW
+  haveI := P.B2x9.sigmaFinite_of_haar D.haarW'
+  haveI := P.B2x9.sigmaFinite_of_haar D.haarN
   obtain ⟨hmul, -, -, hsm, hTK, -⟩ := GlobalTheory.rep_basic_of_isDS hyp.1.2.2.1 k r ε mu R hDS
   have hcoef : IsCoef R l l' (fun g => ⟪x, R.σ g y⟫_ℂ • X) ⟪l x, X (l' y)⟫_ℂ :=
     ⟨1, fun _ => x, fun _ => y, fun _ => X, fun _ => ⟨hx, hy⟩, fun g _ => by simp, by simp⟩
@@ -249,7 +245,7 @@ theorem bessel_integrate_left : HypsG → ∀ (k r : ℕ) (ε : Fin (2 * r + k +
   refine integral_congr_ae ?_
   filter_upwards [hae'] with q hq
   have hg : γ * Matrix.of q.2 * Matrix.of q.1 ∈ GG k r :=
-    Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul hγ.1 (hNG _ hq.2)) (hU' _ hq.1 _ hq.1).2.2
+    P.B2x8.al_mul_mem (P.B2x8.al_mul_mem hγ.1 (hNG _ hq.2)) (hU' _ hq.1 _ hq.1).2.2
   obtain ⟨hI, hE⟩ := left_integral R D.z D.π D.μW D.μN l D.k_pos D.z_mem D.T_pos D.haarW D.haarN hl
     (hsm _ hg y (hTK y hy)) hx
   have hE' := congrArg (fun T : Wp →L[ℂ] Wp =>
@@ -260,7 +256,7 @@ theorem bessel_integrate_left : HypsG → ∀ (k r : ℕ) (ε : Fin (2 * r + k +
   refine Eq.trans (integral_congr_ae ?_) hE'
   filter_upwards [hae] with p hp
   have hs : (Matrix.of p.1 : Mx k r)⁻¹ * (Matrix.of p.2 : Mx k r)⁻¹ ∈ GG k r :=
-    Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv (hU _ hp.1 _ hp.1).2.2) (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv (hNG _ hp.2))
+    P.B2x8.al_mul_mem (P.B2x8.al_inv_mem (hU _ hp.1 _ hp.1).2.2) (P.B2x8.al_inv_mem (hNG _ hp.2))
   rw [← hmul _ hs _ hg]
   simp only [JF.integrand, JF.xiP, B.rho, B.sgs, ContinuousLinearMap.smul_apply, ContinuousLinearMap.comp_apply,
     map_smul, smul_smul, Matrix.mul_assoc]

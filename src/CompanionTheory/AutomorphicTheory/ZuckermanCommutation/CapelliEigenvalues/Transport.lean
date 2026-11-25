@@ -7,6 +7,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LemmaDDeterm
 public import Formalism.RealPlaceAnalysis.FinalF
 import Formalism.RealPlaceAnalysis.QuotientSettingHolds
 import Mathlib.Tactic.TypeStar
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SmoothVecUnitaryModule
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SmoothAddSmul
 
 @[expose] public section
 
@@ -59,22 +61,22 @@ variable {n : ℕ} {ε : Fin n → Bool} {E E' : Type} [NormedAddCommGroup E] [N
 
 theorem ec_congr {f f' : Matrix (Fin n) (Fin n) ℂ → E} (h : ∀ g, inUJ ε g → f g = f' g)
     (Z : Matrix (Fin n) (Fin n) ℂ) {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) : EcV ε Z f g = EcV ε Z f' g := by
-  obtain ⟨h1, h2, -, -⟩ := cpartMem n ε Z
+  obtain ⟨h1, h2, -, -⟩ := complex_parts_mem_lie_algebra_holds n ε Z
   unfold EcV
-  rw [io_rd_congr h h1 hg, io_rd_congr h h2 hg]
+  rw [GlobalTheory.SmoothVecMod.rdV_congr h h1 hg, GlobalTheory.SmoothVecMod.rdV_congr h h2 hg]
 
 theorem top_smooth {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : SmoothOnGV ε f) (u : ℂ) (a b : Fin n) :
     SmoothOnGV ε (Top (EabV ε) u a b f) := by
   unfold Formalism.QuantumDeterminants.Top
   by_cases hab : a = b
   · simp only [if_pos hab]
-    exact io_smooth_add (io_smooth_smul u hf) (io_eab_smooth hf a b)
+    exact io_smooth_add (io_smooth_smul u hf) (GlobalTheory.CapelliCentral.eab_smooth hf a b)
   · simp only [if_neg hab]
-    exact io_smooth_add io_smooth_zero (io_eab_smooth hf a b)
+    exact io_smooth_add GlobalTheory.CapelliCentral.smooth_zero (GlobalTheory.CapelliCentral.eab_smooth hf a b)
 
 theorem eab_clm (φ : E →L[ℂ] E') {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : SmoothOnGV ε f) (a b : Fin n)
     {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) : φ (EabV ε a b f g) = EabV ε a b (fun x => φ (f x)) g := by
-  obtain ⟨h1, h2, -, -⟩ := cpartMem n ε (Matrix.single a b 1)
+  obtain ⟨h1, h2, -, -⟩ := complex_parts_mem_lie_algebra_holds n ε (Matrix.single a b 1)
   unfold EabV EcV
   rw [map_add (f := _), map_smul, (rdVPair n ε E E' φ f _ g hf h1 hg).2, (rdVPair n ε E E' φ f _ g hf h2 hg).2]
 
@@ -86,7 +88,7 @@ theorem capelli_clm (φ : E →L[ℂ] E') {f : Matrix (Fin n) (Fin n) ℂ → E}
   rintro u a b f f' ⟨hs, he⟩
   refine ⟨top_smooth hs u a b, fun x hx => ?_⟩
   unfold Formalism.QuantumDeterminants.Top
-  rw [map_add (f := _), eab_clm φ hs a b hx, io_eab_congr he a b hx]
+  rw [map_add (f := _), eab_clm φ hs a b hx, GlobalTheory.SmoothVecMod.eabV_congr he a b hx]
   congr 1
   split_ifs
   · rw [map_smul, he x hx]

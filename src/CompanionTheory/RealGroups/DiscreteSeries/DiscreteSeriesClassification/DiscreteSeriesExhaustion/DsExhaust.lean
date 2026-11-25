@@ -44,6 +44,7 @@ import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.Ex
 import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.AnalyticIntertwiners.SubquotientNontrivial
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 import Mathlib.Tactic.TypeStar
+import Development.WeilBound.CoreStatements.BranchingTraces.BranchingComatrices.RootOfNe
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.SimpleDistinctness.ClassLit, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ExistsIsoOfHighest, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.ExistsIsAlgebraicRatFuncFractionRingDedekind, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ExistsPermOfCapPEq, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FiniteDimensionalComapSubtype, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.HasCharOfScalChar, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.IsWeightOfIntertwine, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.KHighestOfPerm, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.KHighestRenumber, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.KModOf, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.PathEndEqAddNat, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ScalarOfCommute, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ScalarOfSeparatingSmoothL2Maps, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.SimpleDistinct, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ExistsUnitaryImage, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.UnitarizableOfSeparatingSmoothL2Maps, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.SimpleDistinctness.ExhaustionFiniteLength, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.DsExhaust
@@ -1317,10 +1318,6 @@ theorem exists_adj_qdet {ε : Fin n → Bool} {E : Fin n → Fin n → Module.En
   rw [hl]
   exact exists_adj_sum hU l
 
-theorem adjSign_mul_self (ε : Fin n → Bool) (a b : Fin n) : adjSign ε a b * adjSign ε a b = 1 := by
-  unfold adjSign
-  split_ifs <;> simp
-
 theorem commute_adj {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
     {A B : Module.End ℂ M} (hA : ∀ a b, Commute A (E a b)) (hB : ∀ x y : M, inner ℂ (A x) y = inner ℂ x (B y))
     (c d : Fin n) : Commute B (E c d) := by
@@ -1330,7 +1327,7 @@ theorem commute_adj {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End �
     have h2 : inner ℂ (E d c x) (B y) = adjSign ε d c * inner ℂ x (E c d (B y)) := hU d c _ _
     have h3 : E d c (A x) = A (E d c x) := LinearMap.congr_fun (hA d c).symm.eq x
     rw [h3, hB, h2] at h1
-    have hs : adjSign ε d c ≠ 0 := left_ne_zero_of_mul_eq_one (adjSign_mul_self ε d c)
+    have hs : adjSign ε d c ≠ 0 := left_ne_zero_of_mul_eq_one (schA_adjSign_sq ε d c)
     rw [← hB]
     exact (mul_left_cancel₀ hs h1).symm
   refine LinearMap.ext fun y => ?_
@@ -1411,7 +1408,7 @@ theorem scalar_of_separating_smooth_l2_maps : ScalarCharacterOfL2Embedding := by
   have hint : ∀ x, c ((qdet X.E w - s • (1 : Module.End ℂ X.V)) x) =
       (qdet (smE ε (rreg ε)) w - s • (1 : Module.End ℂ (smD ε (rreg ε)))) (c x) := by
     intro x
-    simp [Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.KLExA.qdet_int c hc]
+    simp [PositivityTheory.UnitaryDecomposition.Com.qdet_int c hc]
   have hpow : ∀ (j : ℕ) x, c (((qdet X.E w - s • (1 : Module.End ℂ X.V)) ^ j) x) =
       ((qdet (smE ε (rreg ε)) w - s • (1 : Module.End ℂ (smD ε (rreg ε)))) ^ j) (c x) := by
     intro j

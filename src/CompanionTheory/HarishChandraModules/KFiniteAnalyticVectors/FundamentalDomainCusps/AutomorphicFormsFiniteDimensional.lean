@@ -32,6 +32,8 @@ import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ModularCharacterEqOneOnExpHer
 import Mathlib.Analysis.Matrix.Hermitian
 import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.RowsProj
 import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.LogNormEstimates
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviMaxCompactClosedSubgroups
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SmallFundamentalSetRealUnipotent
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.CuspidalAtInfinityOf, CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.FiniteDimensionalFromLinearForms, CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.PBAdel, CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.ParabolicSubgroupDecomposition, CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.RealParabolicDecomposition, CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.RowsFinDimOf, CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.AutomorphicFormsFiniteDimensional
@@ -909,13 +911,8 @@ theorem Sc.inv (hW : Isot J W) {g h : Matrix (Fin n) (Fin n) ℂ} (hg : Sc J W 1
   rw [h0]
   simpa using (perp J W).neg_mem ((perp J W).add_mem (hW (h2 _ h3)) h3)
 
-theorem uMat_mul {ε : Fin n → Bool} (g h : UJ ε) : uMat (g * h) = uMat g * uMat h := rfl
-
-theorem uMat_inv_mulF {ε : Fin n → Bool} (g : UJ ε) : uMat g⁻¹ * uMat g = 1 := by
-  rw [← uMat_mul, inv_mul_cancel]; rfl
-
-theorem uMat_mul_invF {ε : Fin n → Bool} (g : UJ ε) : uMat g * uMat g⁻¹ = 1 := by
-  rw [← uMat_mul, mul_inv_cancel]; rfl
+theorem uMat_mul {ε : Fin n → Bool} (g h : UJ ε) : uMat (g * h) = uMat g * uMat h :=
+  GlobalTheory.FlagLeviGroup.uMat_mul g h
 
 theorem continuous_uMat {ε : Fin n → Bool} : Continuous (uMat : UJ ε → _) := (isClosedEmbeddingMatrix n ε).1.continuous
 
@@ -940,7 +937,7 @@ theorem unipotent_radical_subgroup : NWSub := by
                rw [sub_self]
                exact ⟨fun _ _ => zero_mulVec _, fun _ _ => by rw [zero_mulVec]; exact W.zero_mem,
                  fun _ => by rw [zero_mulVec]; exact Submodule.zero_mem _⟩
-             inv_mem' := fun {a} ha => lowers_iff.2 ((lowers_iff.1 ha).inv hW (uMat_inv_mulF a)) }, rfl⟩
+             inv_mem' := fun {a} ha => lowers_iff.2 ((lowers_iff.1 ha).inv hW (GlobalTheory.FlagLeviGroup.uMat_inv_mul a)) }, rfl⟩
 
 def IsPr (W : Submodule ℂ (Fin n → ℂ)) (p : Matrix (Fin n) (Fin n) ℂ) : Prop :=
   pᴴ = p ∧ (∀ z, p *ᵥ z ∈ W) ∧ ∀ w ∈ W, p *ᵥ w = w
@@ -960,11 +957,8 @@ theorem exists_isPr (W : Submodule ℂ (Fin n → ℂ)) : ∃ p, IsPr W p := by
   · rw [hP]
     exact congrArg WithLp.ofLp (Submodule.starProjection_eq_self_iff.2 (show WithLp.toLp 2 w ∈ K from hw))
 
-theorem mat_extF {A B : Matrix (Fin n) (Fin n) ℂ} (h : ∀ z, A *ᵥ z = B *ᵥ z) : A = B :=
-  Matrix.toLin'.injective (LinearMap.ext h)
-
 theorem IsPr.sq {p : Matrix (Fin n) (Fin n) ℂ} (hp : IsPr W p) : p * p = p :=
-  mat_extF fun z => by rw [← mulVec_mulVec, hp.2.2 _ (hp.2.1 z)]
+  GlobalTheory.NilLift.ext_mulVec' fun z => by rw [← mulVec_mulVec, hp.2.2 _ (hp.2.1 z)]
 
 theorem IsPr.dot {p : Matrix (Fin n) (Fin n) ℂ} (hp : IsPr W p) (y z : Fin n → ℂ) :
     star y ⬝ᵥ (p *ᵥ z) = star (p *ᵥ y) ⬝ᵥ z := by
@@ -1006,7 +1000,7 @@ variable {ε : Fin n → Bool} {p : Matrix (Fin n) (Fin n) ℂ}
 alias Jm_sq := _root_.Formalism.REAL.Jm_mul_self
 
 theorem pJp (hW : Isot (Jm ε) W) (hp : IsPr W p) : p * Jm ε * p = 0 :=
-  mat_extF fun z => by rw [← mulVec_mulVec, ← mulVec_mulVec, hp.kill (hW (hp.2.1 z)), zero_mulVec]
+  GlobalTheory.NilLift.ext_mulVec' fun z => by rw [← mulVec_mulVec, ← mulVec_mulVec, hp.kill (hW (hp.2.1 z)), zero_mulVec]
 
 theorem q_facts (hW : Isot (Jm ε) W) (hp : IsPr W p) :
     (Jm ε * p * Jm ε) * (Jm ε * p * Jm ε) = Jm ε * p * Jm ε ∧ p * (Jm ε * p * Jm ε) = 0 ∧
@@ -1056,10 +1050,6 @@ theorem am_sc (hW : Isot (Jm ε) W) (hp : IsPr W p) (t : ℝ) :
     push_cast
     module
 
-theorem hf_uMatF (x : UJ ε) (y z : Fin n → ℂ) : hf (Jm ε) (uMat x *ᵥ y) (uMat x *ᵥ z) = hf (Jm ε) y z := by
-  have hx : (uMat x)ᴴ * Jm ε * uMat x = Jm ε := x.2
-  rw [hf, hf, star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, hx]
-
 end Am
 
 theorem norm_mulVec_le (M : Matrix (Fin n) (Fin n) ℂ) (v : Fin n → ℂ) :
@@ -1087,7 +1077,7 @@ theorem real_parabolic_decomposition : RealPar := by
   have hee : ∀ t : ℝ, ((Real.exp t : ℝ) : ℂ) * (Real.exp (-t) : ℝ) = 1 := fun t => by
     rw [← Complex.ofReal_mul, ← Real.exp_add, add_neg_cancel, Real.exp_zero, Complex.ofReal_one]
   have hne : ∀ g : UJ ε, uMat g⁻¹ *ᵥ w₀ ≠ 0 := fun g h => hw0 (by
-    rw [← one_mulVec w₀, ← uMat_mul_invF g, ← mulVec_mulVec, h, mulVec_zero])
+    rw [← one_mulVec w₀, ← GlobalTheory.FlagLeviGroup.uMat_mul_inv g, ← mulVec_mulVec, h, mulVec_zero])
   have hamc : Continuous fun q : ℝ × Matrix (Fin n) (Fin n) ℂ => am (Jm ε) q.2 q.1 := by
     unfold am
     have c1 : Continuous fun q : ℝ × Matrix (Fin n) (Fin n) ℂ => ((Real.exp q.1 - 1 : ℝ) : ℂ) := by fun_prop
@@ -1108,8 +1098,8 @@ theorem real_parabolic_decomposition : RealPar := by
     rwa [mul_one, mul_one, neg_neg, hee, mul_comm, hee] at this
   · exact (((continuous_uMat.comp continuous_inv).matrix_mulVec continuous_const).norm.log
       fun g => norm_ne_zero_iff.2 (hne g)).neg
-  · rw [_root_.mul_inv_rev, uMat_mul, ← mulVec_mulVec, ((hmem _).1 (N.inv_mem hm)).1 w₀ hw₀, one_smul]
-  · rw [_root_.mul_inv_rev, uMat_mul, ← mulVec_mulVec, hinv]
+  · rw [_root_.mul_inv_rev, GlobalTheory.FlagLeviGroup.uMat_mul, ← mulVec_mulVec, ((hmem _).1 (N.inv_mem hm)).1 w₀ hw₀, one_smul]
+  · rw [_root_.mul_inv_rev, GlobalTheory.FlagLeviGroup.uMat_mul, ← mulVec_mulVec, hinv]
     have : uMat (a (-t)) *ᵥ w₀ = ((Real.exp (-t) : ℝ) : ℂ) • w₀ := (am_sc hW hp (-t)).1 w₀ hw₀
     rw [this, mulVec_smul, norm_smul, Complex.norm_real, Real.norm_of_nonneg (Real.exp_pos _).le,
       Real.log_mul (Real.exp_pos _).ne' (norm_ne_zero_iff.2 (hne g)), Real.log_exp]
@@ -1117,9 +1107,9 @@ theorem real_parabolic_decomposition : RealPar := by
   · have p1 := norm_pos_iff.2 (hne x)
     have p2 := norm_pos_iff.2 (hne (x * y))
     have e1 : uMat (x * y)⁻¹ *ᵥ w₀ = uMat y⁻¹ *ᵥ (uMat x⁻¹ *ᵥ w₀) := by
-      rw [_root_.mul_inv_rev, uMat_mul, mulVec_mulVec]
+      rw [_root_.mul_inv_rev, GlobalTheory.FlagLeviGroup.uMat_mul, mulVec_mulVec]
     have e2 : uMat x⁻¹ *ᵥ w₀ = uMat y *ᵥ (uMat (x * y)⁻¹ *ᵥ w₀) := by
-      rw [e1, mulVec_mulVec _ (uMat y), uMat_mul_invF, one_mulVec]
+      rw [e1, mulVec_mulVec _ (uMat y), GlobalTheory.FlagLeviGroup.uMat_mul_inv, one_mulVec]
     have b1 : Real.log ‖uMat (x * y)⁻¹ *ᵥ w₀‖ ≤ Real.log (S y⁻¹) + Real.log ‖uMat x⁻¹ *ᵥ w₀‖ := by
       rw [← Real.log_mul (one_pos.trans_le (hS1 _)).ne' p1.ne']
       exact Real.log_le_log p2 (by rw [e1]; exact norm_mulVec_le _ _)
@@ -1142,19 +1132,19 @@ theorem real_parabolic_decomposition : RealPar := by
     obtain ⟨τ, hτ, hb⟩ := Metric.eventually_nhds_iff.1 hev
     refine ⟨τ, hτ, fun t ht x => ?_⟩
     let W' : Submodule ℂ (Fin n → ℂ) := W.comap (Matrix.toLin' (uMat x))
-    have hxx : ∀ z, uMat x *ᵥ (uMat x⁻¹ *ᵥ z) = z := fun z => by rw [mulVec_mulVec, uMat_mul_invF, one_mulVec]
+    have hxx : ∀ z, uMat x *ᵥ (uMat x⁻¹ *ᵥ z) = z := fun z => by rw [mulVec_mulVec, GlobalTheory.FlagLeviGroup.uMat_mul_inv, one_mulVec]
     have hP' : ∀ z, z ∈ perp (Jm ε) W' ↔ uMat x *ᵥ z ∈ perp (Jm ε) W := fun z =>
       ⟨fun h w hw => by
-        rw [← hxx w, hf_uMatF]
+        rw [← hxx w, hf_unitary]
         exact h _ (show uMat x *ᵥ _ ∈ W by rwa [hxx]),
-       fun h w hw => by rw [← hf_uMatF x]; exact h _ hw⟩
+       fun h w hw => by rw [← hf_unitary x]; exact h _ hw⟩
     have hW' : Isot (Jm ε) W' := fun z hz => (hP' z).2 (hW hz)
     obtain ⟨p', hp'⟩ := exists_isPr W'
     let a' : UJ ε := indefiniteUnitaryMk ε _ (am_mem hW' hp' t)
     have hs' : Sc (Jm ε) W' (Real.exp t) (Real.exp (-t)) (uMat a') := am_sc hW' hp' t
     have hs : Sc (Jm ε) W (Real.exp t) (Real.exp (-t)) (uMat (x * a' * x⁻¹)) := by
       have hv : ∀ z, uMat (x * a' * x⁻¹) *ᵥ z = uMat x *ᵥ (uMat a' *ᵥ (uMat x⁻¹ *ᵥ z)) := fun z => by
-        rw [uMat_mul, uMat_mul, mulVec_mulVec, mulVec_mulVec]
+        rw [GlobalTheory.FlagLeviGroup.uMat_mul, GlobalTheory.FlagLeviGroup.uMat_mul, mulVec_mulVec, mulVec_mulVec]
       refine ⟨fun w hw => ?_, fun z hz => ?_, fun z => ?_⟩
       · rw [hv, hs'.1 _ (show uMat x *ᵥ _ ∈ W by rwa [hxx]), mulVec_smul, hxx]
       · have : uMat x *ᵥ _ ∈ W := hs'.2.1 (uMat x⁻¹ *ᵥ z) ((hP' _).2 (by rwa [hxx]))

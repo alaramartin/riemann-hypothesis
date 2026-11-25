@@ -4,6 +4,9 @@ public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.Analyt
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ExpFromBlocks
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnipotentCorrectionU1.DjCurveA
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Development.AbelianVarietyTheory.Definitions.Foundations.MemL2OfBoundedContinuousInvariant
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.NotTrivialAndTwist
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FockPolynomialKFiniteBothMembers
 
 @[expose] public section
 
@@ -82,7 +85,7 @@ abbrev covC (x : T.G) : Formalism.BasicNotions.TH.Mat p q := ((T.cov x : GL _ �
 theorem sq_sqC (x : T.G) : ((T.sq x : ℂˣ) : ℂ) ^ 2 = (covC T x).det := T.sq_sq x
 
 theorem eq_of_covC {x y : T.G} (h1 : T.cov x = T.cov y) (h2 : T.sq x = T.sq y) : x = y :=
-  (T.bij (T.cov x) (T.cov_mem x) (T.sq x) (T.sq_sq x)).unique ⟨rfl, rfl⟩ ⟨h1.symm, h2.symm⟩
+  GlobalTheory.RealPar.Cover.ext_of h1 h2
 
 theorem mem_UJC (x : T.G) : rx (covC T x) ∈ Formalism.MainNotions.S.UJset (epq p q) := by
   have h : (covC T x)ᴴ * Formalism.UG.Jpq p q * covC T x = Formalism.UG.Jpq p q := T.cov_mem x
@@ -135,18 +138,10 @@ theorem sq_or_negC {x y : T.G} (h : T.cov x = T.cov y) : T.sq x = T.sq y ∨ T.s
   · exact Or.inl (Units.ext h2)
   · exact Or.inr (Units.ext (by simpa using h2))
 
-theorem norm_sqC (x : T.G) : ‖((T.sq x : ℂˣ) : ℂ)‖ = 1 := by
-  have h : (covC T x)ᴴ * Formalism.UG.Jpq p q * covC T x = Formalism.UG.Jpq p q := T.cov_mem x
-  have hJ : ‖(Formalism.UG.Jpq p q).det‖ = 1 := by
-    simp [Formalism.UG.Jpq, Matrix.det_fromBlocks_zero₂₁, Matrix.det_neg]
-  have hd := congrArg (fun A => ‖Matrix.det A‖) h
-  simp only [det_mul, det_conjTranspose, norm_mul, norm_star, hJ, mul_one] at hd
-  have h2 : ‖((T.sq x : ℂˣ) : ℂ)‖ ^ 4 = 1 := by
-    rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, ← norm_pow, sq_sqC, _root_.sq, ← hd]
-  exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (by norm_num)).1 h2
+theorem norm_sqC (x : T.G) : ‖((T.sq x : ℂˣ) : ℂ)‖ = 1 := GlobalTheory.RealPar.Cover.norm_sq x
 
 theorem sq_contC : Continuous fun x : T.G => ((T.sq x : ℂˣ) : ℂ) :=
-  Units.continuous_val.comp (continuous_snd.comp T.emb.continuous)
+  GlobalTheory.RealPar.Cover.continuous_sq
 
 end Cover
 
@@ -214,14 +209,6 @@ theorem comm_iff_KC (M : Formalism.BasicNotions.TH.Mat p q) :
     by_cases hab : Formalism.BasicNotions.TH.sameBlock a b
     · rw [sgn_eqC hab, mul_comm]
     · rw [h a b hab]; simp
-
-theorem isKC_mulC {A B : Formalism.BasicNotions.TH.Mat p q} (hA : Formalism.BasicNotions.TH.IsKC A) (hB : Formalism.BasicNotions.TH.IsKC B) :
-    Formalism.BasicNotions.TH.IsKC (A * B) := by
-  rw [← comm_iff_KC] at *
-  rw [Matrix.mul_assoc, hB, ← Matrix.mul_assoc, hA, Matrix.mul_assoc]
-
-theorem isKC_oneC : Formalism.BasicNotions.TH.IsKC (1 : Formalism.BasicNotions.TH.Mat p q) := by
-  rw [← comm_iff_KC, Matrix.one_mul, Matrix.mul_one]
 
 end Blocks
 
@@ -387,7 +374,7 @@ theorem harish_chandra_descent : Descend := by
     constructor
     · intro hx
       refine ⟨_, hx, Submodule.subset_span ⟨⟨1, ?_⟩, by simp⟩, fun g hg v hv => ?_⟩
-      · show Formalism.BasicNotions.TH.IsKC (covC T 1); simp only [covC, map_one, Units.val_one]; exact isKC_oneC
+      · show Formalism.BasicNotions.TH.IsKC (covC T 1); simp only [covC, map_one, Units.val_one]; exact GlobalTheory.FockKFin.isKC_one
       obtain ⟨k, hk, rfl⟩ := hK' g hg
       rw [hσ]
       refine Submodule.smul_mem _ _ ?_
@@ -401,7 +388,7 @@ theorem harish_chandra_descent : Descend := by
       refine Submodule.subset_span ⟨⟨k * k', ?_⟩, by simp⟩
       show Formalism.BasicNotions.TH.IsKC (covC T (k * k'))
       simp only [covC, map_mul, Units.val_mul]
-      exact isKC_mulC hk hk'
+      exact GlobalTheory.Cusp.isKC_mul hk hk'
     · rintro ⟨S, hSf, hxS, hSK⟩
       refine Submodule.finiteDimensional_of_le (S₂ := S) (Submodule.span_le.2 ?_)
       rintro _ ⟨⟨k, hk⟩, rfl⟩

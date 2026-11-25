@@ -62,6 +62,7 @@ import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.Exists
 import Std.Tactic.BVDecide.Normalize.Prop
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Data.Nat.Choose.Multinomial
+import Formalism.LocalToGlobal.SiegelLatticeTheory.BesselDiscreteSeries.DecInfPf
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.PieriRules.HarishChandraFormalDegree, CompanionTheory.HarishChandraModules.BesselParameterIntegrals.SmoothCyclicVectors.SmoothCyclicVectors, CompanionTheory.AutomorphicTheory.PieriRules.InfinitesimalCharacterDiscreteSeries
@@ -250,7 +251,7 @@ theorem harish_chandra_formal_degree : HCFdegG := by
     exact absurd hok.1 hk
 
 theorem hypsG_of_zuck (hZ : ZuckG) : HypsG :=
-  ⟨⟨CompanionTheory.FamilyDerivativeExpansion.DecS.decay_low_range, CompanionTheory.FamilyDerivativeExpansion.DecS.decay_infinite_range, CompanionTheory.D.gk.admitted.k_finite_smooth, rank_one_pieri⟩,
+  ⟨⟨CompanionTheory.FamilyDerivativeExpansion.DecS.decay_low_range, Formalism.L2.SG.BesselDiscreteSeries.decInf, CompanionTheory.D.gk.admitted.k_finite_smooth, rank_one_pieri⟩,
     CompanionTheory.D.Upq.Sm.smooth_cyclic_vectors, infinitesimal_character_discrete_series, discrete_series_exist, hZ, poulsen_discrete_series, harish_chandra_formal_degree⟩
 
 end CompanionTheory.PieriExpansion

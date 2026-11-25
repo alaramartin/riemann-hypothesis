@@ -179,8 +179,7 @@ end GlobalTheory.CompanionTheory.SW.CharDual
 
 theorem GlobalTheory.CompanionTheory.SW.char_dual : ∀ (F : Type) [Field F] [NumberField F] (ψ ψ' : AddChar (AF F) ℂ),
     IsCharAF F ψ → IsCharAF F ψ' →
-      ∃ a : F, a ≠ 0 ∧ ∀ x, ψ' x = ψ (algebraMap F (AF F) a * x) :=
-  fun _ _ _ ψ ψ' hψ hψ' => GlobalTheory.CompanionTheory.SW.CharDual.exists_scalar ψ ψ' hψ hψ'
+      ∃ a : F, a ≠ 0 ∧ ∀ x, ψ' x = ψ (algebraMap F (AF F) a * x) := @CharDual.exists_scalar
 end -- clump:auto
 end -- clump:auto
 end -- clump:auto

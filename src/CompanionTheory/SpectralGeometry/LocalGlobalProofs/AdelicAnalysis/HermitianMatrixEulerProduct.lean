@@ -12,6 +12,7 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ExistsTraceFormGramMatrixInBasis
 
 @[expose] public section
 
@@ -31,10 +32,7 @@ abbrev Idx (n d : ℕ) := Fin n ⊕ ({p : Fin n × Fin n // p.1 < p.2} × Fin d)
 variable (R : Type) [CommRing R] [Algebra F R]
 
 theorem sigR_smul (σ : E →ₐ[F] E) (r : R) (y : R ⊗[F] E) :
-    sigR R σ (r • y) = r • sigR R σ y := by
-  induction y with
-  | tmul s e => simp [TensorProduct.smul_tmul', HaarCoord.sigR_tmul]
-  | add a b ha hb => simp only [smul_add, map_add (f := _), ha, hb]
+    sigR R σ (r • y) = r • sigR R σ y := by intros; apply TraceCoord.sigR_smul <;> assumption
 
 variable {d n : ℕ}
 

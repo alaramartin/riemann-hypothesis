@@ -2,8 +2,9 @@ module
 
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.GeometricLemmaFiltration
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetOfInducedFiltration
+import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.GeometricSplitting.Imports
 
 @[expose] public section
 
 theorem CompanionTheory.Geo.geometricLemmaFiltration : GlobalTheory.Published.GeometricLemmaFiltration :=
-  fun k _ _ _ _ => GlobalTheory.CompanionTheory.GeoAssembly.jacquetOfInducedFiltration k
+  PositivityTheory.Geo.geometricLemmaFiltration

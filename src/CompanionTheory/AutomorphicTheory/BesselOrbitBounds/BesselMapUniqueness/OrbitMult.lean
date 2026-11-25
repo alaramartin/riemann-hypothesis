@@ -42,7 +42,7 @@ theorem orbit_mult (hCL : CutLim) (hAd : DsAd) (hF : Factor) {k r : ℕ} {Wp : T
     ∃ c : ℂ, ∀ x ∈ UH (Hpk k r), Bm (X.σ x X.w) = c • l (X.σ x X.w) := by
   obtain ⟨d, hd⟩ := stSchurG k r Wp D X hD hS
   obtain ⟨K, hK⟩ := hbd
-  have hae := BeEquiv.ae_mem_of_haarOn D.haarG
+  have hae := P.HaarUniquenessConjugation.ae_mem D.haarG
   have hAB : B.AB k r ≤ X.a := by
     refine (le_trans ?_ ha)
     have h1 : (1 : ℝ) ≤ r + 1 := by have := Nat.cast_nonneg (α := ℝ) r; linarith
@@ -86,7 +86,7 @@ theorem orbit_mult (hCL : CutLim) (hAd : DsAd) (hF : Factor) {k r : ℕ} {Wp : T
       rw [Real.norm_of_nonneg (mul_nonneg h0 (norm_nonneg _))]
       exact mul_le_mul_of_nonneg_left (hK _ hy) h0)
   have hμ : PI.IsHaarOnM (UH (Hpk k r)) D.μG :=
-    ⟨BeEquiv.sigmaFinite_of_haarOn D.haarG, D.haarG.ne_zero, D.haarG.conc, D.haarG.left⟩
+    ⟨P.B2x9.sigmaFinite_of_haar D.haarG, D.haarG.ne_zero, D.haarG.conc, D.haarG.left⟩
   have hσc : ContinuousOn (fun g => X.σ g X.w) (B.GV k r) := X.rep.2.2 X.w
   have hint : ∀ v, IsSm (UH (Hpk k r)) X.σ v →
       Integrable (fun y : Mt k r => ⟪v, X.σ (Matrix.of y) X.w⟫_ℂ) D.μG := by

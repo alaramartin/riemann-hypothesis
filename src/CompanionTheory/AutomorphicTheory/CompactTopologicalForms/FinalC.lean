@@ -88,6 +88,8 @@ import Formalism.HermitianCurvature.HermitianCurvatureProofs.PsiNormalization
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.RadJFExists
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.WCellMemOmPlus
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutBPEqShift
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.JdPolyOKPolynomialOperators
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.LevelZeroFormEqBigCellIntegralTopDensityCompact
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.CompactTopologicalForms.FinalS, CompanionTheory.AutomorphicTheory.CompactTopologicalForms.JacobiFieldSquareIntegrable, CompanionTheory.AutomorphicTheory.DiscreteGroupWaves.NFDomC, CompanionTheory.AutomorphicTheory.DiscreteGroupWaves.NFTopCpt, CompanionTheory.AutomorphicTheory.DiscreteGroupWaves.NFTopFormCpt, CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.HatCap, CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.HatKBSOf, CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.NFHatProdKBS, CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.NFJCutFF, CompanionTheory.AutomorphicTheory.CompactTopologicalForms.FinalC
@@ -169,7 +171,7 @@ theorem jacobi_field_square_integrable (D : RealPlaceData k r Wp Wq) {A : ℝ} (
   set J : (Fin r → ℂ) × ℂ → _ := fun q => hsVec (JF D F (gq D q)) with hJ
   set h : (Fin r → ℂ) × ℂ → ℝ := fun q => w q * ‖J q‖ ^ 2 with hh
   set μQ : Measure ((Fin r → ℂ) × ℂ) := volume.restrict (Qset D) with hμQ
-  have hw0 : ∀ q, 0 ≤ w q := fun q => JCTx2.bcWeight_nonneg' _ _ q
+  have hw0 : ∀ q, 0 ≤ w q := fun q => B7.boundary_weight_nonneg _ _ q
   have hh0 : ∀ q, 0 ≤ h q := fun q => mul_nonneg (hw0 q) (sq_nonneg _)
   have hcont : ContinuousOn F (GV k r) := B7.jc_cont ⟨c4, hc4⟩
   have hJm : AEStronglyMeasurable J μQ := by
@@ -211,7 +213,7 @@ theorem beta_cut_right (D : RealPlaceData k r Wp Wq) {χ : ℝ → ℝ} (hχ : C
   have hGc : Continuous fun x : Mt k r => Gf k r D.z D.z' (Matrix.of x) :=
     (DifferentialOperatorClasses.gf_cont k r D.z D.z').comp continuous_id
   set w : (Fin r → ℂ) × ℂ → ℝ := bcWeight k r (Tz k r D.z) (Tz k r D.z') with hw
-  have hw0 : ∀ q, 0 ≤ w q := fun q => JCTx2.bcWeight_nonneg' _ _ q
+  have hw0 : ∀ q, 0 ≤ w q := fun q => B7.boundary_weight_nonneg _ _ q
   have hwm : Measurable w := B7.measurable_bcWeight _ _
   have e : ∀ ε, beta D H (Formalism.FourierDecayAlt.D.cutF D χ F ε) = ∫ q in Qset D, ((χ (Gf k r D.z D.z' (gq D q) / ε) : ℝ) : ℂ) *
       ((w q : ℂ) * inner ℂ (hsVec (JF D F (gq D q))) (hsVec (JF D H (gq D q)))) := by
@@ -304,7 +306,7 @@ theorem q_symm (D : RealPlaceData k r Wp Wq) {A : ℝ} (hA : AB k r ≤ A) {c : 
     CutMP.ER.capacity_theta_facts CutMP.ER.beta_form_congr_holds CutMP.ER.coefficient_vector_smoothness CutMP.ER.coefficient_vector_in_class
     CutMP.ER.coefficient_vector_support D hA hc hs w X Y hX hY
   have h2 := CutMP.ER.fold_rev CutMP.ER.coefficient_vector_smoothness CutMP.ER.coefficient_vector_congr CutMP.ER.coefficient_vector_commutation s w Y hY.1
-  rw [beta_congr_right D h2] at h1
+  rw [PBG.beta_congr_right D h2] at h1
   exact h1.trans (CutMP.ER.beta_conj D X _)
 
 theorem good_cut (D : RealPlaceData k r Wp Wq) {χ : ℝ → ℝ} (hχ : C6.IsCut0 χ) {c : ℝ} (h0 : ∀ x, x < c → χ x = 0)
@@ -329,7 +331,7 @@ theorem residue_zero_eq_beta_fold (p : KB.Pl P Wp Wq) {H : B.Mat P.k P.r → (Wq
     {w : List C.Letter} (hw : KB.CutWord P p.l0 w) :
     p.RR H 0 w [] [] = beta p.T.base (fold (M.sgn P p.l0) w H) H := by
   unfold KB.Pl.RR
-  rw [level_zero_holds _ _ _ _ _ _ _ _ _ _ _ hH (good_positioned_of_cut hw)]
+  rw [Dx1.LZ.levelZero _ _ _ _ _ _ _ _ _ _ _ hH (good_positioned_of_cut hw)]
   rfl
 
 theorem q_loc (p : KB.Pl P Wp Wq) {F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)} (hF : CkOn ⊤ (GV P.k P.r) F)
@@ -626,7 +628,7 @@ variable {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace �
 theorem waveG_at_zero {k r : ℕ} (Bs : B.RealPlaceData k r Wp Wq) (w : List C.Letter)
     (x : Wd.Ix (Fin w.length) → B.Mat k r → (Wq →L[ℂ] Wp)) : KB.waveG Bs 0 w x = x := by
   funext e g
-  simp [KB.waveG, P5.fsv, uInv_at_zero]
+  simp [KB.waveG, P5.fsv, GlobalTheory.LevelIntegralStep.uInv_at_zero]
 
 theorem ew_snoc (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (w : List C.Letter) {j : ℕ} (hj : j ≤ P.r)
     {h : C.LPt} (hh : D.IsLocPt h j) (c : ℂ) :
@@ -706,7 +708,7 @@ theorem ew_step (hPS : StandardPairingDecay.PStdC) (p : KB.Pl P Wp Wq) {Cb : ℝ
   obtain ⟨φ, -, hφi, hφ, hint⟩ := hPS Wp Wq P p F j hj w h h hh hh Cb hCb hF hw
   have hae : (fun c : ℂ => C.nAux P.k P.r 0 (fun _ _ => 1) 1 h * (φ c).re) =ᵐ[volume]
       fun c : ℂ => TBB.Ew p (fun _ => 1) F (j + 1) w (h ++ [(1, c)]) := by
-    filter_upwards [ae_ne_zero_c] with c hc
+    filter_upwards [TBBx1.ae_ne_zero] with c hc
     rw [ew_snoc p F w hj hh c, hφ c hc]
   refine ⟨(hφi.re.const_mul _).congr hae, ?_⟩
   have h0 := hint 0
@@ -715,9 +717,6 @@ theorem ew_step (hPS : StandardPairingDecay.PStdC) (p : KB.Pl P Wp Wq) {Cb : ℝ
   rw [← integral_congr_ae hae, integral_const_mul, ew_low p F w hj hh, ← h0]
   congr 1
   exact integral_re hφi
-
-theorem isLocPt_ofFn {j : ℕ} (c : Fin j → ℂ) (hc : ∀ a, c a ≠ 0) :
-    D.IsLocPt (List.ofFn fun l => ((1 : ℕ), c l)) j := PBJ.Dens.isLocPt_bigPt c hc
 
 theorem topForm_cpt (hPS : StandardPairingDecay.PStdC) (p : KB.Pl P Wp Wq) {Cb : ℝ} (hCb : KB.InDDplus2 P p.l0 p.T.base Cb p.Θ)
     {w : List C.Letter} (hw : KB.CutWord P p.l0 w) {F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)}
@@ -732,7 +731,7 @@ theorem topForm_cpt (hPS : StandardPairingDecay.PStdC) (p : KB.Pl P Wp Wq) {Cb :
         rw [List.ofFn_succ']
         simp [List.concat_eq_append]
       simp only [e]
-      exact ew_step hPS p hCb hw hF (by omega) (isLocPt_ofFn c hc))
+      exact ew_step hPS p hCb hw hF (by omega) (GlobalTheory.TopVec.isLocPt_ofFn_unit c hc))
   refine ⟨h.1, h.2.trans ?_⟩
   simp only [List.ofFn_zero]
   rw [TBBx3.ew_zero_nil]
@@ -977,7 +976,7 @@ theorem cap_A_bound : CapAB := by
       rw [hA J _ hGV hCk]), trJB_eq_trR]
     funext ρ
     show MA.toSm _ (Gauge.rawR _ _ e (dMul (drF _) _) ρ) = _
-    rw [(residue_derivative_transition _ _ P Bs hpl hk e he L hL _ _ hA1).2 ρ, R.LevelData.Ahat, Gauge.actA_mul, ← tA]
+    rw [(residue_derivative_transition _ _ P Bs hpl hk e he L hL _ _ hA1).2 ρ, R.LevelData.Ahat, MAx3.F.actA_mul, ← tA]
     rfl
   · have hF := Gauge.tc_famR P Bs hpl J hJ
     obtain ⟨-, ⟨hA1, tA⟩⟩ := capelli_transition_holds _ _ P Bs hpl hk e he L hL _ _ hF y
@@ -989,7 +988,7 @@ theorem cap_A_bound : CapAB := by
       rw [hAv J _ hGV hCk]), trJB_eq_trR]
     funext ρ
     show MA.toSm _ (Gauge.rawR _ _ e (dMul (drbF _) _) ρ) = _
-    rw [(residue_derivative_transition _ _ P Bs hpl hk e he L hL _ _ hA1).1 ρ, R.LevelData.Ahatv, Gauge.actA_mul, ← tA]
+    rw [(residue_derivative_transition _ _ P Bs hpl hk e he L hL _ _ hA1).1 ρ, R.LevelData.Ahatv, MAx3.F.actA_mul, ← tA]
     rfl
 
 theorem radP : JDRRadP := jDRRadP_of_steps residue_first_move_holds residue_second_move_holds
@@ -1132,7 +1131,7 @@ open Formalism.FourierDecayAlt.P.CutMP
 theorem normal_form_hat_product_bessel : NFHatProdKBS := by
   refine ⟨1, 18, ?_⟩
   intro Wp Wq _ _ _ _ _ _ P p e L he hQ hL N u hN hu
-  exact hatProdJB hat_product_bound polynomial_decay_admissible P p.T.base p.hP p.hl.2.2 e L he hQ hL N u hN hu
+  exact hatProdJB hat_product_bound GlobalTheory.HatNF.polyOp_ok P p.T.base p.hP p.hl.2.2 e L he hQ hL N u hN hu
 
 end Formalism.FourierDecayAlt.P.CutBP.LimitNormalForms
 end -- clump:auto
@@ -1157,19 +1156,19 @@ theorem jf_mem_ffkb {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerPro
     (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (hF : ∀ (A : ℝ) (m : ℕ), B.InCC A m F) :
     B.JF p.T.base F ∈ FFKB p := by
   set Bs := p.T.base
-  have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bs.haarW
-  have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bs.haarN
-  have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bs.haarW'
+  have := B2x9.sigmaFinite_of_haar Bs.haarW
+  have := B2x9.sigmaFinite_of_haar Bs.haarN
+  have := B2x9.sigmaFinite_of_haar Bs.haarW'
   have hN := bessel_unipotent_equiv_holds Wp Wq P.k P.r Bs.z Bs.z' cStd Bs.π Bs.π' Bs.μW Bs.μN Bs.μW' F Bs.z_mem Bs.z'_mem
     Bs.haarN.conc (fun n₀ h => Bs.haarN.left n₀ h)
   refine ⟨fun g₀ hg₀ => Formalism.FourierDecayAlt.P5.Rad.jf_smoothLev Bs F hF g₀ ⟨hg₀.1, (CutMP.jdc_om_of _ _ hg₀.1.1 hg₀.2).2⟩, ?_, ?_, ?_⟩
   · intro g _ n hn
     have e := hN g n hn.1 1 WeylGroupFacts.mem_n_one
-    rw [Matrix.mul_one, BesselCapelliCommutation.psi_one Bs.z'_mem, mul_one] at e
+    rw [Matrix.mul_one, Qx8.psi_one Bs.z'_mem, mul_one] at e
     exact e
   · intro g _ n hn
     have e := hN g 1 WeylGroupFacts.mem_n_one n hn.1
-    rw [Matrix.one_mul, BesselCapelliCommutation.psi_one Bs.z_mem, one_mul] at e
+    rw [Matrix.one_mul, Qx8.psi_one Bs.z_mem, one_mul] at e
     exact e
   · intro g _ h hh h' hh'
     exact Formalism.FourierDecayAlt.P5.jf_uEquiv Bs F g hh hh'

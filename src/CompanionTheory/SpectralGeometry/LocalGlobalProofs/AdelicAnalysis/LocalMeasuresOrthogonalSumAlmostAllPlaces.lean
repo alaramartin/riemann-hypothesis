@@ -13,6 +13,7 @@ import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorL
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalDensitiesBlockOneAlmostAll
 
 @[expose] public section
 
@@ -27,15 +28,7 @@ theorem gram_first {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [Co
     (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (t : F) :
     gramR R σ (blockOne (algebraMap F E t) J)
         (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → R ⊗[F] E)) =
-      (hermScal R σ (algebraMap F R t) : HermR R σ 1) := by
-  funext a c
-  have h1 : (algebraMap F R t) ⊗ₜ[F] (1 : E) = (1 : R) ⊗ₜ[F] (algebraMap F E t) := by
-    rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
-  simp only [gramR, hR, hform, Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, map_one, map_zero,
-    zero_mul, mul_zero, Finset.sum_const_zero, add_zero, one_mul, mul_one, JR, Matrix.map_apply]
-  show inclR R (blockOne (algebraMap F E t) J 0 0) = (algebraMap F R t) ⊗ₜ[F] (1 : E)
-  rw [h1]
-  rfl
+      (hermScal R σ (algebraMap F R t) : HermR R σ 1) := GoodStep.gram_mulVec_e0 R σ J t
 
 theorem first_mem {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {d M n : ℕ}
     (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (σ : E →ₐ[F] E)
@@ -75,7 +68,7 @@ theorem stage_good : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numbe
         funext a
         exact Fin.cases rfl (fun j => j.elim0) a
       rwa [hc] at h0
-    obtain ⟨k, hk, hkl⟩ := hv _ _ he0 he (gram_first (Fv F v) σ J t) (hgram h _)
+    obtain ⟨k, hk, hkl⟩ := hv _ _ he0 he (GoodStep.gram_mulVec_e0 (Fv F v) σ J t) (hgram h _)
     obtain ⟨ι, -, -, hrange, -, hcons⟩ := StabFirst.stab_first F E σ hCM M J hJ t ht (Fv F v)
     have hg : actW (Fv F v) σ _ (k⁻¹ * h) (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0)) =
         (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0)) := by

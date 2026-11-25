@@ -15,6 +15,7 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.OrderedCreationCommutesPastLevi
 import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.IsSimpleTriv
 import Mathlib.Tactic.TypeStar
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LeviActionPreservesSupportDegree
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CreationProductSingleBasis, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CreationProductSupportDegree, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.HighestWeightVectorKilledByRaising, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LeviActionCommutesWithBoundary, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LeviActionUnitaryAdjoint, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LocallyFiniteLeviInvariantSubspace, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.InjUOfInjR
@@ -717,22 +718,6 @@ theorem cre_ann_mem {S : Submodule ℂ V} {x : Cn n V} (hx : ∀ A, x A ∈ S) (
     · exact S.smul_mem _ (hx _)
   · exact S.zero_mem
 
-theorem inU_of_adC {lev : Fin n → ℕ} {p q : Fin n} (hpq : lev p = lev q) {i k : Pos n}
-    (h : adC p q i k ≠ 0) (hi : inU lev i) : inU lev k := by
-  by_cases c1 : q = i.1.1 ∧ k.1 = (p, i.1.2)
-  · show lev k.1.1 < lev k.1.2
-    rw [c1.2]
-    show lev p < lev i.1.2
-    rw [hpq, c1.1]
-    exact hi
-  by_cases c2 : i.1.2 = p ∧ k.1 = (i.1.1, q)
-  · show lev k.1.1 < lev k.1.2
-    rw [c2.2]
-    show lev i.1.1 < lev q
-    rw [← hpq, ← c2.1]
-    exact hi
-  · exact absurd (by simp [adC, c1, c2]) h
-
 theorem lF_ne {E : Fin n → Fin n → Module.End ℂ V} {p q : Fin n} {x : Cn n V} {A : Finset (Pos n)}
     (h : lF E p q x A ≠ 0) : x A ≠ 0 ∨ ∃ i k, adC p q i k ≠ 0 ∧ cre k (ann i x) A ≠ 0 := by
   by_contra hc
@@ -753,7 +738,7 @@ theorem term_supp {lev : Fin n → ℕ} {d : ℕ} {p q : Fin n} (hpq : lev p = l
   have hi : inU lev i := hs i (mem_insert_self _ _)
   refine ⟨fun j hj => ?_, ?_⟩
   · by_cases e : j = k
-    · exact e ▸ inU_of_adC hpq h0 hi
+    · exact e ▸ RgCOBlock.LeviSupp.inU_of_adC hpq h0 hi
     · exact hs j (mem_insert_of_mem (mem_erase.2 ⟨e, hj⟩))
   · have e1 := hd _ h3
     rw [card_insert_of_notMem h2] at e1

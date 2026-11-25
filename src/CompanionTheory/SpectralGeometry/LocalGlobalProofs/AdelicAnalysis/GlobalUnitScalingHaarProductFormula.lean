@@ -11,6 +11,7 @@ import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 public import GroundTheory.GlobalFields.TateThesis.AdeleMeasurable
 public import GroundTheory.GlobalFields.TateThesis.AdeleMeasure
+import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.NumFieldHosCountable
 
 @[expose] public section
 
@@ -85,7 +86,7 @@ theorem map_mul_left_finite (v : HeightOneSpectrum (𝓞 F)) (a : Fv F v) (ha : 
     (μ : Measure (Fv F v)) (hμ : μ.IsAddHaarMeasure) :
     μ.map (fun x => a * x) = (‖a‖₊)⁻¹ • μ := by
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
-  haveI := PI.UnitaryGroupMassFormula.LocJacTyp.BM.secondCountable_Fv v
+  haveI := Formalism.IndefR.Eqv.G5.fv_secondCountable v
   haveI : μ.Regular := inferInstance
   ext S hS
   rw [Measure.map_apply (continuous_const_mul _).measurable hS, Measure.smul_apply]

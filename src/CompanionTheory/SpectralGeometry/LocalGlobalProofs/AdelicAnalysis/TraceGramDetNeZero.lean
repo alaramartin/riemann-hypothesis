@@ -4,6 +4,7 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SemidirectVolume.TraceGramNondegenerate
 
 @[expose] public section
 
@@ -17,10 +18,6 @@ open scoped TensorProduct ENNReal NNReal Matrix
 section Alg
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
-
-theorem trace_one_tmul [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] (e : E) :
-    Algebra.trace R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] e) = algebraMap F R (Algebra.trace F E e) := by
-  rw [Algebra.trace_apply, Algebra.trace_apply, ← Algebra.baseChange_lmul, LinearMap.trace_baseChange]
 
 def traceGram (σ : E →ₐ[F] E) {M d : ℕ} (J : Matrix (Fin M) (Fin M) E) (b : Module.Basis (Fin d) F E) :
     Matrix (Fin M × Fin d) (Fin M × Fin d) F :=
@@ -62,7 +59,7 @@ theorem trace_expand [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F 
   have h2 : inclR R e = (1 : R) ⊗ₜ[F] e := rfl
   rw [hs, h1, h2, smul_mul_assoc, smul_mul_assoc, mul_smul_comm, map_smul, map_smul,
     Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, one_mul, one_mul,
-    trace_one_tmul, smul_eq_mul, smul_eq_mul]
+    PI.VolSemiDirect.W.Cj.trace_one_tmul, smul_eq_mul, smul_eq_mul]
   ring
 
 theorem trace_hR [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) {M d : ℕ}

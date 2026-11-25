@@ -4,6 +4,7 @@ public import Mathlib.Analysis.CStarAlgebra.Module.Constructions
 public import Mathlib.Analysis.InnerProductSpace.Continuous
 public import Mathlib.Analysis.InnerProductSpace.LinearMap
 public import Mathlib.Analysis.InnerProductSpace.ProdL2
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.AdmissibleSmoothVectors.FinOfPI
 
 @[expose] public section
 
@@ -18,13 +19,8 @@ variable {G : Type} [Group G] {H H' : Type} [NormedAddCommGroup H] [InnerProduct
   {σ : G →* (H →L[ℂ] H)} {σ' : G →* (H' →L[ℂ] H')}
 
 omit [CompleteSpace H] in
-theorem inner_map_left (hiso : ∀ g v, ‖σ g v‖ = ‖v‖) (g : G) (v w : H) : ⟪σ g v, w⟫_ℂ = ⟪v, σ g⁻¹ w⟫_ℂ := by
-  have h := (⟨(σ g : H →ₗ[ℂ] H), hiso g⟩ : H →ₗᵢ[ℂ] H).inner_map_map v (σ g⁻¹ w)
-  have e : σ g (σ g⁻¹ w) = w := by
-    rw [← mul_apply_eq_comp, ← map_mul, mul_inv_cancel, map_one]; rfl
-  rw [← h]
-  show _ = ⟪σ g v, σ g (σ g⁻¹ w)⟫_ℂ
-  rw [e]
+theorem inner_map_left (hiso : ∀ g v, ‖σ g v‖ = ‖v‖) (g : G) (v w : H) : ⟪σ g v, w⟫_ℂ = ⟪v, σ g⁻¹ w⟫_ℂ :=
+  by intros; apply admitted.FinOfPIAux.inner_left <;> assumption
 
 theorem exists_graph (hiso : ∀ g v, ‖σ g v‖ = ‖v‖) (hiso' : ∀ g v, ‖σ' g v‖ = ‖v‖)
     (hs : ∀ T : H' →L[ℂ] H', (∀ g v, T (σ' g v) = σ' g (T v)) → ∃ c : ℂ, ∀ v, T v = c • v)

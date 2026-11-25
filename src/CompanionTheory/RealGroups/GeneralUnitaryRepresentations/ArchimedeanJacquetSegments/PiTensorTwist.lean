@@ -15,6 +15,8 @@ import Formalism.ConjugateSelfDual.Statement
 import ReciprocityTheory.GaloisValuations.GlobalA
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ExistsNotCongPow
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HasExponentZeroIff
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactOpenSubgroupsBasis
+import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.ComplementarySeries.Complementary
 
 @[expose] public section
 
@@ -58,7 +60,7 @@ theorem prodModel (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [Is
     fun a => twist x.rep (detChar (Fin x.1) (absPow k (![-(s : ℂ), (s : ℂ)] a)))
   have hs : ∀ a, IsSmooth (π a) := fun a => isSmooth_twist x.2.rep.smooth (isSmoothChar_absPow _).detChar
   have hi : ∀ a, (π a).IsIrreducible := fun a => isIrreducible_twist x.2.rep.irr _
-  have e1 := prodIrrEquiv (d := fun _ : Fin 2 => x.1) (sum_two x.1) π hs hi
+  have e1 := prodIrrEquiv (d := fun _ : Fin 2 => x.1) (PositivityTheory.RgGu.NR.sum_two x.1) π hs hi
   have hy : (fun a => IrrGL.of (π a) (hs a) (hi a)) = ![x.nu (-(s : ℂ)), x.nu (s : ℂ)] := by
     funext a
     have key : ∀ c : ℂ, IrrGL.of (twist x.rep (detChar (Fin x.1) (absPow k c))) (isSmooth_twist x.2.rep.smooth
@@ -68,8 +70,8 @@ theorem prodModel (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [Is
     fin_cases a
     · exact key _
     · exact key _
-  obtain ⟨e2⟩ := prodIrr_congr hy (sum_two x.1) hd
-  have e3 : (multiProd (stdBlocks (fun _ : Fin 2 => x.1) (sum_two x.1)) π).Equiv
+  obtain ⟨e2⟩ := prodIrr_congr hy (PositivityTheory.RgGu.NR.sum_two x.1) hd
+  have e3 : (multiProd (stdBlocks (fun _ : Fin 2 => x.1) (PositivityTheory.RgGu.NR.sum_two x.1)) π).Equiv
       (parInd (blk2 x.1) (twist (piTensor fun _ : Fin 2 => x.rep) (chi k x.1 s))) :=
     parIndEquiv (blk2 x.1) ((piTensor_twist x s) ▸ Representation.Equiv.refl _)
   exact ⟨(e2.symm.trans e1.symm).trans e3⟩
@@ -87,7 +89,7 @@ theorem cuspUnit (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsN
     have hsm := (y.nu ((-(s / y.1) : ℝ) : ℂ)).2.rep.smooth
     haveI := GlobalTheory.SmGL.Model.nontrivial_of_isIrreducible hi
     obtain ⟨v₀, hv₀⟩ := exists_ne (0 : (y.nu ((-(s / y.1) : ℝ) : ℂ)).2.rep.V)
-    obtain ⟨l, hl⟩ := GlobalTheory.ContraRefl.exists_smooth_form_ne hsm (GlobalTheory.SqIntUnit.compactOpen_basis k _) hv₀
+    obtain ⟨l, hl⟩ := GlobalTheory.ContraRefl.exists_smooth_form_ne hsm (GlobalTheory.CompanionTheory.SmGL.exists_compact_open_subgroup_subset k _) hv₀
     refine GlobalTheory.isUnitarisable_of_isSupercuspidal _ _ _ (l : Module.Dual ℂ _) l.2
       (fun e => hl (by rw [e]; rfl)) hi (GlobalTheory.CuspCoef.isSupercuspidal_of_isCuspidal k _ _ _ hρc.2) ?_
     intro g hg

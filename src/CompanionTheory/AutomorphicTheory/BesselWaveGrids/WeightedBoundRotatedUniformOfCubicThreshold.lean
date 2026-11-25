@@ -161,6 +161,10 @@ import Formalism.HermitianCurvature.HermitianCurvatureProofs.TriangleInequalityA
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.LeftDerivativeCurves
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.LieBracketMultiplication
 import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.AdmissibleSmoothVectors.AdmissibleOfIwasawa
+import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.CapelliEigenvalues.BetaAtInfinityZero
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselPointwiseBoundAtLargeGaps
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UniformBesselConstant
+import Development.WeilBound.RepresentationTheoryGL.HolomorphicDiscreteSeries.WordSpans.StepM
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.SchurLimitBounds.ZuckermanDuality.BetaAtInfinityZero, CompanionTheory.AutomorphicTheory.SchurLimitBounds.ZuckermanDuality.LimBdFpm, CompanionTheory.AutomorphicTheory.BesselWaveGrids.LimStepsOf, CompanionTheory.AutomorphicTheory.BesselWaveGrids.SmoothCoefficientBessel, CompanionTheory.AutomorphicTheory.BesselWaveGrids.NormalizedMeasureScaling, CompanionTheory.AutomorphicTheory.BesselWaveGrids.NqOfLamData, CompanionTheory.HarishChandraModules.NonemptyRepresentations.IsData, CompanionTheory.HarishChandraModules.NonemptyRepresentations.TypeHW, CompanionTheory.AutomorphicTheory.BesselWaveGrids.TypeHC, CompanionTheory.AutomorphicTheory.BesselWaveGrids.WeightedUniformRotatedOfExpansion, CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFunctors.ZuckDualTThrS, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.CapelliParamsDiffInt, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.TypeExponentsDifferByIntegers, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.TypeExponentsConsecutiveGap, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.OmgLeftRight, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.OmgNMulN, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.WignerMapContinuousRep, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.WignerMapPolynomialOperator, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.WignerMapUpperBound, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.WignerPlusMinusDecomposition, CompanionTheory.SpectralGeometry.LocalGlobalProofs.WeylGroupActions.UpdateEqUMinus, CompanionTheory.AutomorphicTheory.BesselWaveGrids.WeightedBoundRotatedUniformOfCubicThreshold
@@ -181,7 +185,7 @@ theorem beta_at_infinity_zero : BetaInfZero := by
   intro k r Wp Wq _ _ _ _ _ _ D F F' h
   unfold B.betaInf B.betaInfTau
   refine integral_eq_zero_of_ae ?_
-  filter_upwards [P.B5.ae_inSS D] with p hp
+  filter_upwards [P.B6.ae_inSS D] with p hp
   have hχ : ∀ t, D.χ t ≠ 0 → t ≠ 0 := fun t ht h0 => by
     have := (D.χ_supp (subset_tsupport _ ht)).1
     rw [h0] at this
@@ -223,8 +227,8 @@ theorem phase_zero_alt : PhZero := by
   have ha : a ∈ UH (Hpk k r) := (grp _ (grp _ hp.1.1).2.1).2.2 _ (grp _ hp.2.1.1).2.1
   have hb : b ∈ UH (Hpk k r) := (grp _ hp.2.2.2.1).2.2 _ hp.2.2.1.1
   have hμG : PI.BesselPeriodGGP.IsHaarOn (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) D.μG :=
-    ⟨P.B5.haar_sigmaFinite D.haarG, D.haarG.ne_zero, D.haarG.conc, D.haarG.left⟩
-  have hz := (schur_inequiv hσ hσ' (capelli_inequivalence hE k r ε ε μ μ' H H' σ σ' hμ hμ' hσ hσ' hne) hμG
+    ⟨P.B2x9.sigmaFinite_of_haar D.haarG, D.haarG.ne_zero, D.haarG.conc, D.haarG.left⟩
+  have hz := (schur_inequiv hσ hσ' (CapEig.capelli_inequivalence hE k r ε ε μ μ' H H' σ σ' hμ hμ' hσ hσ' hne) hμG
     (σ b v) (σ a⁻¹ w) v' w').2
   set S : Wq →L[ℂ] Wp := (D.π (Matrix.of p.1.1)).comp (T.comp (D.π' (Matrix.of p.2.1)⁻¹))
   unfold B.Ph
@@ -298,7 +302,7 @@ open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P Formalism.FourierDeca
 
 theorem global_regularity_jacobi : GRegJ :=
   gRegJ_of nilpotent_derivative unitary_capelli_holds group_equations_post_holds smooth_of_coefficients_holds
-    (gRegScalar_of group_chart_holds chart_equations_holds classical_to_weak_solution elliptic_regularity_weighted JfS.symbol_nilpotent_holds lie_stabilizer_splitting)
+    (gRegScalar_of group_chart_holds chart_equations_holds classical_to_weak_solution elliptic_regularity_weighted JfS.Sym.symbolNil_direct lie_stabilizer_splitting)
 
 theorem smooth_coefficient_bessel : SmoothKB := by
   intro P Wp Wq _ _ _ _ _ _ p f A hA hCk hCC heig
@@ -316,7 +320,7 @@ theorem smooth_coefficient_bessel : SmoothKB := by
   have hint : ∀ᵐ q ∂p.T.base.μSS,
       JF.xiP p.T.base q • Q.CV P.k P.r (Y : ℂ) (B.rho p.T.base q f) g =
         c • (JF.xiP p.T.base q • B.rho p.T.base q f g) := by
-    filter_upwards [B7.ae_inSS p.T.base] with q hq
+    filter_upwards [B6.ae_inSS p.T.base] with q hq
     rw [_root_.Formalism.FourierDecayAlt.P.JFxE.cVRho P.k P.r _ _ p.T.base (Y : ℂ) f q hq hCkn _ hgG]
     have hs := B7.sgs_mem p.T.base hq hgG
     simp only [B.rho]
@@ -353,7 +357,7 @@ theorem norm_JF_eq (Bs : B.RealPlaceData k r Wp Wq) (F : B.Mat k r → (Wq →L[
     ‖B.hsVec (B.JF Bs F γ)‖ = ‖B.hsVec (B.JF Bs F γ')‖ := by
   have hl : D.IsLocPt (PBJ.bigPt d) (r + 1) := PBJ.Dens.isLocPt_bigPt d hd
   have hpos' : 0 < Gf k r Bs.z Bs.z' γ' := by
-    rw [← ptG_spec k r _ _ (PBJ.bigPt d) _ hl hZ', ptG_spec k r _ _ (PBJ.bigPt d) _ hl hZ]
+    rw [← Dx1.ptGSpec k r _ _ (PBJ.bigPt d) _ hl hZ', Dx1.ptGSpec k r _ _ (PBJ.bigPt d) _ hl hZ]
     exact hpos
   obtain ⟨s, hs, s', hs', hγs⟩ := fibre_orbit_description k r Bs.z Bs.z'
     ⟨Bs.k_pos, Dx2.VV.std_vector_z Bs, Dx2.VV.std_vector_z_prime Bs⟩ _ hγ _ hγ' hpos (hZ.trans hZ'.symm)
@@ -390,10 +394,10 @@ theorem normSq_sec (hk : 2 ≤ k) (Bs : B.RealPlaceData k r Wp Wq) (F : B.Mat k 
   have hZ := PBM.zhat_bigCell_pt Bs d (by rw [hd2]; exact hζ)
   have hZ' := PBM.zhat_bigCell_pt { Bs with μsec := μsec, sec := hsec } d (by rw [hd2]; exact hζ)
   rw [hd1, hd2] at hZ hZ'
-  have e := norm_JF_eq Bs F d hd (bigCellMem k r _ _ hc (Bs.sec.2 _ hζ).1) (bigCellMem k r _ _ hc (hsec.2 _ hζ).1) hZ hZ'
+  have e := norm_JF_eq Bs F d hd (big_cell_mem_holds k r _ _ hc (Bs.sec.2 _ hζ).1) (big_cell_mem_holds k r _ _ hc (hsec.2 _ hζ).1) hZ hZ'
     (Formalism.MainNotions.S.Pv.LemmaJ.Gf_big Bs.z_mem Bs.z'_mem Bs.sec q.1 hc q.2 hζ)
   congr 2
-  rw [Real.norm_eq_abs, sq_abs, Real.sq_sqrt (Formalism.MainNotions.BesselShellMomentBounds.hsNormSq_nonneg _), Formalism.MainNotions.BesselShellMomentBounds.hsNormSq_eq]
+  rw [Real.norm_eq_abs, sq_abs, Real.sq_sqrt (GlobalTheory.ThA.BpDict.hsNormSq_nonneg _), Formalism.MainNotions.BesselShellMomentBounds.hsNormSq_eq]
   change ‖B.hsVec (B.JF Bs F (bigCell k r q.1 (Bs.μsec q.2)))‖ ^ 2 = _
   rw [e, PiLp.norm_sq_eq_of_L2]
   rfl
@@ -451,7 +455,7 @@ theorem orbSq_le (L : LocBessel k r) (κ s : ℝ≥0∞) (hs0 : s ≠ 0) (hs : s
     conv_lhs => rw [e1, integral_smul_measure]
     rw [Complex.coe_smul]
     rfl
-  rw [e, Formalism.MainNotions.BesselShellMomentBounds.hsNormSq_smul, Complex.norm_real, Real.norm_eq_abs, sq_abs, ENNReal.ofReal_mul (by positivity)]
+  rw [e, GlobalTheory.AmpNorm.hsNormSq_smul, Complex.norm_real, Real.norm_eq_abs, sq_abs, ENNReal.ofReal_mul (by positivity)]
   refine mul_le_mul' le_rfl ?_
   exact le_iSup_of_le g (le_iSup_of_le μR (le_iSup_of_le (s⁻¹ • ν) (le_iSup_of_le ⟨hc.1, hc.2.1, hc.2.2.1, hq⟩ le_rfl)))
 
@@ -466,7 +470,7 @@ theorem jNorm2_eq (L : LocBessel k r) (κ s : ℝ≥0∞) (h : pairMeas L = s �
   rw [← ENNReal.ofReal_mul (by positivity)]
   congr 1
   unfold Formalism.MainNotions.BesselShellMomentBounds.dens
-  rw [hJ, Formalism.MainNotions.BesselShellMomentBounds.hsNormSq_smul, Complex.norm_real, Real.norm_eq_abs, sq_abs]
+  rw [hJ, GlobalTheory.AmpNorm.hsNormSq_smul, Complex.norm_real, Real.norm_eq_abs, sq_abs]
   change _ = _ * (bcWeight k r (Tz k r L.z) (Tz k r L.z') q * _)
   ring
 
@@ -528,13 +532,11 @@ namespace CompanionTheory.D.Inhab.IsDataInh
 
 open Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5
 
-theorem glev_last_eq (k r : ℕ) : Glev k r (Fin.last r) = B2.UWb k r := by
-  ext g
-  exact ⟨fun ⟨h1, h2⟩ => ⟨h1, fun a => h2 a (by simp)⟩, fun ⟨h1, h2⟩ => ⟨h1, fun a _ => h2 a⟩⟩
+theorem glev_last_eq (k r : ℕ) : Glev k r (Fin.last r) = B2.UWb k r := @P.PBH.glev_last_eq k r
 
 theorem haar_glev_last (k r : ℕ) : ∃ μ : Measure (Mt k r), B.IsHaarOn (Glev k r (Fin.last r)) μ := by
   rw [glev_last_eq]
-  exact Formalism.FourierDecayAlt.P.opposite_weyl_haar_exists k r
+  exact P.B2x3.haarWb k r
 
 theorem isData_of_place {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
     [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : M.Par)
@@ -567,12 +569,6 @@ namespace CompanionTheory.D.Inhab.TypeHW
 open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.P
 
 variable {k r : ℕ} {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
-
-theorem prod_Icc (n : ℕ) (f : ℕ → ℂ) : ∏ i ∈ Finset.Icc 1 n, f i = ∏ j : Fin n, f ((j : ℕ) + 1) := by
-  rw [Fin.prod_univ_eq_prod_range (fun j => f (j + 1)) n]
-  induction n with
-  | zero => simp
-  | succ n ih => rw [Finset.prod_Icc_succ_top (by omega), ih, Finset.prod_range_succ]
 
 end CompanionTheory.D.Inhab.TypeHW
 end -- clump:auto
@@ -672,7 +668,7 @@ theorem isType_of_hc {u : ℕ → ℝ} {u₀ : Fin k → ℝ} (hz : Formalism.Qu
   have e := hx (w - ((k : ℂ) - 1) / 2)
   rw [sub_add_cancel] at e
   rw [(P.frame_general_linear W k r k z π Bs ⟨hrep, hcont⟩ hBs).2, P.QrCap.capChange hz hT ⟨hrep, hcont⟩ hBs hB, hEB, e,
-    CompanionTheory.D.Inhab.TypeHW.prod_Icc]
+    P.ProductIntervalFrames.prod_Icc_one]
   congr 1
   refine Finset.prod_congr rfl fun j _ => ?_
   rw [hu]
@@ -786,7 +782,7 @@ theorem wLoc1N_of (hW : ∀ Cb, WEnd.WBp Cb) {Cgc : ℝ} (hCC : CoefCC1 Cgc) (Ch
   have hb1 : 1 ≤ b := by linarith
   have hb0 : 0 < b := by linarith
   have hcStd : L.c = cStd := by rw [hc]; exact Formalism.MainNotions.OnePlaceEstimates.cOfDpsi_one
-  have hInCC := hCC D.R.k D.R.rS L f hk1 hf (Formalism.L2.SG.Pf.BesselExpansion.gap_mono hgap
+  have hInCC := hCC D.R.k D.R.rS L f hk1 hf (PositivityTheory.RgHe.SM.gap_mono hgap
     (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right g2 (by positivity)) (by positivity)))
   have hok := GapSizes.gapOK_of D.R.k D.R.rS hk1 Cg g3
   rw [mul_assoc] at hgap hok
@@ -887,7 +883,7 @@ theorem wLoc1N_of (hW : ∀ Cb, WEnd.WBp Cb) {Cgc : ℝ} (hCC : CoefCC1 Cgc) (Ch
 theorem wLoc1_of_N {D : D7} {Ch Cg Ca C : ℝ}
     (H : WLoc1 D Ch Cg Ca C fun L => L.μN = Formalism.FourierDecayAlt.D.muN D.R.k D.R.rS) : WLoc1 D Ch Cg Ca C fun _ => True := by
   intro L f μsec ka b _ hok hg hf hsec l a ha γ hγ
-  obtain ⟨c, hc0, hc1, hc⟩ := Formalism.MainNotions.BridgeLemma₃.hu_eq_smul (Formalism.FourierDecayAlt.P.unipotent_radical_closed D.R.k D.R.rS)
+  obtain ⟨c, hc0, hc1, hc⟩ := Formalism.MainNotions.BridgeLemma₃.hu_eq_smul (Formalism.FourierDecayAlt.P.B2x2.closedN D.R.k D.R.rS)
     (Formalism.FourierDecayAlt.P.nilpotent_measure_is_haar D.R.k D.R.rS) (Formalism.MainNotions.BridgeCSB.haarLieN D.R.k D.R.rS 1 one_ne_zero ENNReal.one_ne_top)
   have hsm : ∀ κ : ℝ≥0∞, haarLie (Nset D.R.k D.R.rS) κ = κ • haarLie (Nset D.R.k D.R.rS) 1 := fun κ => by
     simp [haarLie]
@@ -1065,7 +1061,7 @@ theorem weighted_uniform_rotated_of_expansion_alt_alt (hW : ∀ Cb, WEnd.WBp Cb)
   have hlam := lam_eq_of_dist0 D X v
   have hgF : GapFr D Cgf (X.L v).ε (X.L v).lam := by
     rw [hlam]
-    exact Formalism.L2.SG.Pf.BesselExpansion.gap_mono hStd.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
+    exact PositivityTheory.RgHe.SM.gap_mono hStd.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
       (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right g2 (by positivity)) (by positivity))
   set M : ℝ := ((2 * D.R.rS + 2 : ℕ) : ℝ) with hM
   have hM1 : 1 ≤ M := by rw [hM]; exact_mod_cast (by omega : 1 ≤ 2 * D.R.rS + 2)
@@ -1285,7 +1281,7 @@ theorem omg_left_right : ∀ (k r : ℕ) (z z' : (Fin (2 * r + k + 1) → ℂ)),
       exact hh.1
     have hii : h⁻¹⁻¹ = h :=
       Matrix.nonsing_inv_nonsing_inv h
-        (Matrix.isUnit_det_of_right_inverse (GlobalTheory.WigSh.OmgEquiv.mul_inv hhU))
+        (Matrix.isUnit_det_of_right_inverse (P.FrameEntries.mul_inv_uh hhU))
     have e := GlobalTheory.WigSh.omg_equivariant k r z z' g h⁻¹ 1 hz hTz hz' hTz' hg
       (GlobalTheory.WigSh.OmgEquiv.inv_mem hh) (_root_.Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r z')
     rw [hii, mul_one, inv_one, Matrix.one_mulVec] at e
@@ -1342,7 +1338,7 @@ theorem wigEquiv_omg (Wq : Type) [NormedAddCommGroup Wq] [InnerProductSpace ℂ 
     have h1 := (GlobalTheory.CompanionTheory.OmgUW.omg_left_right k r z z' hz hT hz' hT' g hg).2 h hh
     have h2 := hA.2.1 h⁻¹ hi (GlobalTheory.WigSh.omg k r z z' g)
     have h3 : (π'' h⁻¹).comp (π'' h) = ContinuousLinearMap.id ℂ Wq' := by
-      rw [← hπ.2 _ hi _ hh, Formalism.FourierDecayAlt.P.LeftDerivativeCurves.uh_inv_mul hh.1, hπ.1]
+      rw [← hπ.2 _ hi _ hh, P.FrameEntries.inv_mul_uh hh.1, hπ.1]
       rfl
     show A (GlobalTheory.WigSh.omg k r z z' (g * h)) = (π' h⁻¹).comp ((A (GlobalTheory.WigSh.omg k r z z' g)).comp (π'' h))
     rw [h1, ← ContinuousLinearMap.comp_assoc, ← h2, ContinuousLinearMap.comp_assoc, h3,

@@ -5,6 +5,7 @@ public import Mathlib.Analysis.CStarAlgebra.Module.Constructions
 public import CompanionTheory.HarishChandraModules.BesselParameterIntegrals.SmoothCyclicVectors.IntegralMemOfIsClosed
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.SmoothOnAdditive
 import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.HaarBumpFunctions.ExistsOpOfForm
+import CompanionTheory.AutomorphicTheory.BesselOrbitBounds.BesselMapUniqueness.BesselMapUniqGapAlt
 
 @[expose] public section
 
@@ -79,8 +80,6 @@ theorem Bdd.sum {E ι : Type} [NormedAddCommGroup E] {T : ι → H → E} (s : F
     simp only [Finset.sum_insert hi]
     exact (h i (Finset.mem_insert_self _ _)).add (ih fun j hj => h j (Finset.mem_insert_of_mem hj))
 
-theorem dsW_append (W W' : List (Mat n)) (v : H) : dsW σ (W ++ W') v = dsW σ W (dsW σ W' v) := List.foldr_append
-
 theorem Bdd.comp_dsW {E : Type} [NormedAddCommGroup E] {T : H → E} (h : Bdd G L σ T) (hσ : RepOn G σ)
     (hL : ∀ X, L X → ∀ t, ex X t ∈ G) {W' : List (Mat n)} (hW' : ∀ X ∈ W', L X) :
     Bdd G L σ fun v => T (dsW σ W' v) := by
@@ -89,7 +88,7 @@ theorem Bdd.comp_dsW {E : Type} [NormedAddCommGroup E] {T : H → E} (h : Bdd G 
   · obtain ⟨W₀, hW₀, rfl⟩ := List.mem_map.1 hW0
     exact (List.mem_append.1 hX).elim (hW W₀ hW₀ X) (hW' X)
   · refine (hb _ (hv.dsW hσ fun X hX => hL X (hW' X hX))).trans (le_of_eq ?_)
-    simp only [nu, List.map_map, Function.comp_def, dsW_append]
+    simp only [nu, List.map_map, Function.comp_def, GlobalTheory.CompanionTheory.BmuReduce.dsW_append]
 
 theorem exists_factor [CompleteSpace H] [CompleteSpace H'] {T : H → H'} (hl : Lin G σ T) (hσ : RepOn G σ) {C : ℝ}
     {ι : Type} [Fintype ι] {W : ι → List (Mat n)} (hW : ∀ i, LieW G (W i))
@@ -290,7 +289,7 @@ theorem TwInt.bdd_dsW (h : TwInt G L σ τ M T) (hσ : RepOn G σ) (hτ : RepOn 
         rw [Finset.sum_insert hi, Finset.sum_insert hi, dsW_add hτ (hi'.smul _) ih'.1 hWG, ih'.2,
           dsW_smul hτ hi' _ hWG]
         exact ⟨(hi'.smul _).add ih'.1, rfl⟩
-    rw [dsW_append]
+    rw [GlobalTheory.CompanionTheory.BmuReduce.dsW_append]
     show dsW τ W (ds τ X (T c v)) = dsW τ W (T c (ds σ X v)) + _
     rw [h.ds_eq hσ hiso hd hL hM1 hX hM' c hv, dsW_add hτ (h.isSm hσ hL hM c hs) (hsum _).1 hWG, (hsum _).2]
 

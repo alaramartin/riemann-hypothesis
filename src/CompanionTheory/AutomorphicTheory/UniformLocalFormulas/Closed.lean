@@ -91,6 +91,8 @@ import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.Rig
 import Mathlib.CategoryTheory.Countable
 import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker.DegreeRatioFormulaStatement
 import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.RealObjClosed
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CovolumeUnipotentIntegralNormalisedHaar
+import Formalism.SharpRestriction.CuspSpanNormBounds.KappaEndpoints
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.RankOneTori.BeRankScale, CompanionTheory.AutomorphicTheory.RankOneTori.Factor, CompanionTheory.AutomorphicTheory.RankOneTori.NzTranslate, CompanionTheory.AutomorphicTheory.RankOneTori.FrameBesselBoundOfLargeConstants, CompanionTheory.AutomorphicTheory.BesselWaveGrids.WeightedBoundRotatedUniformOfHypsG, CompanionTheory.AutomorphicTheory.BesselWaveGrids.ThmBFinal, CompanionTheory.AutomorphicTheory.UniformLocalFormulas.StepThmBPinnedCOfN, CompanionTheory.AutomorphicTheory.UniformLocalFormulas.RankOneTermInvariant, CompanionTheory.AutomorphicTheory.UniformLocalFormulas.UniformRestrictionOfFiniteEnergy, CompanionTheory.AutomorphicTheory.UniformLocalFormulas.Closed
@@ -163,14 +165,14 @@ theorem be_rank_scale (hk : 1 ≤ k) {ε : Fin (2 * r + k + 1) → Bool} {lam : 
     exact Formalism.MainNotions.BridgeCSB.haarLieN k r _ (mul_ne_zero h0 (ENNReal.ofReal_pos.2 (deltaN_pos hκ hτ)).ne')
       (ENNReal.mul_ne_top h1 ENNReal.ofReal_ne_top)
   obtain ⟨L, hL⟩ := CompanionTheory.FamilyDerivativeExpansion.M1.be_rank_one (z := ((1 : ℝ) : ℂ) • z) (π := fun x => π (cjI k r κ₀⁻¹ 1 x)) hk hl hσ hg hh
-    (inWb_smul hz _) (by rw [Tz_smul]; simpa using hT) (isHCTypeW_cjI hκ hτ hz hπ) (isHaarOn_map_cjT hκ hτ hz hW) hN
+    (FourierDecayAlt.Q.LieAlgebraWeightVectors.gb_wb_smul hz _) (by rw [Tz_smul]; simpa using hT) (isHCTypeW_cjI hκ hτ hz hπ) (isHaarOn_map_cjT hκ hτ hz hW) hN
   have hd := dM_mem_UH (k := k) (r := r) hκ hτ
   have hdi := dMi_mem_UH (k := k) (r := r) hκ hτ
   have hcan : ∀ x : H, σ (dM k r κ₀⁻¹ 1) (σ (dMi k r κ₀⁻¹ 1) x) = x := fun x => by
     rw [← ContinuousLinearMap.comp_apply, ← TranslationBesselVanishing.sigma_mul hσ hd hdi, dM_mul_dMi hκ hτ, (MatrixMultiplicationContinuity.sigma_facts hσ).1]
     rfl
   refine ⟨fun x => L (σ (dMi k r κ₀⁻¹ 1) x), fun w hw v hv => ?_⟩
-  have e := be_scale (π := π) hσ hz (Formalism.MainNotions.S.Pv.AmpDDPf.ae_mem_sk hW) (Formalism.MainNotions.S.Pv.AmpDDPf.ae_mem_haarLieN κN) hκ hτ
+  have e := be_scale (π := π) hσ hz (L2.SG.Pf.Jac.ae_memS hW) (Formalism.MainNotions.S.Pv.AmpDDPf.ae_mem_haarLieN κN) hκ hτ
     (cOfDpsi (κ₀ : ℂ)) (σ (dMi k r κ₀⁻¹ 1) w) (σ (dMi k r κ₀⁻¹ 1) v)
   rw [hcan, hcan, hc] at e
   rw [← e]
@@ -236,7 +238,7 @@ theorem int_coefF (L : LocBessel k r) {μG : Measure (Mt k r)} (hμG : IsHaarOn 
   have hsm : StronglyMeasurable fun p : PairSp k r => ∫ x, PsiM L w0 v v' ξ ξ' γ (p, x) ∂μG :=
     (sm_PsiM L w0 v v' ξ ξ' γ).integral_prod_right'
   have he : ∀ p, InPair L p → ∫ x, PsiM L w0 v v' ξ ξ' γ (p, x) ∂μG = ∫ x, Psi L w0 v v' ξ ξ' γ p x ∂μG := fun p hp =>
-    integral_congr_ae ((ae_mem_sk hμG).mono fun x hx => PsiM_eq L w0 v v' ξ ξ' hγ hp hx)
+    integral_congr_ae ((L2.SG.Pf.Jac.ae_memS hμG).mono fun x hx => PsiM_eq L w0 v v' ξ ξ' hγ hp hx)
   have hI : Integrable (fun p : PairSp k r => ∫ x, PsiM L w0 v v' ξ ξ' γ (p, x) ∂μG) ν := by
     refine (hpm.const_mul K).mono' hsm.aestronglyMeasurable (hae.mono fun p hp => ?_)
     rw [he p hp]
@@ -260,8 +262,8 @@ theorem cell_factor (L : LocBessel k r) {a : ℝ} {w0 : L.Hs} (hw1 : ⟪w0, w0�
       (∀ x, ContinuousLinearMap.adjoint P x ∈ Sm) → (∀ w, Q w ∈ Sm) → ∀ F : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (L.Wq →L[ℂ] L.Wp),
       (∀ x ∈ UH (Hpk k r), F x = P.comp ((L.σ x).comp Q)) → OrbInt L F γ ν = (lamP L l P * lamQ L l' Q) • Ψ := by
   obtain ⟨hγ, hrel, hR, hq, hinv, b, hb, hab, hpm⟩ := hc
-  obtain ⟨μG, hμG0⟩ := P.unitary_group_haar_exists k r
-  have hμG : IsHaarOn (UH (Hpk k r)) μG := ⟨P.B5.haar_sigmaFinite hμG0, hμG0.ne_zero, hμG0.conc, hμG0.left⟩
+  obtain ⟨μG, hμG0⟩ := P.B2x3.haarG k r
+  have hμG : IsHaarOn (UH (Hpk k r)) μG := ⟨P.B2x9.sigmaFinite_of_haar hμG0, hμG0.ne_zero, hμG0.conc, hμG0.left⟩
   obtain ⟨νR, hν⟩ := quot_exists hγ hμG hR
   obtain ⟨d, hd, hSch⟩ := P.schur_hermitian k r L.ε L.lam L.Hs L.σ μG L.hlam L.hσ hμG
   have hd' : (d : ℂ) ≠ 0 := by exact_mod_cast hd.ne'
@@ -335,7 +337,7 @@ theorem nz_translate (hKD : Pv.AmpDD.KDense) (hlam : IsHCParam lam) (hσ : PI.Up
     ∃ u : H, PI.UpqRep.IsKFinHpk (k := k) (r := r) σ u ∧ Bm (σ t u) ≠ 0 := by
   have hU : IsURepOn (UH (Hpk k r)) σ := Formalism.MainNotions.LowestKTypeMultiplicity.urep_of_DS hσ
   have hti := WeylGroupFacts.uh_inv ht
-  have hu : IsUnit t.det := (unitary_group_closed k r).unit t ht
+  have hu : IsUnit t.det := (B2x2.closedG k r).unit t ht
   set x := σ t⁻¹ v with hx
   have hxs : x ∈ PI.UpqRep.smoothVecs (k := k) (r := r) σ := TranslationBesselVanishing.smooth_translate hσ hv hti
   have htx : σ t x = v := by
@@ -390,13 +392,13 @@ theorem side_nz (hKD : Pv.AmpDD.KDense) {h : ℝ} (hlam : IsHCParam lam) (hσ : 
       ThreeDimData.be z c π σ μW (haarLie (Nset k r) κ) w v = (innerSL ℂ (l v)).smulRight (l w))
     {v : H} (hv : PI.UpqRep.IsKFinHpk (k := k) (r := r) σ v) (hlv : l v ≠ 0) {t : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (ht : t ∈ UH (Hpk k r)) :
     ∃ y : H, PI.UpqRep.IsKFinHpk (k := k) (r := r) σ y ∧ l (σ t y) ≠ 0 ∧ ∀ a : ℂ, l (a • σ t y) = a • l (σ t y) := by
-  obtain ⟨μG, hμG⟩ := unitary_group_haar_exists k r
-  have hGsk : IsHaarOn (UH (Hpk k r)) μG := ⟨B5.haar_sigmaFinite hμG, hμG.ne_zero, hμG.conc, hμG.left⟩
+  obtain ⟨μG, hμG⟩ := B2x3.haarG k r
+  have hGsk : IsHaarOn (UH (Hpk k r)) μG := ⟨B2x9.sigmaFinite_of_haar hμG, hμG.ne_zero, hμG.conc, hμG.left⟩
   have hS := Formalism.L2.SG.Pf.Choice.isHaarOn_muS hz hT hW hW1 h0 h1
   obtain ⟨νq, hq⟩ := Formalism.L2.SG.Pf.QuotMeasExists.quotMeasExists k r z hz hT μG _ hGsk hS
   have hN : IsHaarOn (Nset k r) (haarLie (Nset k r) κ) := Formalism.MainNotions.BridgeCSB.haarLieN k r κ h0 h1
   have hB := PI.WBL.S5.G.beBessel_of growth_spherical_bound
-    ⟨CompanionTheory.FamilyDerivativeExpansion.DecS.decay_low_range, CompanionTheory.FamilyDerivativeExpansion.DecS.decay_infinite_range, CompanionTheory.D.gk.admitted.k_finite_smooth, trivial⟩
+    ⟨CompanionTheory.FamilyDerivativeExpansion.DecS.decay_low_range, L2.SG.BesselDiscreteSeries.decInf, CompanionTheory.D.gk.admitted.k_finite_smooth, trivial⟩
     k r ε lam h H σ w0 Wp z c u π μW _ μG νq ⟨hlam, hσ, hg, hO, hw0, hz, hT, hc, hπ, hW, hN, hGsk, hq⟩ v (Or.inr hv) (l v)
   have hvs := CompanionTheory.D.gk.admitted.k_finite_smooth k r ε lam H σ hlam hσ v hv
   have hn : ⟪l v, l v⟫_ℂ ≠ 0 := inner_self_ne_zero.2 hlv
@@ -562,7 +564,7 @@ theorem rankOne_core (hKD : Pv.AmpDD.KDense) (L : LocBessel k r) {κ₀ h : ℝ}
     simp
   set Sm := PI.UpqRep.smoothVecs (k := k) (r := r) L.σ with hSm
   have hdec : ∀ v ∈ Sm, ∃ C : ℝ, ∀ g ∈ UH (Hpk k r), ‖⟪v, L.σ g w0⟫_ℂ‖ ≤ C * B.gN g ^ (-(ThreeDimData.aOf r h - 1)) := by
-    obtain ⟨C, Ws, -, hb⟩ := CompanionTheory.FamilyDerivativeExpansion.DecS.decay_infinite_range k r L.ε L.lam h L.Hs L.σ L.hlam hσ hg hO w0 hw0K
+    obtain ⟨C, Ws, -, hb⟩ := L2.SG.BesselDiscreteSeries.decInf k r L.ε L.lam h L.Hs L.σ L.hlam hσ hg hO w0 hw0K
     intro v hv
     refine ⟨C * (Ws.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) L.σ W v‖).sum, fun g hgU => ?_⟩
     have := hb v hv g⁻¹ (WeylGroupFacts.uh_inv hgU)
@@ -719,9 +721,9 @@ theorem goodS_deg {X : HidaSetting D} {θ : ℝ} {C : Choice X θ} (hLF : LocFac
   have hL' : 0 < (l2SG (C.nuS u' τ) (phiOf hB u' τ)).toReal := ENNReal.toReal_pos hLu'.1 hLu'.2.ne
   have hc : 0 < cOf hB u τ := div_pos hL hd
   obtain ⟨P, hP⟩ := Formalism.MainNotions.S.Inh.obj_cayleyU_rows D
-  have hε : ∀ i, epsSH D.R i = X.B.I.ε v (Fin.cast (Choice.n_eq' X).symm i) := fun i => by
+  have hε : ∀ i, epsSH D.R i = X.B.I.ε v (Fin.cast (WuDec.hdim X).symm i) := fun i => by
     rw [X.eps_eq]; exact congrArg (epsS D.R) (Fin.ext rfl)
-  have hF := Choice.fdegHpk_tr (Choice.n_eq' X) (X.B.I.ε v) (epsSH D.R) hε (X.B.σ v) (X.ds v).2.2.1
+  have hF := Choice.fdegHpk_tr (WuDec.hdim X) (X.B.I.ε v) (epsSH D.R) hε (X.B.σ v) (X.ds v).2.2.1
     (Formalism.L2.SG.Pf.RowDictPf.fdeg_of_schur X Formalism.L2.SG.Pf.RowDictPf.schur_orthogonality_discrete_series v)
     (C.Q τ) (C.Qi τ) (C.isT τ).2.1 (C.isT τ).2.2.1 P hP
   have hF2 := Formalism.L2.SG.Pf.RowDictPf.isFdeg_smul (D.s.cdScale_pos _ (epsSH D.R)) hF
@@ -964,7 +966,7 @@ namespace Formalism.MainStatements.RowRest
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 theorem ka_pos (D : D7) : 0 < D.host.ka := by
-  have := rdE_pos D
+  have := MainNotions.KappaEndpoints.pf_rd_pos D
   unfold Formalism.BasicNotions.Host.ka Formalism.BasicNotions.Host.v
   positivity
 
@@ -1043,31 +1045,12 @@ theorem cMr_smap (γ : X.B.I.Ginf) (τ : D.what₂.Tau) (s z : Formalism.REAL.UJ
   simp only [Matrix.mul_assoc]
   rw [← Matrix.mul_assoc (C.Q τ) (C.Qi τ), (C.isT τ).2.1, Matrix.one_mul, ← Matrix.mul_assoc (uMat (γ (vOf X τ))) (uMat (γ (vOf X τ)))⁻¹, uMat_mul_inv, Matrix.one_mul]
 
-theorem map_smap (τ : D.what₂.Tau) (g : Formalism.REAL.UJ (X.B.I.ε (vOf X τ))) :
-    (Formalism.REAL.muG (X.B.I.ε (vOf X τ))).map (Smap C τ g) = muGB X (C.Q τ) (C.Qi τ) τ := by
-  have : (Formalism.REAL.muG (X.B.I.ε (vOf X τ))).IsMulRightInvariant := ⟨fun g => Formalism.REAL.indefinite_unitary_unimodular _ _ g⟩
-  set y' : Formalism.REAL.UJ (X.B.I.ε (vOf X τ)) := ujOf' _ (y_facts C τ).1 with hy'
-  have e : Smap C τ g = (fun γ => Matrix.of.symm (trG (C.Q τ) (C.Qi τ) γ)) ∘ (fun x => x * y') ∘ fun x => g⁻¹ * x := by
-    funext z
-    show Matrix.of.symm (C.Qi τ * umat (g⁻¹ * z) * C.Q τ * (C.y τ)⁻¹) =
-      Matrix.of.symm (C.Qi τ * (umat (g⁻¹ * z) * (C.Q τ * (C.y τ)⁻¹ * C.Qi τ)) * C.Q τ)
-    congr 1
-    simp only [Matrix.mul_assoc]
-    rw [(C.isT τ).1, Matrix.mul_one]
-  have hm : Measurable fun γ : Formalism.REAL.UJ (X.B.I.ε (vOf X τ)) => Matrix.of.symm (trG (C.Q τ) (C.Qi τ) γ) := by
-    refine Continuous.measurable ?_
-    unfold trG
-    exact (continuous_const.matrix_mul (Units.continuous_val.comp continuous_subtype_val)).matrix_mul continuous_const
-  rw [e, ← Measure.map_map hm ((measurable_mul_const _).comp (measurable_const_mul _)),
-    ← Measure.map_map (measurable_mul_const _) (measurable_const_mul _), map_mul_left_eq_self, map_mul_right_eq_self]
-  rfl
-
 theorem quot_push (γ : X.B.I.Ginf) (τ : D.what₂.Tau) {μR ν : Measure (Formalism.REAL.UJ (X.B.I.ε (vOf X τ)))}
     (h : IsQuotLoc μR ν) :
     IsQuotMeas (muGB X (C.Q τ) (C.Qi τ) τ) (μR.map (cMr C γ τ)) (ν.map (Smap C τ (γ (vOf X τ)))) := by
   intro f hf
   have he := smap_measEmb C τ (γ (vOf X τ))
-  rw [← map_smap C τ (γ (vOf X τ)), he.lintegral_map, he.lintegral_map]
+  rw [← muG_smap C τ (γ (vOf X τ)), he.lintegral_map, he.lintegral_map]
   refine (h _ (hf.comp he.measurable)).trans (lintegral_congr fun x => ?_)
   rw [(cMr_measEmb C γ τ).lintegral_map]
   refine lintegral_congr fun s => ?_
@@ -1076,7 +1059,7 @@ theorem quot_push (γ : X.B.I.Ginf) (τ : D.what₂.Tau) {μR ν : Measure (Form
 theorem mem_range (τ : D.what₂.Tau) (g : Formalism.REAL.UJ (X.B.I.ε (vOf X τ))) {x : MatKR D.R.k D.R.rS}
     (hx : x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS)) : x ∈ Set.range (Smap C τ g) := by
   rw [range_smap]
-  have h1 := transp_mem C τ ((Formalism.FourierDecayAlt.P.unitary_group_closed D.R.k D.R.rS).mul_mem _ hx _ (C.y_mem τ))
+  have h1 := transp_mem C τ ((FourierDecayAlt.P.B2x2.closedG D.R.k D.R.rS).mul_mem _ hx _ (C.y_mem τ))
   have e : C.Q τ * Matrix.of x * C.y τ * C.Qi τ = C.Q τ * (x * C.y τ) * C.Qi τ := by
     rw [← Matrix.mul_assoc]; rfl
   show umat g * (C.Q τ * Matrix.of x * C.y τ * C.Qi τ) ∈ UJset _
@@ -1092,7 +1075,7 @@ theorem root_push (u u' : D.what₂.Word) (w : Point D.host.E (D.R.rS + 1)) (hw 
   set γ := gamW X u u' w with hγ
   have hemb := cMr_measEmb C γ τ
   have hN1 : (1 : MatKR D.R.k D.R.rS) ∈ Formalism.QuantumDeterminants.Nset D.R.k D.R.rS :=
-    (Formalism.FourierDecayAlt.P.unipotent_radical_closed D.R.k D.R.rS).one_mem
+    (FourierDecayAlt.P.B2x2.closedN D.R.k D.R.rS).one_mem
   have hid : (fun x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS => fun i j => ((1 : MatKR D.R.k D.R.rS)⁻¹ * Matrix.of x * 1) i j) = id := by
     funext x i j
     simp
@@ -1214,7 +1197,7 @@ namespace Formalism.MainStatements.RowRest
 theorem uniqOfPin : UniqOfPin := fun _ _ _ _ C hB u u' νl hP => use₇ C hB u u' νl hP
 
 theorem uniform_restriction_of_finite_energy (hE : EnergyFin) : Formalism.L2.SG.Pf.ThmBChain6.AmplitudeBoundsAllChoicesUniform :=
-  uniform_restriction_of_energy covariance_formula uniqOfPin hE
+  uniform_restriction_of_energy GlobalTheory.CovNFormulaPf.main uniqOfPin hE
 
 end Formalism.MainStatements.RowRest
 end -- clump:auto

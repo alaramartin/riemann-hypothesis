@@ -7,23 +7,14 @@ import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.CStarAlgebra.Classes
 import Mathlib.Tactic.TypeStar
 public import Mathlib.MeasureTheory.Integral.Prod
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.LevelZeroFormEqBigCellIntegralTopDensityCompact
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.MinLeTruncatedExponential
 
 @[expose] public section
 
 namespace CompanionTheory.NFCpt
 
 open MeasureTheory Filter Topology
-
-theorem ae_coords_ne_zero (n : ℕ) : ∀ᵐ c : Fin n → ℂ, ∀ a, c a ≠ 0 := by
-  rw [ae_all_iff]
-  intro a
-  have h : (volume : Measure (Fin n → ℂ)) {c | c a = 0} = 0 := Measure.pi_hyperplane _ a 0
-  rw [ae_iff]
-  simpa using h
-
-theorem ae_ne_zero_c : ∀ᵐ t : ℂ, t ≠ 0 := by
-  rw [ae_iff]
-  simp
 
 theorem tower_integral : ∀ (n : ℕ) (E : (j : ℕ) → (Fin j → ℂ) → ℝ),
     AEStronglyMeasurable (E n) volume → (∀ c, (∀ a, c a ≠ 0) → 0 ≤ E n c) →
@@ -53,13 +44,13 @@ theorem tower_integral : ∀ (n : ℕ) (E : (j : ℕ) → (Fin j → ℂ) → �
       exact hm.comp_measurePreserving (hmp.symm e)
     have hGpos : ∀ c : Fin n → ℂ, (∀ a, c a ≠ 0) → ∀ᵐ t : ℂ, 0 ≤ G (c, t) := by
       intro c hc
-      filter_upwards [ae_ne_zero_c] with t ht
+      filter_upwards [Formalism.FourierDecayAlt.P.TBBx1.ae_ne_zero] with t ht
       refine h0 _ fun a => ?_
       induction a using Fin.lastCases with
       | last => simpa using ht
       | cast i => simpa using hc i
     have hae : (fun c : Fin n → ℂ => ∫ t, G (c, t)) =ᵐ[volume] E n := by
-      filter_upwards [ae_coords_ne_zero n] with c hc
+      filter_upwards [GlobalTheory.ae_coords_ne_zero n] with c hc
       exact (hs n (Nat.lt_succ_self n) c hc).2
     have hmn : AEStronglyMeasurable (E n) volume := hGm.integral_prod_right'.congr hae
     have h0n : ∀ c, (∀ a, c a ≠ 0) → 0 ≤ E n c := by
@@ -71,10 +62,10 @@ theorem tower_integral : ∀ (n : ℕ) (E : (j : ℕ) → (Fin j → ℂ) → �
     have hGI : Integrable G ((volume : Measure (Fin n → ℂ)).prod (volume : Measure ℂ)) := by
       rw [integrable_prod_iff hGm]
       refine ⟨?_, ?_⟩
-      · filter_upwards [ae_coords_ne_zero n] with c hc
+      · filter_upwards [GlobalTheory.ae_coords_ne_zero n] with c hc
         exact (hs n (Nat.lt_succ_self n) c hc).1
       · refine (And.left ih).congr ?_
-        filter_upwards [ae_coords_ne_zero n] with c hc
+        filter_upwards [GlobalTheory.ae_coords_ne_zero n] with c hc
         rw [← (hs n (Nat.lt_succ_self n) c hc).2]
         refine integral_congr_ae ?_
         filter_upwards [hGpos c hc] with t ht

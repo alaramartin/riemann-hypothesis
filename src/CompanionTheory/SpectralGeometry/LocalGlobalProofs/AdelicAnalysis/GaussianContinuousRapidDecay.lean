@@ -7,6 +7,7 @@ public import Formalism.UnipotentAdelicQuotients.SWXSDefs
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 public import Mathlib.Algebra.Order.Chebyshev
 import Mathlib.Algebra.Order.Star.Real
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SiegelWeilArchimedeanDensity
 
 @[expose] public section
 
@@ -107,15 +108,6 @@ namespace GlobalTheory.CompanionTheory.SW.BB
 
 open GaussReg
 
-theorem sizeTup_eq_sum_xw {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
-    {M d : ℕ} (b : Module.Basis (Fin d) F E) (e : Ainf F ≃+* (InfinitePlace F → ℝ))
-    (he : ∀ y w, |e y w| = ‖y w‖) (X : Fin 1 → Fin M → Ainf F ⊗[F] E) :
-    sizeTup b X = ∑ w, ∑ p, |xw e b X w p| := by
-  simp only [sizeTup, sizeInf, xw, cv, he, Fintype.sum_prod_type, Fin.sum_univ_one]
-  symm
-  rw [Finset.sum_comm]
-  exact Finset.sum_congr rfl fun i _ => Finset.sum_comm
-
 theorem gaussQ_continuous_rapidDecay : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M d : ℕ) (b : Module.Basis (Fin d) F E) (e : Ainf F ≃+* (InfinitePlace F → ℝ)), IsHomeomorph e → (∀ y w, |e y w| = ‖y w‖) → ∀ (Pm : InfinitePlace F → Matrix (Fin M × Fin d) (Fin M × Fin d) ℝ), Continuous (gaussQ e b Pm) ∧ ((∀ w, (Pm w).PosDef) → RapidDecay b (fun X => (gaussQ e b Pm X : ℂ))) := by
   intro F E _ _ _ _ _ σ hCM M d b e hom he Pm
   obtain ⟨h1, h2, h3, h4, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.isLocR_Ainf F hCM.1
@@ -137,7 +129,7 @@ theorem gaussQ_continuous_rapidDecay : ∀ (F E : Type) [Field F] [NumberField F
     exact (hxw' w).dotProduct (Continuous.matrix_mulVec continuous_const (hxw' w))
   · obtain ⟨c, hc, hlow⟩ := exists_lower_family hP
     refine ⟨Real.exp ((N : ℝ) ^ 2 / (4 * (Real.pi * c))), fun X => ?_⟩
-    have hs := sizeTup_eq_sum_xw b e he X
+    have hs := CountHyp.size_eq_sum b e he X
     have hs0 : 0 ≤ sizeTup b X := by
       rw [hs]
       exact Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _

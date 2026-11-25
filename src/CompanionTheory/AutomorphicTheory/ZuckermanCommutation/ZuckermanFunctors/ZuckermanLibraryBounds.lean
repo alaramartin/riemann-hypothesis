@@ -46,6 +46,7 @@ import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.HarishChandraMultiplicityBound
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.TensorProductsG2.FormalDegreeConstantDiscrete
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.InfinitesimalDecay.DecBoundOfCompact
+import CompanionTheory.AutomorphicTheory.RankOneEstimates.DecSender
 
 @[expose] public section
 
@@ -92,7 +93,7 @@ theorem zuckerman_library_bounds : Lib thr := by
       (lt_of_le_of_lt (by unfold thr; linarith [le_max_right (2 * ((2 * r + k + 1 : ℕ) : ℝ)) (thrStar ε)]) ht) (σ := U.R.σ) hU.2
     refine ⟨C, Ws, fun W hW => (hWs W hW).2, fun u hu v hv g hg' => ?_⟩
     have h1 := hC u hu v hv g hg'
-    simp only [dsigW_SK] at h1
+    simp only [FamilyDerivativeExpansion.DecS.dsigW_eq] at h1
     exact h1
   · intro k r ε μ R R' h hR hR' hg ht
     have h2 : 2 * ((2 * r + k + 1 : ℕ) : ℝ) < h :=
@@ -100,7 +101,7 @@ theorem zuckerman_library_bounds : Lib thr := by
     obtain ⟨P, hP, hd⟩ := hR.2
     obtain ⟨P', hP', hd'⟩ := hR'.2
     have hU' := CompanionTheory.LimBd.SchurHpk.isURepOn_of_ds hR'.2
-    obtain ⟨e, he⟩ := (G2.discrete_series_props_large_gap _ ε μ hR.1 h hg h2 R.H (fun g => R.σ (P⁻¹ * g * P)) hd).2.2.2.2 R'.H
+    obtain ⟨e, he⟩ := (G2.isDS_props_of_gap _ ε μ hR.1 h hg h2 R.H (fun g => R.σ (P⁻¹ * g * P)) hd).2.2.2.2 R'.H
       (fun g => R'.σ (P'⁻¹ * g * P')) hd'
     have hPu : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det _).1 hP.1.1
     have hPu' : IsUnit P'.det := (Matrix.isUnit_iff_isUnit_det _).1 hP'.1.1

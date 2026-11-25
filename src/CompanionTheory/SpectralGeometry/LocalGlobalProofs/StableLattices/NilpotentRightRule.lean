@@ -4,6 +4,7 @@ public import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassifica
 import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.Topology.UniformSpace.Matrix
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.IntegrableComplexContinuousBoundedSupport
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.HasDerivAtInvExpCurveEntry
 
 @[expose] public section
 
@@ -37,12 +38,6 @@ theorem exp_entry (Y : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
   exact (LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ i j)).hasFDerivAt.comp_hasDerivAt
     (0 : ℝ) (hasDerivAt_exp_smul_const (𝕂 := ℝ) Y 0)
 
-theorem mul_exp_entry (g Y : Matrix (Fin n) (Fin n) ℂ) (j i : Fin n) :
-    HasDerivAt (fun t : ℝ => (g * NormedSpace.exp ((t : ℂ) • Y)) j i) ((g * Y) j i) 0 := by
-  simp only [Matrix.mul_apply]
-  exact HasDerivAt.fun_sum (u := Finset.univ) (A := fun l (t : ℝ) => g j l * NormedSpace.exp ((t : ℂ) • Y) l i)
-    fun l _ => (exp_entry Y l i).const_mul (g j l)
-
 theorem tens_action (X : GMod n) (Y : Matrix (Fin n) (Fin n) ℂ) (u : Fin n → X.V) (i : Fin n) :
     (∑ a, ∑ b, Y a b • (tens X).E a b u) i = (∑ a, ∑ b, Y a b • X.E a b (u i)) + ∑ b, Y i b • u b := by
   show (∑ a, ∑ b, (Y a b • tensE X a b u : Fin n → X.V)) i = _
@@ -58,7 +53,7 @@ theorem tens_ok {ε : Fin n → Bool} {X : GMod n} {c : X.V →ₗ[ℂ] (Matrix 
       c (u i) (g * NormedSpace.exp ((t : ℂ) • Y)))
       ((g * Y) j i * c (u i) g + g j i * c (∑ a, ∑ b, Y a b • X.E a b (u i)) g) 0 := by
     intro i
-    refine ((mul_exp_entry g Y j i).fun_mul (h (u i) Y hY g hg)).congr_deriv ?_
+    refine ((ReciprocityTheory.ChartRestriction.DS.hasDerivAt_exp_curve_entry g Y j i).fun_mul (h (u i) Y hY g hg)).congr_deriv ?_
     simp only [_root_.Formalism.REAL.mul_exp_zero_smul_eq]
   have h2 := HasDerivAt.fun_sum (u := Finset.univ)
     (A := fun i (t : ℝ) => (g * NormedSpace.exp ((t : ℂ) • Y)) j i * c (u i) (g * NormedSpace.exp ((t : ℂ) • Y)))

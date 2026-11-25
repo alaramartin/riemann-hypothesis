@@ -9,6 +9,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicClassFinit
 public import Formalism.SatakeDualWeyl.KpqSubgroupCompact
 import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirReductionTheory.OneParameterDerivatives.TauReduction.Imports
 import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.RationalPointsLeHolds
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicClassFiniteness.DictLat
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicClassFiniteness.DictTop
 
 @[expose] public section
 
@@ -102,12 +104,6 @@ theorem exists_sandwich (I : AutInst) : ∃ c : ℕ, 1 ≤ c ∧ (∀ l ∈ I.L,
     · subst hi; simp; ring
     · simp [Pi.single_eq_of_ne hi]
 
-theorem iv_mulVec (I : AutInst) (A : Matrix (Fin I.n) (Fin I.n) I.E) (l : Fin I.n → I.E) :
-    A.map (Formalism.UG.inclE (F := I.F) (Af I.F)) *ᵥ iv I l = iv I (A *ᵥ l) := by
-  funext i
-
-  simp [iv, mulVec, dotProduct, map_sum]
-
 theorem cong_Lf (I : AutInst) {c g : ℕ} (h1 : ∀ l ∈ I.L, (c : I.E) • l ∈ IntV I) (h2 : ∀ u ∈ IntV I, (c : I.E) • u ∈ I.L)
     {A : Matrix (Fin I.n) (Fin I.n) I.E} (hA : Cong I (g * c * c) A) : ∀ y ∈ I.Lf, ∃ z ∈ I.Lf,
       (A.map (Formalism.UG.inclE (F := I.F) (Af I.F)) - 1) *ᵥ y = (g : I.E ⊗[I.F] Af I.F) • z := by
@@ -115,8 +111,8 @@ theorem cong_Lf (I : AutInst) {c g : ℕ} (h1 : ∀ l ∈ I.L, (c : I.E) • l �
   let B : Matrix (Fin I.n) (Fin I.n) I.E := ((c : I.E) * c) • Matrix.of a
   have hB : I.L ≤ DictGen.lamM I (B.map (Formalism.UG.inclE (F := I.F) (Af I.F))) := fun l hl => by
     show _ ∈ I.Lf
-    rw [iv_mulVec]
-    refine DictGen.iv_mem I ?_
+    rw [dictTop_map_mulVec]
+    refine DictLat.iv_mem I ?_
     have : B *ᵥ l = (c : I.E) • (Matrix.of a *ᵥ ((c : I.E) • l)) := by
       simp only [B, smul_mulVec, mulVec_smul, smul_smul]
     rw [this]

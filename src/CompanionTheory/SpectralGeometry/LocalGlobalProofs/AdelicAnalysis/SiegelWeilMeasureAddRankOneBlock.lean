@@ -29,6 +29,7 @@ import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.TensTo
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ExistsLocalApproximateIdentity
 
 @[expose] public section
 
@@ -46,9 +47,8 @@ theorem of_cofinite {α : Type} {p : α → Prop} (h : ∀ᶠ v in Filter.cofini
 
 theorem lattice_measurable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d) F E) (n M : ℕ)
-    (v : HeightOneSpectrum (𝓞 F)) : MeasurableSet (latV b v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) := by
-  obtain ⟨h1, h2, h3, h4, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v
-  exact (((_root_.GlobalTheory.CompanionTheory.SW.MeasProj.proj_props F E σ hCM d b n M).2.2.2.1 v).2).measurableSet
+    (v : HeightOneSpectrum (𝓞 F)) : MeasurableSet (latV b v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) :=
+  Hypotheses₂.OneV.DxEuler.measurableSet_latV σ hCM b n M v
 
 theorem theta_hypothesis : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ t : F, t ≠ 0 → ∀ (n d : ℕ) (b : Module.Basis (Fin d) F E) (I : Measure (Fin n → Fin M → AF F ⊗[F] E)) (minf : Measure (Fin n → Fin M → Ainf F ⊗[F] E)) (m : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Fin n → Fin M → Fv F v ⊗[F] E)), IsEulerProd b I 1 minf m → ∃ S₂ : Finset (HeightOneSpectrum (𝓞 F)), ∀ S, S₂ ⊆ S → ∀ (φinf : (Fin (n + 1) → Fin (M + 1) → Ainf F ⊗[F] E) → ℝ≥0∞) (φ : ∀ v : HeightOneSpectrum (𝓞 F), (Fin (n + 1) → Fin (M + 1) → Fv F v ⊗[F] E) → ℝ≥0∞) (Ψinf : (Fin 1 → Fin (M + 1) → Ainf F ⊗[F] E) → ℝ≥0∞) (Ψ : ∀ v : HeightOneSpectrum (𝓞 F), (Fin 1 → Fin (M + 1) → Fv F v ⊗[F] E) → ℝ≥0∞), Measurable φinf → (∀ v, Measurable (φ v)) → (∀ g : HA (Ainf F) σ (blockOne (algebraMap F E t) J), Ψinf (actW (Ainf F) σ _ g (fun _ => Fin.cons 1 (fun _ => 0))) = ∫⁻ X, φinf (actW (Ainf F) σ _ g (consTup X)) ∂minf) → (∀ v, ∀ g : HA (Fv F v) σ (blockOne (algebraMap F E t) J), Ψ v (actW (Fv F v) σ _ g (fun _ => Fin.cons 1 (fun _ => 0))) = ∫⁻ X, φ v (actW (Fv F v) σ _ g (consTup X)) ∂(m v)) → (∀ v, v ∉ S → ∀ g : HA (Fv F v) σ (blockOne (algebraMap F E t) J), m v {X | actW (Fv F v) σ _ g (consTup X) ∈ latV b v} = (latV b v).indicator (fun _ => m v (latV b v)) (actW (Fv F v) σ _ g (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0)))) → ∀ h : HA (AF F) σ (blockOne (algebraMap F E t) J), ENNReal.ofReal (∏' v : {v // v ∉ S}, (m v.1 (latV b v.1)).toReal) * pureL b S Ψinf Ψ (actW (AF F) σ _ h (fun _ => Fin.cons 1 (fun _ => 0))) = ∫⁻ X, pureL b S φinf φ (actW (AF F) σ _ h (consTup X)) ∂I := by
   intro F E _ _ _ _ _ σ hCM M J hJ t ht n d b I minf m hE
@@ -68,7 +68,7 @@ theorem theta_hypothesis : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
       actW (Ainf F) σ _ ginf (consTup Y) := _root_.GlobalTheory.CompanionTheory.SW.Fact.measurable_actW_consTup F E σ hCM (Ainf F) hLi n M _ ginf
   have hmv : ∀ v, Measurable fun Y : Fin n → Fin M → Fv F v ⊗[F] E =>
       actW (Fv F v) σ _ (g v) (consTup Y) := fun v => _root_.GlobalTheory.CompanionTheory.SW.Fact.measurable_actW_consTup F E σ hCM (Fv F v) (hLv v) n M _ (g v)
-  have hlatm : ∀ v, MeasurableSet (latV b v : Set (Fin (n + 1) → Fin (M + 1) → Fv F v ⊗[F] E)) := fun v => lattice_measurable σ hCM b (n + 1) (M + 1) v
+  have hlatm : ∀ v, MeasurableSet (latV b v : Set (Fin (n + 1) → Fin (M + 1) → Fv F v ⊗[F] E)) := fun v => Hypotheses₂.OneV.DxEuler.measurableSet_latV σ hCM b (n + 1) (M + 1) v
   simp_rw [hi]
   have hmψ : ∀ v, Measurable (fun Y : Fin n → Fin M → Fv F v ⊗[F] E => if v ∈ S then φ v (actW (Fv F v) σ _ (g v) (consTup Y)) else (latV b v).indicator 1 (actW (Fv F v) σ _ (g v) (consTup Y))) := fun v => by
     by_cases hv : v ∈ S
@@ -134,7 +134,7 @@ theorem blockOne_step : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
   obtain ⟨m'inf, hm'inf⟩ := loc_families σ hCM J hJ (Ainf F) hLi b laminf hinf.1 n
   choose m₁ hm₁ using fun v => loc_families σ hCM _ hJ' (Fv F v) (hLv v) b (lam v) (hlam v).1 1
   choose m' hm' using fun v => loc_families σ hCM J hJ (Fv F v) (hLv v) b (lam v) (hlam v).1 n
-  obtain ⟨⟨μ₁, hμ₁⟩, hFV⟩ := _root_.GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hCM M J hJ
+  obtain ⟨⟨μ₁, hμ₁⟩, hFV⟩ := CompanionTheory.SWFin.finVol F E σ hCM M J hJ
   obtain ⟨⟨𝓕₁, h𝓕₁⟩, -⟩ := hFV μ₁ hμ₁
 
   obtain ⟨cinf, c, hc, hcinf, hcv⟩ := _root_.GlobalTheory.CompanionTheory.SW.map_inclR_prodFormula F E σ hCM (algebraMap F E t) hta
@@ -152,7 +152,7 @@ theorem blockOne_step : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
   let T1 : Matrix (Fin 1) (Fin 1) E := fun _ _ => algebraMap F E t
   have hT1 : ∀ a b, σ (T1 b a) = T1 a b := fun a b => by simp [T1]
   have hdet1 : T1.det ≠ 0 := by rw [Matrix.det_fin_one]; exact hta
-  have hE₁ := _root_.GlobalTheory.CompanionTheory.SW.OneVector.siegel_one_vector F E σ hCM (M + 1) _ hJ' (by omega) T1 hT1 hdet1 d b laminf lam hinf hlam μ 𝓕 hμ h𝓕
+  have hE₁ := CompanionTheory.PlacePermOperatorBicommutantSpan.sw_one F E σ hCM (M + 1) _ hJ' (by omega) T1 hT1 hdet1 d b laminf lam hinf hlam μ 𝓕 hμ h𝓕
     m₁inf m₁ hm₁inf hm₁
   obtain ⟨β, hβ1, -, hβ2⟩ := _root_.GlobalTheory.CompanionTheory.SW.hermOne_eq_scal F E σ hCM T1 hT1
   have hβ : β = t := (algebraMap F E).injective (congrFun (congrFun hβ1 0) 0).symm

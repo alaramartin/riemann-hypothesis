@@ -239,7 +239,7 @@ theorem hilbert_lowest_weight_of_inputs : StepStable → StepMoll → StepWtSpan
     have hw2 := bhw_Ecc_Eab hE hzν a b
     have hd := weights_le_of_irr_hw hE hU hL hm hne' hw2
     exact not_cdom_add_root ε _ hab hd
-  obtain ⟨k, hk⟩ := khw_line_of_irr hE hU hL hzL hyL hzH hyH hy0
+  obtain ⟨k, hk⟩ := khw_line_of_kIrrHW hE hU hL hzL hyL hzH hyH hy0
   apply hex
   have hxy : Submodule.inclusion hLLle x = k • (⟨y, hyW⟩ : ↥((S ⊔ V1 ε Ψ).map A)) := by
     apply Subtype.ext

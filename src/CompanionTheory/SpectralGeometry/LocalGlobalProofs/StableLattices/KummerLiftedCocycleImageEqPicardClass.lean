@@ -3,6 +3,7 @@ module
 public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.DiscreteSeriesCharacters.CapelliDeterminantBlockProduct
 public import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.RingTheory.PiTensorProduct
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockQuadraticActionMapLieBracket
 
 @[expose] public section
 
@@ -120,15 +121,11 @@ def dd (ε : Fin n → Bool) (a b : Fin n) : Module.End ℂ (MvPolynomial (NC ε
 
 def yy (i : NC ε) : Module.End ℂ (MvPolynomial (NC ε) ℂ) := LinearMap.mulLeft ℂ (X i)
 
-theorem pderiv_comm' {σ : Type} (i j : σ) (f : MvPolynomial σ ℂ) :
-    pderiv i (pderiv j f) = pderiv j (pderiv i f) :=
-  _root_.MvPolynomial.pderiv_comm i j f
-
 theorem dd_comm (a b c d : Fin n) : Commute (dd ε a b) (dd ε c d) := by
   unfold dd
   split_ifs
   · refine LinearMap.ext fun f => ?_
-    exact pderiv_comm' _ _ f
+    exact pderiv_pderiv_comm_fock _ _ f
   all_goals simp
 
 theorem dd_yy (a c : Fin n) (j : NC ε) :

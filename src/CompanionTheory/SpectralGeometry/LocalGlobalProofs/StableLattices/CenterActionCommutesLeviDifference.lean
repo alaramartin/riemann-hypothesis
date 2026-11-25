@@ -6,6 +6,7 @@ public import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BaseChangeDefiniteUnitary
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.IsNormalisedOfIsDiscrete
 import Development.AutomorphicArithmetic.IntegralCasts.IsOpenStabOfMemNhds
+import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.CapelliEigenvalues.CoefEigOfInfChar
 
 @[expose] public section
 
@@ -22,7 +23,7 @@ open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.
 theorem ev_fa {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (E : Fin n → Fin n → Module.End ℂ V) (Y : ℂ) :
     ev E (fa n Y) = qdet E (Y + ((n : ℂ) - 1) / 2) := by
   unfold fa
-  rw [map_qdet]
+  rw [CompanionTheory.CapEig.algHom_qdet]
   congr 1
   funext p q
   simp [ev]
@@ -37,7 +38,7 @@ theorem evL_fb {n M : ℕ} (lev : Fin n → ℕ) (d : Fin M → ℕ) (h : ∑ i,
   rw [map_list_prod, List.map_ofFn]
   congr 2
   funext i
-  rw [Function.comp_apply, map_qdet, shift, add_sub_assoc]
+  rw [Function.comp_apply, CompanionTheory.CapEig.algHom_qdet, shift, add_sub_assoc]
   congr 1
   funext p q
   simp [evL, hlev]

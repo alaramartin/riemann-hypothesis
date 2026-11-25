@@ -36,6 +36,7 @@ import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.Hermiti
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramFiberMeasuresScaling
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.T2SpaceTensorProductFiniteExtension
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.TensTop
+import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.BaseOneSide.BaseOneOf
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.SiegelUnitTheory.ClassNumberMass, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ContinuousDiag, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FinprodEqIndicator, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.IsUnitOfTmulOne, CompanionTheory.AutomorphicTheory.SiegelUnitTheory.UnitsAinf, CompanionTheory.AutomorphicTheory.SiegelUnitTheory.VolumeSignatureIndependent
@@ -415,14 +416,8 @@ namespace GlobalTheory.CompanionTheory.SW.QTie
 
 theorem isUnit_of_tmul_one {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {R : Type} [CommRing R] [Algebra F R] {c : R}
-    (h : IsUnit (c ⊗ₜ[F] (1 : E))) : IsUnit c := by
-  obtain ⟨bb, -, -⟩ := GlobalTheory.CompanionTheory.SW.OneHerm.exists_basis hσ
-  have h1 := h.map (Algebra.norm R (S := R ⊗[F] E))
-  have h2 := Algebra.norm_algebraMap_of_basis (Algebra.TensorProduct.basis R bb) c
-  rw [Algebra.TensorProduct.algebraMap_apply] at h2
-  have h3 : Algebra.norm R (c ⊗ₜ[F] (1 : E)) = c ^ 2 := by simpa using h2
-  rw [h3] at h1
-  exact (isUnit_pow_iff two_ne_zero).mp h1
+    (h : IsUnit (c ⊗ₜ[F] (1 : E))) : IsUnit c :=
+  @RgBase.ScalFib.isUnit_of_tmul F E _ _ _ _ _ σ hσ R _ _ c h
 
 def hermAdd {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
@@ -646,12 +641,12 @@ theorem sw1b2 (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [
     Subtype.ext (funext fun _ => funext fun _ => by
       show (1 : R) ⊗ₜ[F] algebraMap F E β = algebraMap F R β ⊗ₜ[F] (1 : E)
       rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul])
-  have hE := OneVector.siegel_one_vector F E σ hcm' M J hJ' hM T hT hdet d b li lv hli hlv μ 𝓕 hμ h𝓕 mi mv hmi hmv
+  have hE := PlacePermOperatorBicommutantSpan.sw_one F E σ hcm' M J hJ' hM T hT hdet d b li lv hli hlv μ 𝓕 hμ h𝓕 mi mv hmi hmv
   simp only [hof] at hE
   obtain ⟨k1, k2, k3⟩ := EulerPos.euler_pos F E σ hcm' d b 1 M _ _ _ hE
     (fun v => (LocFin.fibre_loc_fin F E σ hcm' M J hJ' (Fv F v) (Rv v) 1 _ _ (mv v) (Hv v).1 (Hv v).2 (hmv v) _).1)
     _ _ hU Φ Φi Φf Φv hΦi hpure hpos hΦ
-  rw [ThetaLint.theta_lint_eq F E σ hcm' M J hJ' μ 𝓕 hμ h𝓕 1 _ Φ k1] at k3
+  rw [PlacePermOperatorBicommutantSpan.theta_lint F E σ hcm' M J hJ' μ 𝓕 hμ h𝓕 1 _ Φ k1] at k3
   have hS : {x : Fin 1 → Fin M → E | x 0 ≠ 0 ∧ Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE σ J (x 0) (x 0) = algebraMap F E β} =
       {X | gramE σ J X = T} := by
     ext x

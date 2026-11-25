@@ -13,6 +13,7 @@ import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.RingTheory.TotallySplit
 import Mathlib.Topology.Algebra.Group.Units
 import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirReductionTheory.OneParameterDerivatives.TauReduction.Imports
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeCountingBound.ArchPlace
 
 @[expose] public section
 
@@ -27,7 +28,7 @@ open Formalism.MainNotions.S Formalism.MainNotions.LeviCoordinates Formalism.L2.
 variable (I : AutInst)
 
 theorem phi_star (v : InfinitePlace I.F) (a : I.E) : I.φ v (star a) = star (I.φ v a) :=
-  I.cm.cmUnram.2.1 (I.φ v) a
+  by intros; apply PI.UnitaryGroupMassFormula.LCG.ap_star <;> assumption
 
 theorem star_atV_vecMul (v : InfinitePlace I.F) (u : Fin I.n → I.E) :
     star (atV I v u) ᵥ* Formalism.REAL.Jm (I.ε v) = (fun i => I.φ v ((star u ᵥ* I.J) i)) ᵥ* I.P v := by
@@ -38,7 +39,7 @@ theorem star_atV_vecMul (v : InfinitePlace I.F) (u : Fin I.n → I.E) :
   congr 1
   funext i
 
-  simp [vecMul, dotProduct, map_sum, phi_star]
+  simp [vecMul, dotProduct, map_sum, PI.UnitaryGroupMassFormula.LCG.ap_star]
 
 theorem hf_atV (v : InfinitePlace I.F) (u : Fin I.n → I.E) (z : Fin I.n → ℂ) :
     hf (Formalism.REAL.Jm (I.ε v)) (atV I v u) z = (fun i => I.φ v ((star u ᵥ* I.J) i)) ⬝ᵥ (I.P v *ᵥ z) := by
@@ -123,7 +124,7 @@ theorem atM_mulVec (v : InfinitePlace I.F) (A : Matrix (Fin I.n) (Fin I.n) I.E) 
 
 theorem transport_to_standard_form : Transp := by
   intro I
-  refine ⟨I.J_herm, phi_star I, hf_atV_atV I, Wv_perp I, fun v W hW h => hW ?_, atM_mulVec I, fun v w b => ?_,
+  refine ⟨I.J_herm, PI.UnitaryGroupMassFormula.LCG.ap_star I, hf_atV_atV I, Wv_perp I, fun v W hW h => hW ?_, atM_mulVec I, fun v w b => ?_,
     fun γ hγ => ⟨fun v => Formalism.L2.S.S7.DensRat.ratReal I γ hγ v, fun _ => rfl⟩⟩
   · refine (Submodule.eq_bot_iff _).2 fun u hu => funext fun i => (I.φ v).injective ?_
     have h1 : atV I v u ∈ Wv I W v := Submodule.subset_span ⟨u, hu, rfl⟩

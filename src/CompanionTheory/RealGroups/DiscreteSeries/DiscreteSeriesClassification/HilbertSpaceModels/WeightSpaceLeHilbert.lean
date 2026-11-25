@@ -33,7 +33,7 @@ theorem hilb_of (h1 : StepStable) (h2 : StepDatum) (h0 : StepSig) (h3 : StepMoll
       rreg ε g ((Hlam ε Ψ T.w).subtype x) := by
     intro g hg x
     rw [mir_Kset_eq] at hg
-    exact hcoe g (UnitaryGroupOfForm.K_mem_UJ hg) x
+    exact hcoe g (closure_inUJ_of_mem_Kset hg) x
   have hcone : ∀ (η : Fin n → ℝ) (S : Submodule ℂ (Hlam ε Ψ T.w)),
       Formalism.MainNotions.S.IsKTypeOf ε (sigLam ε Ψ T.w) η S → InCone (lowK ε lam) η := by
     intro η S hS

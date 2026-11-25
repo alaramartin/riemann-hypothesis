@@ -16,6 +16,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.OnePointBasi
 public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.NqMovedExample
 import Mathlib.Tactic.Lemma
 import Mathlib.Algebra.Order.Star.Int
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.InsertUnitMatrixZeroApply
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.FreeFamily, CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.GridSum, CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.LagSum, CompanionTheory.AutomorphicTheory.BesselWaveGrids.Bridge, CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.ProgYInjective, CompanionTheory.AutomorphicTheory.BesselWaveGrids.FourLeOfFive
@@ -271,7 +272,7 @@ theorem gridOK_of_free (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (Y : Finset ℝ) (
       linarith
     have hmem : ∀ y ∈ TBBx5.ysOf grid n, ∃ a, grid a (n a) = y := fun y hy => List.mem_ofFn.1 hy
     refine ⟨?_, ?_, hnew⟩
-    · rw [TBBx5.plusW_eq]
+    · rw [PBF.plusW_eq]
       refine cutWord_of_list P p.l0 _ (fun l hl => ?_) ?_
       · rcases List.mem_append.1 hl with hl | hl
         · obtain ⟨y, hy, rfl⟩ := List.mem_map.1 hl

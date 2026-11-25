@@ -15,6 +15,9 @@ import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.Topology.Connected.Separation
 import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicBoxesCompactExhaust
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTensMemLatO
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SemidirectVolume.TraceGramNondegenerate
 
 @[expose] public section
 
@@ -155,18 +158,9 @@ section Alg
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-theorem trace_one_tmul' [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] (z : E) :
-    Algebra.trace R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] z) = algebraMap F R (Algebra.trace F E z) := by
-  have h : Algebra.lmul R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] z) = (Algebra.lmul F E z).baseChange R := by
-    apply TensorProduct.AlgebraTensorModule.ext
-    intro r e
-    simp [Algebra.TensorProduct.tmul_mul_tmul]
-  rw [Algebra.trace_apply, h, LinearMap.trace_baseChange, Algebra.trace_apply]
-
 theorem trace_tmul' [FiniteDimensional F E] {R : Type} [CommRing R] [Algebra F R] (r : R) (e : E) :
-    Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] e) = r * algebraMap F R (Algebra.trace F E e) := by
-  have h : r ⊗ₜ[F] e = r • ((1 : R) ⊗ₜ[F] e) := by simp [TensorProduct.smul_tmul']
-  rw [h, map_smul, trace_one_tmul', smul_eq_mul]
+    Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] e) = r * algebraMap F R (Algebra.trace F E e) :=
+  by intros; apply LatVac.trace_tmul <;> assumption
 
 variable {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R']
 
@@ -234,11 +228,6 @@ theorem q_expand [FiniteDimensional F E] {d M : ℕ} (b : Module.Basis (Fin d) F
     Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
   ring
 
-theorem scale_repr {d : ℕ} (b : Module.Basis (Fin d) F E) (a : ℕ) (y : R ⊗[F] E) (k : Fin d) :
-    (Algebra.TensorProduct.basis R b).repr ((a : R ⊗[F] E) * y) k =
-      (a : R) * (Algebra.TensorProduct.basis R b).repr y k := by
-  rw [← nsmul_eq_mul, map_nsmul, Finsupp.smul_apply, nsmul_eq_mul]
-
 end Alg
 
 section Places
@@ -278,11 +267,11 @@ theorem scale_ev {d M : ℕ} (b : Module.Basis (Fin d) F E) {a : ℕ} (ha : 0 < 
   constructor
   · intro h p i k
     have h1 := h p i k
-    rw [scale_repr] at h1
+    rw [BoxF.repr_nat_mul] at h1
     have h2 := mul_mem hv h1
     rwa [← mul_assoc, hinv, one_mul] at h2
   · intro h p i k
-    rw [scale_repr]
+    rw [BoxF.repr_nat_mul]
     exact mul_mem (natCast_mem _ a) (h p i k)
 
 end Places

@@ -6,6 +6,8 @@ public import Formalism.HermitianCurvature.StatementTop
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.AdmissibleRecOfAdmissibleWord
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJDHat
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGaugeCut
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGaugeVLem
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.SquareIntegrableGammaZetabarInv
 
 @[expose] public section
 
@@ -19,25 +21,13 @@ section act
 
 variable (P : M.Par)
 
-theorem act_diag (d : M.Ty P → (MA.DQ P).Pr) (f : M.Ty P → MA.SmQ P.r P.TT) :
-    MA.actA P (Matrix.diagonal d) f = fun ρ => (d ρ).1 (f ρ) := by
-  funext ρ
-  show ∑ π', (Matrix.diagonal d ρ π').1 (f π') = (d ρ).1 (f ρ)
-  rw [Finset.sum_eq_single ρ (fun b _ hb => by rw [Matrix.diagonal_apply_ne _ (Ne.symm hb)]; rfl)
-    (fun h => absurd (Finset.mem_univ ρ) h), Matrix.diagonal_apply_eq]
-
 theorem act_sc (w : (MA.DQ P).Pr) (f : M.Ty P → MA.SmQ P.r P.TT) :
     MA.actA P (MA.sc P (MA.DQ P) w) f = fun ρ => w.1 (f ρ) := by
-  rw [MA.sc, Matrix.scalar_apply, act_diag]
+  rw [MA.sc, Matrix.scalar_apply, Gauge.VLem.actA_diag]
 
 theorem act_smul (c : ℂ) (a : MA.A P (MA.DQ P)) (f : M.Ty P → MA.SmQ P.r P.TT) :
     MA.actA P (c • a) f = c • MA.actA P a f := by
-  rw [Algebra.smul_def, Gauge.actA_mul, Matrix.algebraMap_eq_diagonal, act_diag]
-  rfl
-
-theorem sc_star (w : (MA.DQ P).Pr) : star (MA.sc P (MA.DQ P) w) = MA.sc P (MA.DQ P) (star w) := by
-  rw [MA.sc, Matrix.scalar_apply, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose, MA.sc,
-    Matrix.scalar_apply]
+  rw [Algebra.smul_def, Gauge.actA_mul, Matrix.algebraMap_eq_diagonal, Gauge.VLem.actA_diag]
   rfl
 
 def opA (l : Fin P.r) : Fin 6 → MA.A P (MA.DQ P) :=
@@ -89,7 +79,7 @@ theorem tiedOp_inv {a b : Q.Pr V} {a' b' : MA.A P (MA.DQ P)} (h : IsIntertwinedE
   have e : a.1 (b.1 Φ) = Φ := by
     have : (a * b).1 Φ = Φ := by rw [h1]; rfl
     exact this
-  rw [← jdh_actA_one P (τ (b.1 Φ)), ← h2, Gauge.actA_mul, ← h, e]
+  rw [← MAx2.R2.act_one P (τ (b.1 Φ)), ← h2, Gauge.actA_mul, ← h, e]
 
 theorem tiedRel_invClosed : (intertwiningRelation τ).InvClosed := fun a a' b b' h h1 h2 h3 h4 =>
   ⟨tiedOp_inv τ h.1 h1 h4, tiedOp_inv τ h.2 (by rw [← star_mul, h2, star_one]) (by rw [← star_mul, h3, star_one])⟩
@@ -134,12 +124,12 @@ theorem word_tied {X : Q.ActualOps P.k P.r z z' π π'} {μ : Measure (Mt P.k P.
   obtain ⟨-, -, -, -, -, -, mζ, mζi, mζb, mζbi, mG, mGi, -⟩ := hM
   have hF : FnRel (intertwiningRelation τ) L Lm := by
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
-    · rw [aζ, mζ]; exact tied_mkP (hB.fn 0) (by rw [MA.zA, sc_star]; exact hB.fn 2)
-    · rw [aζi, mζi]; exact tied_mkP (hB.fn 1) (by rw [MA.ziA, sc_star]; exact hB.fn 3)
-    · rw [aζb, mζb]; exact tied_mkP (hB.fn 2) (by rw [MA.zbA, sc_star]; exact hB.fn 0)
-    · rw [aζbi, mζbi]; exact tied_mkP (hB.fn 3) (by rw [MA.zbiA, sc_star]; exact hB.fn 1)
-    · rw [aG, mG]; exact tied_mkP (hB.fn 4) (by rw [MA.ggA, sc_star]; exact hB.fn 4)
-    · rw [aGi, mGi]; exact tied_mkP (hB.fn 5) (by rw [MA.ggiA, sc_star]; exact hB.fn 5)
+    · rw [aζ, mζ]; exact tied_mkP (hB.fn 0) (by rw [MA.zA, MAx2.R2.star_sc]; exact hB.fn 2)
+    · rw [aζi, mζi]; exact tied_mkP (hB.fn 1) (by rw [MA.ziA, MAx2.R2.star_sc]; exact hB.fn 3)
+    · rw [aζb, mζb]; exact tied_mkP (hB.fn 2) (by rw [MA.zbA, MAx2.R2.star_sc]; exact hB.fn 0)
+    · rw [aζbi, mζbi]; exact tied_mkP (hB.fn 3) (by rw [MA.zbiA, MAx2.R2.star_sc]; exact hB.fn 1)
+    · rw [aG, mG]; exact tied_mkP (hB.fn 4) (by rw [MA.ggA, MAx2.R2.star_sc]; exact hB.fn 4)
+    · rw [aGi, mGi]; exact tied_mkP (hB.fn 5) (by rw [MA.ggiA, MAx2.R2.star_sc]; exact hB.fn 5)
   have hQQ : ∀ Y, star Y = Y →
       ((intertwiningRelation τ).mat (Fin 2)).r (st.QQ Y) ((MA.startM P (MA.DQ P) l0).QQ Y) := by
     intro Y hY
@@ -164,13 +154,13 @@ theorem word_tied {X : Q.ActualOps P.k P.r z z' π π'} {μ : Measure (Mt P.k P.
     refine ⟨?_, ?_, ?_⟩
     · show (intertwiningRelation τ).r (L.p l) (MA.pA P (MA.DQ P) l)
       rw [ap]
-      exact tied_mkP (hB.op l 0) (by rw [MA.pA, sc_star]; exact tiedOp_neg_sc (hB.op l 3) rfl)
+      exact tied_mkP (hB.op l 0) (by rw [MA.pA, MAx2.R2.star_sc]; exact tiedOp_neg_sc (hB.op l 3) rfl)
     · show (intertwiningRelation τ).r (L.c l) (MA.cA P (MA.DQ P) l)
       rw [ac]
-      exact tied_mkP (hB.op l 1) (by rw [MA.cA, sc_star]; exact hB.op l 4)
+      exact tied_mkP (hB.op l 1) (by rw [MA.cA, MAx2.R2.star_sc]; exact hB.op l 4)
     · show (intertwiningRelation τ).r (L.ci l) (MA.ciA P (MA.DQ P) l)
       rw [aci]
-      exact tied_mkP (hB.op l 2) (by rw [MA.ciA, sc_star]; exact hB.op l 5)
+      exact tied_mkP (hB.op l 2) (by rw [MA.ciA, MAx2.R2.star_sc]; exact hB.op l 5)
   have hbT : ((intertwiningRelation τ).mat (Wd.Ix S)).r (P5.bTall L w)
       ((MA.sites P (MA.DQ P)).map fun σ => Wd.bT σ w).prod := by
     have e1 : ((MA.sites P (MA.DQ P)).map fun σ => Wd.bT σ w) =

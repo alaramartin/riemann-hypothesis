@@ -15,6 +15,7 @@ import Development.AbelianVarietyTheory.Proofs.JetHarmonics.SmoothVectorsDiscret
 import Formalism.PeriodIntegrals.ContractionsCovariantIff
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CovariantDeterminantScaling.IntCastMulEqSmul
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CovariantLinearProduct.OfFnProdSmul
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.CasPsA
 
 @[expose] public section
 
@@ -50,7 +51,7 @@ theorem qdet_smooth (hC : PI.DSInfCharCap.DSInfCharCap) (k r : ℕ) (ε : Fin (2
         (Q0 * Q⁻¹) * Matrix.single a b (1 : ℂ) * (Q * Q0⁻¹) := by
       simp only [Matrix.mul_assoc]
     rw [h1]
-    simp only [_root_.Formalism.QuantumDeterminants.ioh_single, Formalism.FourierDecayAlt.Q.Econj, LinearMap.sum_apply, LinearMap.smul_apply,
+    simp only [ReciprocityTheory.ChartRestriction.DS.S7.CasPsA.entry_conj_single, Formalism.FourierDecayAlt.Q.Econj, LinearMap.sum_apply, LinearMap.smul_apply,
       Submodule.coe_sum, Submodule.coe_smul]
   have h2 : (Q * Q0⁻¹) * (Q0 * Q⁻¹) = 1 := by
     rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_left _ _ hdQ0, Matrix.mul_nonsing_inv _ hdQ]

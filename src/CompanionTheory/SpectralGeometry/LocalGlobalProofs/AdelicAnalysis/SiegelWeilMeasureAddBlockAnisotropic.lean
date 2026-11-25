@@ -94,7 +94,7 @@ theorem swMeas_of_not_represented : ∀ (F E : Type) [Field F] [NumberField F] [
   have htE : algebraMap F E t ≠ 0 := (map_ne_zero _).2 ht
   have hdet1 : T1.det ≠ 0 := by
     rw [Matrix.det_fin_one]; exact htE
-  have hsw := _root_.GlobalTheory.CompanionTheory.SW.OneVector.siegel_one_vector F E σ hCM M J hJ (by omega) T1 hT1 hdet1
+  have hsw := CompanionTheory.PlacePermOperatorBicommutantSpan.sw_one F E σ hCM M J hJ (by omega) T1 hT1 hdet1
   obtain ⟨minf1, hminf1⟩ := _root_.GlobalTheory.CompanionTheory.SW.GramExist.exists_gramFib F E σ hCM M J hJ (Ainf F) hLinf 1 _ _
     ((haarOf _ hLinf laminf hinf.1).1 1 M) ((haarOf _ hLinf laminf hinf.1).2 1)
   have hex : ∀ v : HeightOneSpectrum (𝓞 F), ∃ m' : HermR (Fv F v) σ 1 → Measure (Fin 1 → Fin M → Fv F v ⊗[F] E),

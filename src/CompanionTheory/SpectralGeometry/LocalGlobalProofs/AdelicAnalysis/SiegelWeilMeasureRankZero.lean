@@ -97,7 +97,7 @@ end Glob
 
 theorem swMeas_zero : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (T : Matrix (Fin 0) (Fin 0) E) (hT : ∀ a b, σ (T b a) = T a b), T.det ≠ 0 → SWMeas σ J T hT := by
   intro F E _ _ _ _ _ σ hCM M J hJ T hT _ d b laminf lam _ _ μ 𝓕 hμ h𝓕 minf m hinf hv
-  have hfin : μ 𝓕 < ⊤ := ((GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hCM M J hJ).2 μ hμ).2 𝓕 h𝓕
+  have hfin : μ 𝓕 < ⊤ := ((CompanionTheory.SWFin.finVol F E σ hCM M J hJ).2 μ hμ).2 𝓕 h𝓕
   obtain ⟨⟨hLC, hSC, hT2⟩, -⟩ := GlobalTheory.CompanionTheory.AdeleTop.adele_top F
   obtain ⟨tg, lc, sc, t2, bs, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.TopH.topH_props F E σ hCM M J hJ (AF F)
   let Γ : Subgroup (HA (AF F) σ J) := HFinIn (AF F) σ J

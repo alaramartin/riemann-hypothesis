@@ -242,7 +242,7 @@ theorem eigStr_of_steps [CompleteSpace Wp] (h1 : GfPoly) (h2 : SpanPow) (h3 : Co
   let e := c.support.equivFin.symm
   have hgν : ∀ ν : Box lam (d : ℝ), PI.ZuckTensor.GapAtLeast ε ν.1 h₀ := fun ν => gap_of_box ν.2 hgap hh
   refine ⟨A, c.support.card, fun i => c (e i), fun i y => Formalism.QuantumDeterminants.capP (fun s => ((e i).1.1 s : ℂ)) (y : ℂ), hA,
-    fun i => wsp_ckOn hK h3 (hc _), fun i => wsp_inCC hK h4 hD (hgν _) (hc _), fun g hg => ?_,
+    fun i => CompanionTheory.LimBd.Main.ckOn_GV_of_mem_Wsp hK h3 (hc _), fun i => wsp_inCC hK h4 hD (hgν _) (hc _), fun g hg => ?_,
     fun i y _ => wsp_eig hK h3 h5 _ (hc _), fun i y hy => (norm_capP_le (e i).1.2 y).trans (hnn y hy),
     fun i j hij => wsp_orth hK h4 h5 h6 h7 _ hA hD (hgν _) (hgν _)
       (fun hh' => hij (e.injective (Subtype.ext (Subtype.ext hh')))) (hc _) (hc _)⟩

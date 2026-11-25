@@ -4,6 +4,7 @@ public import CompanionTheory.AutomorphicTheory.ProductFormulaTheory.CuspidalExh
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IrreducibleAdmissibleGL
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NonemptyEquivMultiProdOne
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CuspidalTwistInjective
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LUnlinkedIrr
 
 @[expose] public section
 
@@ -14,9 +15,6 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Loc
 namespace CompanionTheory.Exh
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-
-theorem nu_nu_nat (x : IrrGL (k := k)) (a b : ℕ) : (x.nu (a : ℂ)).nu (b : ℂ) = x.nu ((a + b : ℕ) : ℂ) := by
-  rw [IrrGL.nu_nu, Nat.cast_add]
 
 theorem not_linked_single (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (ρ : IrrGL (k := k)) (hρ : ρ.IsCusp) (n j : ℕ)
     (hj : j + 2 ≤ n) :
@@ -29,9 +27,9 @@ theorem not_linked_single (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) 
   obtain ⟨i, hi, ei⟩ := Segment.mem_carrier.1 ha
   obtain ⟨i', hi', ei'⟩ := Segment.mem_carrier.1 hb
   have key : ∀ s : ℕ, Γ.first.nu ((i' + s : ℕ) : ℂ) = ρ.nu ((j + s : ℕ) : ℂ) := by
-    intro s; rw [← nu_nu_nat, ei', nu_nu_nat]
+    intro s; rw [← GlobalTheory.CompanionTheory.BZSeg.NuPairIrr.nu_nat_add, ei', GlobalTheory.CompanionTheory.BZSeg.NuPairIrr.nu_nat_add]
   have key2 : ∀ s : ℕ, Γ.first.nu ((i + s : ℕ) : ℂ) = ρ.nu ((n + s : ℕ) : ℂ) := by
-    intro s; rw [← nu_nu_nat, ei, nu_nu_nat]
+    intro s; rw [← GlobalTheory.CompanionTheory.BZSeg.NuPairIrr.nu_nat_add, ei, GlobalTheory.CompanionTheory.BZSeg.NuPairIrr.nu_nat_add]
   rcases lt_or_ge i' i with h | h
   · have e1 := key (i - i')
     rw [show i' + (i - i') = i by omega, ei] at e1

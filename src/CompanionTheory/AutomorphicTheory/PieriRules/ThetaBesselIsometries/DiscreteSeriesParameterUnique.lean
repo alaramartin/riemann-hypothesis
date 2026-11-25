@@ -4,6 +4,7 @@ public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries
 import Mathlib.Algebra.Order.Archimedean.Real.Hom
 import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
 import Mathlib.Tactic.Lemma
+import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.CapelliEigenvalues.BetaAtInfinityZero
 
 @[expose] public section
 
@@ -26,16 +27,7 @@ open PI.DSInfCharCap
 
 lemma eq_of_capP {n : ℕ} (mu mu' : Fin n → ℝ) (h : StrictAnti mu) (h' : StrictAnti mu')
     (e : ∀ Y : ℂ, Formalism.QuantumDeterminants.capP (fun s => (mu s : ℂ)) Y = Formalism.QuantumDeterminants.capP (fun s => (mu' s : ℂ)) Y) :
-    mu = mu' := by
-  have key : ∀ (a b : Fin n → ℝ),
-      (∀ Y : ℂ, Formalism.QuantumDeterminants.capP (fun s => (a s : ℂ)) Y = Formalism.QuantumDeterminants.capP (fun s => (b s : ℂ)) Y) →
-      Set.range a ⊆ Set.range b := by
-    rintro a b e _ ⟨s, rfl⟩
-    have h0 : Formalism.QuantumDeterminants.capP (fun s => (a s : ℂ)) (-(a s : ℂ)) = 0 :=
-      Finset.prod_eq_zero (Finset.mem_univ s) (by simp)
-    obtain ⟨t, -, ht⟩ := Finset.prod_eq_zero_iff.mp ((e _).symm.trans h0)
-    exact ⟨t, by exact_mod_cast (by linear_combination ht : (b t : ℂ) = a s)⟩
-  exact (h.range_inj_of_wellFoundedGT h').mp ((key _ _ e).antisymm (key _ _ fun Y => (e Y).symm))
+    mu = mu' := @CompanionTheory.CapEig.eq_of_capelliPolynomial_eq n mu mu' h h' e
 
 section
 variable {n : ℕ} {ε : Fin n → Bool} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]

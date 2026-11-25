@@ -182,9 +182,9 @@ theorem theta_map (σ : E →ₐ[F] E) (hcm : IsCMExt F E σ) {M : ℕ} (J : Mat
       thetaMeas σ J μ 𝓕 {X : Fin n → Fin M → E | gramE σ J X = T} := by
   refine Measure.ext_of_lintegral _ fun Φ hΦ => ?_
   rw [lintegral_map hΦ he,
-    _root_.GlobalTheory.CompanionTheory.SW.ThetaLint.theta_lint_eq F E σ hcm M J hJ μ 𝓕 hH hF n _
+    CompanionTheory.PlacePermOperatorBicommutantSpan.theta_lint F E σ hcm M J hJ μ 𝓕 hH hF n _
       (fun X => Φ (rmul (AF F) X (H.map (inclR (F := F) (AF F))))) (hΦ.comp he),
-    _root_.GlobalTheory.CompanionTheory.SW.ThetaLint.theta_lint_eq F E σ hcm M J hJ μ 𝓕 hH hF n _ Φ hΦ]
+    CompanionTheory.PlacePermOperatorBicommutantSpan.theta_lint F E σ hcm M J hJ μ 𝓕 hH hF n _ Φ hΦ]
   congr 1
   refine lintegral_congr fun h => ?_
   let eqv : ({X : Fin n → Fin M → E | gramE σ J X = T'} : Set _) ≃

@@ -669,13 +669,6 @@ theorem dR_wedge (k r m : ℕ) (X : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k
   simp only [Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero, submatrix_apply] at h
   exact h.deriv
 
-theorem reH_add_imH (k r : ℕ) (Y : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : reH k r Y + Complex.I • imH k r Y = Y := by
-  have : Complex.I * (1 / (2 * Complex.I)) = 1 / 2 := by field_simp
-  rw [reH, imH, smul_smul, this, ← smul_add]
-  ext i j
-  simp only [Matrix.smul_apply, Matrix.add_apply, Matrix.sub_apply, smul_eq_mul]
-  ring
-
 theorem dC_wedge_single : ∀ (k r m : ℕ) (a b : Fin (2 * r + k + 1)) (J J' : Sub (2 * r + k + 1) m), (wedge k r m).dC (Matrix.single a b 1) J J' = if b ∈ J'.1 ∧ a ∉ J'.1.erase b ∧ J.1 = insert a (J'.1.erase b) then (-1) ^ ((J'.1.erase b).filter fun c => c < a).card * (-1) ^ ((J'.1.erase b).filter fun c => c < b).card else 0 := by
   intro k r m a b J J'
   have h := sum_adj _ _ (J.1.orderEmbOfFin J.2).strictMono (J'.1.orderEmbOfFin J'.2).strictMono a b
@@ -685,7 +678,7 @@ theorem dC_wedge_single : ∀ (k r m : ℕ) (a b : Fin (2 * r + k + 1)) (J J' : 
   refine sum_congr rfl fun j _ => ?_
   rw [mul_sum, ← sum_add_distrib]
   refine sum_congr rfl fun i _ => ?_
-  conv_rhs => rw [← reH_add_imH k r (Matrix.single a b 1)]
+  conv_rhs => rw [← ZuckStdD.reH_add_imH k r (Matrix.single a b 1)]
   simp only [Matrix.smul_apply, Matrix.add_apply, smul_eq_mul]
   ring
 

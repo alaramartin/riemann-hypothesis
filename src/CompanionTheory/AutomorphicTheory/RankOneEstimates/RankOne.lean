@@ -25,25 +25,6 @@ noncomputable section
 
 namespace CompanionTheory.FamilyDerivativeExpansion.M1
 
-lemma haar_smul {k r : ℕ} {U : Set (B.Mat k r)} {μ : Measure (Mt k r)} (h : B.IsHaarOn U μ) {c : ℝ≥0∞} (h0 : c ≠ 0)
-    (h1 : c ≠ ⊤) : B.IsHaarOn U (c • μ) := by
-  refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · rw [smul_apply, h.conc, smul_zero]
-  · intro a ha
-    have hm : Continuous (lmulM a : Mt k r → Mt k r) :=
-      continuous_const.matrix_mul continuous_id
-    rw [Measure.map_smul c hm.measurable.aemeasurable, h.left a ha]
-  · intro a ha
-    have hm : Continuous (B.rmulF a : Mt k r → Mt k r) :=
-      continuous_id.matrix_mul continuous_const
-    rw [Measure.map_smul c hm.measurable.aemeasurable, h.right a ha]
-  · intro K hK
-    rw [smul_apply, smul_eq_mul]
-    exact ENNReal.mul_lt_top h1.lt_top (h.finite_compact K hK)
-  · intro e
-    have he : c * μ Set.univ = 0 := congrArg (fun m : Measure (Mt k r) => m Set.univ) e
-    exact h.ne_zero (Measure.measure_univ_eq_zero.1 ((mul_eq_zero.1 he).resolve_left h0))
-
 theorem be_rank_one {k r : ℕ} (hk : 1 ≤ k) {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ} {h : ℝ}
     {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {σ : Mx k r → (H →L[ℂ] H)}
     {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp]
@@ -62,7 +43,7 @@ theorem be_rank_one {k r : ℕ} (hk : 1 ≤ k) {ε : Fin (2 * r + k + 1) → Boo
   have hm0 : μW Set.univ ≠ 0 := fun e => hW.2.1 (Measure.measure_univ_eq_zero.1 e)
   have hm1 : μW Set.univ ≠ ⊤ := measure_ne_top _ _
   have hWB : B.IsHaarOn (UWset k r D0.z) ((μW Set.univ)⁻¹ • μW) :=
-    haar_smul (((GlobalTheory.T.isHaarOn_iff_groups_unitary_unipotent k r μW).2.2 _ hz hT hk).1 hW) (ENNReal.inv_ne_zero.2 hm1) (ENNReal.inv_ne_top.2 hm0)
+    isHaarOn_smul_of (((GlobalTheory.T.isHaarOn_iff_groups_unitary_unipotent k r μW).2.2 _ hz hT hk).1 hW) (ENNReal.inv_ne_zero.2 hm1) (ENNReal.inv_ne_top.2 hm0)
   let D : B.RealPlaceData k r Wp Wp :=
     { D0 with
       μW := (μW Set.univ)⁻¹ • μW, μW' := (μW Set.univ)⁻¹ • μW, μN := μN, haarW := hWB

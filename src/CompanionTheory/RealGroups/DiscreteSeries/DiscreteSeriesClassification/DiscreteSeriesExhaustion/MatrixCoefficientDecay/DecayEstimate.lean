@@ -36,6 +36,7 @@ import Mathlib.Analysis.Calculus.InverseFunctionTheorem.FDeriv
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.RightDerivativeToL2
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.SlmPhiCont
 import Mathlib.Tactic.Lemma
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.HaarVolumes.JacobianNearOneOfSmall
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.DecayOf, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.HilbertSchmidtDecay.BackOf, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.HilbertSchmidtDecay.DecayAssembly.ChainGen, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.HilbertSchmidtDecay.DecayAssembly.Source, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.HilbertSchmidtDecay.DecayAssembly.HasCharPath, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LineFormulaOfFubiniAndParabolic, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.LineFormulas.LineFinal, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.GrowthStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ToL2CongrOnUnitaryBis, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.HilbertSchmidtDecay.BackwardOfLineFormula, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.MaximalCompactStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.SlabStatement, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.LineFormulas.ExhaustionStart, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.DecayEstimate
@@ -911,9 +912,6 @@ section Log
 open Filter Topology
 open scoped Matrix.Norms.Operator
 
-theorem exp_cont : Continuous (NormedSpace.exp : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ) :=
-  NormedSpace.exp_continuous
-
 theorem exp_flip {Y m : Matrix (Fin n) (Fin n) ℂ} (hr : NormedSpace.exp Y = m) (hu : Formalism.REAL.inUJ ε m) :
     NormedSpace.exp (-(Formalism.REAL.Jm ε * Yᴴ * Formalism.REAL.Jm ε)) = m := by
   have h1 : -(Formalism.REAL.Jm ε * Yᴴ * Formalism.REAL.Jm ε) = Formalism.REAL.Jm ε * (-Yᴴ) * (Formalism.REAL.Jm ε)⁻¹ := by
@@ -1005,7 +1003,7 @@ theorem frechet (n : ℕ) (ε : Fin n → Bool) (X : GMod n) (c : X.V →ₗ[ℂ
       ‖c u (g * NormedSpace.exp Y) - c u g - c (∑ a, ∑ b, Y a b • X.E a b u) g‖ ≤ η * ∑ a, ∑ b, ‖Y a b‖ := by
   have hΨ : Tendsto (fun Z : Matrix (Fin n) (Fin n) ℂ => g * NormedSpace.exp Z) (𝓝 0) (𝓝 g) := by
     have h : Continuous (fun Z : Matrix (Fin n) (Fin n) ℂ => g * NormedSpace.exp Z) :=
-      continuous_const.matrix_mul exp_cont
+      continuous_const.matrix_mul kd_exp_continuous
     have h2 := h.tendsto 0
     simpa [NormedSpace.exp_zero] using h2
   have hQ : ∀ᶠ x in 𝓝[{g | Formalism.REAL.inUJ ε g}] g, ∀ a b, ‖c (X.E a b u) x - c (X.E a b u) g‖ < η := by

@@ -7,6 +7,7 @@ import Mathlib.Algebra.Ring.IsFormallyReal
 import Mathlib.Dynamics.Ergodic.Action.Regular
 import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.RingTheory.SimpleRing.Principal
+import Development.WeilBound.ThetaLifts.Reductions.SiegelAbs
 
 @[expose] public section
 
@@ -62,8 +63,7 @@ def placeEquiv (hF : IsTotallyReal F) : InfinitePlace F ≃ (F →ₐ[ℚ] ℂ) 
   (Equiv.ofBijective _ (embedding_bijective hF)).trans (RingHom.equivRatAlgHom F ℂ)
 
 theorem card_places (hF : IsTotallyReal F) :
-    Fintype.card (InfinitePlace F) = Module.finrank ℚ F := by
-  rw [Fintype.card_congr (placeEquiv hF), AlgHom.card]
+    Fintype.card (InfinitePlace F) = Module.finrank ℚ F := PositivityTheory.ThKR.card_infinitePlace
 
 theorem exists_integral_basis [DecidableEq (InfinitePlace F)] (hF : IsTotallyReal F) (ρ : InfinitePlace F → (F →+* ℝ))
     (hρ : ∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) :

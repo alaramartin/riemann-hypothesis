@@ -17,6 +17,7 @@ import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
 public import Mathlib.Analysis.Calculus.Deriv.ZPow
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.KTypeExtendsHolomorphicComplexifiedK
 
 @[expose] public section
 
@@ -48,9 +49,8 @@ namespace HWRep
 
 variable {k : ℕ}
 
-theorem differentiable_det : Differentiable ℂ (fun B : Fin k → Fin k → ℂ => (Matrix.of B).det) := by
-  simp only [Matrix.det_apply', Matrix.of_apply]
-  fun_prop
+theorem differentiable_det : Differentiable ℂ (fun B : Fin k → Fin k → ℂ => (Matrix.of B).det) :=
+  by intros; apply GlobalTheory.HolExt.differentiable_det <;> assumption
 
 def detPow (k : ℕ) (m : ℤ) : HWRep k (fun _ => m) where
   I := Unit

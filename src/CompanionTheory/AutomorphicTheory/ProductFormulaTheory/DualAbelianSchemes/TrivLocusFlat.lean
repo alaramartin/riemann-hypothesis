@@ -59,6 +59,7 @@ import Mathlib.RingTheory.Etale.Weakly
 import Mathlib.RingTheory.TotallySplit
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LiftLeftFst
 import Mathlib.AlgebraicGeometry.ZariskisMainTheorem
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.WeilPairingPullbackIff
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.ProductFormulaTheory.AbelianDeRham.FreeAbelianDeRham.H1StructureDimLe, CompanionTheory.AutomorphicTheory.ProductFormulaTheory.DualAbelianSchemes.AddAcyclic, CompanionTheory.AutomorphicTheory.ProductFormulaTheory.DualAbelianSchemes.FewEqBridge, CompanionTheory.AutomorphicTheory.ProductFormulaTheory.DualAbelianSchemes.TrivLocusA, CompanionTheory.AutomorphicTheory.ProductFormulaTheory.DualAbelianSchemes.TrivLocusB, CompanionTheory.AutomorphicTheory.ProductFormulaTheory.DualAbelianSchemes.TrivLocus, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechFlatComplex, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CechFlatComplexStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.ExistsPointOfIsAffine, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.IsIsoOfClosedImmersion, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.SpecMapAppFromSpec, CompanionTheory.AutomorphicTheory.ProductFormulaTheory.DualAbelianSchemes.TrivLocusFlat
@@ -1208,7 +1209,7 @@ theorem univNoeth : TrivLocus → TrivLocusFlat → PointSurj → ∀ (R : Type)
         evc hM a₀ (Over.homMk Y.hom rfl : Over.mk (Y.hom ≫ t) ⟶ Over.mk t) := by
     intro Y a a₀ ea
     rw [← pull_comp, evc]
-    refine congrArg (fun q ↦ CechPic.pull q (cls M hM)) (left_ext ?_ ?_)
+    refine congrArg (fun q ↦ CechPic.pull q (cls M hM)) (Ar.WeilPull.left_ext ?_ ?_)
     · rw [Category.assoc, r₁, lift_left_fst, ea]
     · rw [Category.assoc, r₂, lift_left_snd]
       exact Over.w a
@@ -1230,7 +1231,7 @@ theorem univNoeth : TrivLocus → TrivLocusFlat → PointSurj → ∀ (R : Type)
   let τ : Over.mk (snd A (Over.mk t)).left ⟶ Over.mk (𝟙 (Sp C)) :=
     Over.homMk (snd A (Over.mk t)).left (by simp)
   have ar : a.left ≫ r = 𝟙 _ := by
-    apply left_ext
+    apply Ar.WeilPull.left_ext
     · rw [Category.assoc, r₁, Category.id_comp]
       exact liftPt_left _ _ _ _
     · rw [Category.assoc, r₂, Category.id_comp]
@@ -1584,8 +1585,6 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace CompanionTheory.PfDual
 
 theorem fewEquations : FewEquations := fewEquations_pf _root_.MainStatements.Hodge.Free.h1Le
-
-theorem ciFlat : CIFlat := GlobalTheory.T.CechFlatComplex
 
 theorem trivLocusFlat : TrivLocusFlat := @GlobalTheory.CompanionTheory.TrivFlat.trivLocusFlat fewEquations _root_.GlobalTheory.CompanionTheory.CIFlatPf.ciFlat
 

@@ -15,6 +15,7 @@ import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IntegrableMonomialMulConjComplexGaussian
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SchurFunctionCompactSupportModuloUnipotent, CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.QuadraticLevelSetDensity
@@ -74,12 +75,7 @@ lemma ker_le {b : ℝ} (hb : 0 < b) (w : V) :
   linarith
 
 lemma integrable_gauss {b : ℝ} (hb : 0 < b) :
-    Integrable (fun x : V => Real.exp (-b * ‖x‖ ^ 2)) volume := by
-  have h := GaussianFourier.integrable_cexp_neg_mul_sq_norm_add (V := V)
-    (b := (b : ℂ)) (by simpa using hb) 0 0
-  have h2 := h.norm
-  refine h2.congr (Eventually.of_forall fun x => ?_)
-  simp [Complex.norm_exp, ← Complex.ofReal_pow]
+    Integrable (fun x : V => Real.exp (-b * ‖x‖ ^ 2)) volume := integrable_exp_neg_mul_norm_sq hb
 
 lemma integrable_ker {b : ℝ} (hb : 0 < b) : Integrable (ker b : V → ℝ) volume := by
   exact (integrable_gauss (V := V) (b := Real.pi ^ 2 / b) (by positivity)).const_mul _

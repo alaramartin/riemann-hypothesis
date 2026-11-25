@@ -69,8 +69,6 @@ open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroi
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-theorem cmOrd_int_id : CMOrd ℤ id := CMOrd.int
-
 end GlobalTheory.CompanionTheory.Ar.Fan
 end -- clump:auto
 end -- clump:auto
@@ -461,7 +459,7 @@ theorem exists_isTwG_simpLab_star : ∀ (O : Type) [CommRing O] [IsDedekindDomai
   rcases hS.2.2 X hX n γ' hγ' with ⟨m, γ, hγ, hfree, hin⟩ | ⟨m, γ, β₀, m', s, h, hγ, hb₀, hp₀, hw₀, hin₀, hf, hpos, hin⟩
   · obtain ⟨m₁, δ, hδ, hli, hinj, hγδ⟩ := hSL.2 X hX m γ hγ
     obtain ⟨g, hg1, hg2, hg3⟩ := exists_cut_of_cell_le O bar φ X m₁ m δ γ hδ hγ hγδ
-    obtain ⟨m₂, s, hfs⟩ := exists_isFaceCut δ g hg1
+    obtain ⟨m₂, s, hfs⟩ := exists_faceCut δ g hg1
     have hδs : IsCell bar φ (fun j => δ (s j)) := _root_.GlobalTheory.CompanionTheory.Ar.Fan.FaceCells.isCell_face_of_isFaceCut O bar hb q φ hφ X hX (hDom X) m₁ δ hδ m₂ s g hfs
     have hfree' : ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone (fun j => δ (s j)) β → w.evalZ β = 0 :=
       fun β hb hp hc => hfree β hb hp (hg3 β hb hp (inRCone_of_sub s hc) (IsFaceCut.apply_eq_zero hfs hc))
@@ -474,12 +472,12 @@ theorem exists_isTwG_simpLab_star : ∀ (O : Type) [CommRing O] [IsDedekindDomai
     refine ⟨m₂, _, hcell', hli.comp _ s.injective, fun i j hij => ?_, fun j => ?_⟩
     · simp only [starLab_evalZ_of_not lab w (hnc i), starLab_evalZ_of_not lab w (hnc j)] at hij
       exact s.injective (hinj (Real.exp_injective (by linarith)))
-    · exact inRCone_trans (fun k => inRCone_face hfs (hγδ k) (hg2 k)) (hin j)
+    · exact inRCone_trans (fun k => Mark.FaceIn.inRCone_face hfs (hγδ k) (hg2 k)) (hin j)
   · obtain ⟨m₁, δ, hδ, hli, hinj, hγδ⟩ := hSL.2 X hX m γ hγ
     have hγs : IsCell bar φ (fun j => γ (s j)) := _root_.GlobalTheory.CompanionTheory.Ar.Fan.FaceCells.isCell_face_of_isFaceCut O bar hb q φ hφ X hX (hDom X) m γ hγ m' s h hf
     obtain ⟨g, hg1, hg2, hg3⟩ :=
       exists_cut_of_cell_le O bar φ X m₁ m' δ (fun j => γ (s j)) hδ hγs (fun k => hγδ (s k))
-    obtain ⟨m₂, s', hfs⟩ := exists_isFaceCut δ g hg1
+    obtain ⟨m₂, s', hfs⟩ := exists_faceCut δ g hg1
     have hβ₀δ : InRCone δ β₀ := inRCone_trans hγδ hin₀
     have hgpos : 0 < g β₀ := by
       rcases (hβ₀δ.apply_nonneg g hg1).lt_or_eq with h' | h'
@@ -527,7 +525,7 @@ theorem exists_isTwG_simpLab_star : ∀ (O : Type) [CommRing O] [IsDedekindDomai
       refine Fin.cases ?_ (fun k => ?_) k
       · simpa using inRCone_self (Fin.cons β₀ fun j => δ (s' j) : Fin (m₂ + 1) → LinearMap.BilinForm ℤ X) 0
       · simp only [Fin.cons_succ]
-        exact inRCone_trans hself (inRCone_face hfs (hγδ (s k)) (hg2 k))
+        exact inRCone_trans hself (Mark.FaceIn.inRCone_face hfs (hγδ (s k)) (hg2 k))
 
 end GlobalTheory.CompanionTheory.Ar.Fan.TwistedStarLabelling
 end -- clump:auto
@@ -1288,7 +1286,7 @@ theorem exists_smooth_fan_int : ∀ g : ℕ, ∃ φ : InvFun ℤ, IsPolFan id g 
   have hpoly : IsPolyFan (id : ℤ → ℤ) g (vorFun ℤ g) :=
     _root_.GlobalTheory.CompanionTheory.Ar.Fan.vorFun_isPolyFan ℤ id g g (fun Y _ _ _ _ => hasRedCover_int_proj Y) (by simp)
   have htw : IsTwG (0 : ℤ) (vorFun ℤ g) := fun σ _ n B => baseFun_twist _ _ _ σ n B
-  obtain ⟨φ, h₁, h₂, -, -⟩ := _root_.GlobalTheory.CompanionTheory.Ar.Fan.SmoothRefinement.exists_smooth_refinement ℤ id 0 cmOrd_int_id g (vorFun ℤ g)
+  obtain ⟨φ, h₁, h₂, -, -⟩ := _root_.GlobalTheory.CompanionTheory.Ar.Fan.SmoothRefinement.exists_smooth_refinement ℤ id 0 CMOrd.int g (vorFun ℤ g)
     (fun Y _ _ _ _ => dominates_int_proj Y) hpoly htw
   exact ⟨φ, h₁, h₂⟩
 

@@ -23,6 +23,7 @@ import Mathlib.Tactic.ENatToNat
 import Mathlib.Tactic.Linter.Style
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutEXAsm
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.BesselWaveGrids.NQText, CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.CloudPair, CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.CloudProd, CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.Bracket, CompanionTheory.AutomorphicTheory.BesselWaveGrids.InterlacingGrids.PstMul, CompanionTheory.AutomorphicTheory.BesselWaveGrids.QwBound, CompanionTheory.AutomorphicTheory.BesselWaveGrids.NqMovedExample
@@ -536,10 +537,6 @@ namespace CompanionTheory.WaveGrid
 
 open Formalism.FourierDecayAlt
 
-theorem qC_ofReal (P : M.Par) (y : ℝ) :
-    M.qC P (y : ℂ) = ((I.qpoly P.k P.T P.T' P.u P.u' y : ℝ) : ℂ) := by
-  simp [M.qC, I.qpoly]
-
 end CompanionTheory.WaveGrid
 end -- clump:auto
 end -- clump:auto
@@ -642,7 +639,7 @@ theorem nq_onCut_pair (P : M.Par) (hOK : P.OK) (l : ℕ) (hl1 : 1 ≤ l) (hlk : 
   have hρ := interlaces_of_OK P hOK
   have hq := _root_.Formalism.FourierDecayAlt.P.Interlace.qPositive P.k P.u P.u' P.lo l Y P.T P.T' hl1 hlk hρ hY hOK.T_pos hOK.T'_pos
   have hTT : 0 < P.T * P.T' := mul_pos hOK.T_pos hOK.T'_pos
-  rw [qC_ofReal, Complex.ofReal_re]
+  rw [Formalism.FourierDecayAlt.P.PBI.qC_ofReal, Complex.ofReal_re]
   refine ⟨hq, ?_⟩
   have hden := den_onCut P.k P.u P.u' P.lo l Y hl1 hlk hρ hY
   have hYb : |Y| ≤ b := abs_le_of_onCut P.u P.u' l Y b hY hL.ul_le.1 hL.ul_le.2

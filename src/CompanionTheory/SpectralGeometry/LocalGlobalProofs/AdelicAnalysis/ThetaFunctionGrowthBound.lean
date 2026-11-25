@@ -353,7 +353,7 @@ theorem ei_bound : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A 
   intro F _ _ _ _ lf hlf hO ψ hψ ι _ _ M B ρ P hQ hM φ hφ t ht
   have hTR : IsTotallyReal F := hQ.1
   have hρ : ∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x := hQ.2.2.2.2.1
-  obtain ⟨C1, hC1⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.norm_fstar_le_den F lf hlf hO ψ hψ ι M B ρ P hQ φ hφ
+  obtain ⟨C1, hC1⟩ := CompanionTheory.PlacePermOperatorBicommutantSpan.fstar_decay F lf hlf hO ψ hψ ι M B ρ P hQ φ hφ
   obtain ⟨C2, hC2⟩ := _root_.GlobalTheory.CompanionTheory.SW.LatSum.lattice_sum F hTR ρ hρ M (by omega) t ht
   obtain ⟨Q, out, hinj, hsep, hbij⟩ := exists_decomp F
   obtain ⟨hd1, hd2, hd3⟩ := _root_.GlobalTheory.CompanionTheory.SW.DenSum.summable_den F M hM 1 one_pos

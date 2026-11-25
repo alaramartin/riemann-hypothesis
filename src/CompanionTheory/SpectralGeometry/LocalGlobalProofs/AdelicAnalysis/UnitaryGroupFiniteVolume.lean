@@ -54,14 +54,14 @@ variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [De
   (h : HermitianForm F E W) (v : Basis ι E W)
 
 theorem te : TorusEmbedding.Statement h v :=
-  TorusEmbedding.proof h v (HermAtPlace.full h v) (GramAtData.full h v)
+  TorusEmbedding.proof h v (HermAtPlace.proof h v) (GramAtData.proof h v)
 
 theorem le : LineEigenvalue.Statement h v := LineEigenvalue.proof h v (VecAtNeZero.full v)
 
 theorem sh : SemidirectHaar.Statement (archUnitary h v) (InfinitePlace E → ℂˣ) := SemidirectHaar.proof _ _
 
 theorem tm : TorusModulus.Statement h v :=
-  TorusModulus.proof h v (HermAtPlace.full h v) (GramAtData.full h v) (ComplementForm.full h)
+  TorusModulus.proof h v (HermAtPlace.proof h v) (GramAtData.proof h v) (ComplementForm.full h)
     (StabilizerLevi.proof h v) (UnipotentModulus.proof h v) (RadicalTorusModulus.proof h v)
     fun _ _ _ _ _ => SemidirectHaar.proof _ _
 

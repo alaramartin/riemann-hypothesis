@@ -40,7 +40,7 @@ theorem cyclic_vectors_dense : CycDense := by
   have hst := closure_genSub_stable (V := V) (c := c.re) hU hD hVf
     (fun a b h x hx => ⟨⟨hSt a b h x hx.1.1, cyc_stab a b hx.1.2⟩, by
       have h1 : Cas E x - c • x = 0 := hx.2
-      have h2 := LinearMap.congr_fun ((Formalism.REAL.casCentral _ n ε E hK.gl).1 a b) x
+      have h2 := LinearMap.congr_fun ((Formalism.REAL.casimir_central_holds _ n ε E hK.gl).1 a b) x
       simp only [Module.End.mul_apply] at h2
       show Cas E (E a b x) - c • E a b x = 0
       rw [h2, ← map_smul, ← map_sub, h1, map_zero]⟩)

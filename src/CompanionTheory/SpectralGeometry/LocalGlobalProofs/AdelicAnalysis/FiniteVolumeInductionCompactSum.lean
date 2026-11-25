@@ -22,6 +22,7 @@ import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorL
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CountingRationalVectorsBoxBound
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteVolumeBlockOneExtension, CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteVolumeInductionCompactSum
@@ -68,7 +69,7 @@ theorem mean_lt_top {G G₁ : Type} [Group G] [TopologicalSpace G] [IsTopologica
     have h3 : μ₁ (ι ⁻¹' U) ≤ (μ₁.map ι) U := Measure.le_map_apply hme.measurable.aemeasurable U
     exact (h2.trans_le h3).ne'
   obtain ⟨C', K, hC', hK, hcover⟩ := _root_.CompanionTheory.PlacePermOperatorBicommutantSpan.cover G μ ι.range (μ₁.map ι) hνinv hνpos C hC
-  obtain ⟨𝓕', h𝓕', hunf⟩ := _root_.GlobalTheory.CompanionTheory.Adelic.unfold_coset_sum_fundamentalDomain G μ Γ (Γ ⊓ ι.range) inf_le_left 𝓕 h𝓕 Q r hr hQ
+  obtain ⟨𝓕', h𝓕', hunf⟩ := CompanionTheory.PlacePermOperatorBicommutantSpan.unf G μ Γ (Γ ⊓ ι.range) inf_le_left 𝓕 h𝓕 Q r hr hQ
   rw [hunf f hf]
   haveI : Countable ↥(Γ ⊓ ι.range) :=
     (Subgroup.inclusion_injective (inf_le_left : Γ ⊓ ι.range ≤ Γ)).countable
@@ -339,25 +340,11 @@ theorem hE_mulVec (σ : E →ₐ[F] E) {M : ℕ} (J g : Matrix (Fin M) (Fin M) E
     Matrix.dotProduct_mulVec ((σ : E →+* E) ∘ x) (cT (σ : E →+* E) g) _]
   simp only [cT, Matrix.vecMul_transpose]
 
-theorem gramE_mulVec (σ : E →ₐ[F] E) {M n : ℕ} (J g : Matrix (Fin M) (Fin M) E)
-    (X : Fin n → Fin M → E) :
-    gramE σ J (fun a => g *ᵥ X a) = gramE σ (cT (σ : E →+* E) g * J * g) X := by
-  funext a b
-  exact hE_mulVec σ J g (X a) (X b)
-
 end Alg
 
 section Top
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
-
-theorem continuous_actTup (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
-    [IsTopologicalRing (R ⊗[F] E)] {M n : ℕ} (g : GL (Fin M) (R ⊗[F] E)) :
-    Continuous (actTup R g : (Fin n → Fin M → R ⊗[F] E) → _) := by
-  refine continuous_pi fun a => continuous_pi fun i => ?_
-  simp only [actTup, Matrix.mulVec, dotProduct]
-  exact continuous_finsetSum _ fun j _ =>
-    continuous_const.mul ((continuous_apply j).comp (continuous_apply a))
 
 theorem isCompact_preimage_actTup (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
     [IsTopologicalRing (R ⊗[F] E)] {M n : ℕ} (g : GL (Fin M) (R ⊗[F] E))
@@ -376,7 +363,7 @@ theorem isCompact_preimage_actTup (R : Type) [CommRing R] [Algebra F R] [Topolog
         simp [actTup, Matrix.mulVec_mulVec]
       simpa [Set.mem_preimage, this] using hY
   rw [h]
-  exact hΩ.image (continuous_actTup R g⁻¹)
+  exact hΩ.image (IsoBox.continuous_actTup R g⁻¹)
 
 end Top
 
@@ -404,7 +391,7 @@ theorem finite_count : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
             {X : Fin 1 → Fin (M₁ + 1) → E | gramE σ J X = fun _ _ => algebraMap F E t}} =
           {X | gramE σ (blockOne (algebraMap F E t) J₁) X = fun _ _ => algebraMap F E t} := by
         ext X
-        simp only [Set.mem_ofPred_eq, gramE_mulVec, hblock]
+        simp only [Set.mem_ofPred_eq, IsoBox.gramE_mulVec, hblock]
       have hfun : (fun Y : Fin 1 → Fin (M₁ + 1) → AF F ⊗[F] E =>
           Set.indicator Ω (fun _ => (1 : ℝ≥0∞)) (actTup (AF F) (bc (inclR (AF F)) g) Y)) =
           Set.indicator (actTup (AF F) (bc (inclR (AF F)) g) ⁻¹' Ω) (fun _ => (1 : ℝ≥0∞)) := by

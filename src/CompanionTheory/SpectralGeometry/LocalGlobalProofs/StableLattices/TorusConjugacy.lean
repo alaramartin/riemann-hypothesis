@@ -1,6 +1,7 @@
 module
 
 public import CompanionTheory.AutomorphicTheory.BesselOrbitBounds.BesselMapUniqueness.BesselMapUniqGap
+import Formalism.FormalDegreeBessel.FormalDegreeRatio.UnitaryWeylNormalHolds
 
 @[expose] public section
 
@@ -55,21 +56,8 @@ theorem hpk_row (k r : ℕ) (p q : Fin (2 * r + k + 1)) (hpq : p.val + q.val = 2
 
 theorem uw_col (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
     (hh : h ∈ UWset k r z) (p : Fin (2 * r + k + 1)) (hp : p.val < r ∨ r + k < p.val)
-    (i : Fin (2 * r + k + 1)) : h i p = if i = p then 1 else 0 := by
-  obtain ⟨-, hcols, -⟩ := hh
-  have hplt := p.isLt
-  rcases hp with hp | hp
-  · have e : eI k r ⟨p.val, hp⟩ = p := Fin.ext rfl
-    have hx := congrFun (hcols ⟨p.val, hp⟩).1 i
-    rw [e] at hx
-    simpa [bvec, mulVec_single, Pi.single_apply] using hx
-  · have e : esI k r ⟨2 * r + k - p.val, by omega⟩ = p := by
-      apply Fin.ext
-      show 2 * r + k - (2 * r + k - p.val) = p.val
-      omega
-    have hx := congrFun (hcols ⟨2 * r + k - p.val, by omega⟩).2 i
-    rw [e] at hx
-    simpa [bvec, mulVec_single, Pi.single_apply] using hx
+    (i : Fin (2 * r + k + 1)) : h i p = if i = p then 1 else 0 :=
+  @WeylGroupFacts.uw_fixed_col k r z h hh p hp i
 
 theorem uw_row (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
     (hh : h ∈ UWset k r z) (q : Fin (2 * r + k + 1)) (hq : q.val < r ∨ r + k < q.val)

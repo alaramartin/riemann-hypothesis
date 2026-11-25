@@ -49,7 +49,7 @@ theorem bounded : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace (A F
   obtain ⟨𝒟, h𝒟⟩ : ∃ 𝒟 : ((ι → A F) → ℂ) → (InfinitePlace F → ℂ) → ℂ, ∀ φ τ,
     𝒟 φ τ = (∫ ω, theta B ρ P (gf ω) (gi ω) φ τ ∂Pr) - eis ψ lf B ρ P φ τ := ⟨_, fun _ _ => rfl⟩
   have hUD := fun ω => _root_.GlobalTheory.CompanionTheory.SW.ThetaUD.main F ψ hψ ι M B ρ P hQ _ _ (hO ω)
-  have hei := _root_.GlobalTheory.CompanionTheory.SW.Core.EiInv.ei_inv F lf hlf h1 ψ hψ ι M B ρ P hQ hM
+  have hei := ei_inv F lf hlf h1 ψ hψ ι M B ρ P hQ hM
   have heb := _root_.GlobalTheory.CompanionTheory.SW.Core.EiBound.ei_bound F lf hlf h1 ψ hψ ι M B ρ P hQ hM
   have hti := _root_.GlobalTheory.CompanionTheory.SW.Core.ThetaIntegral.main F lf hlf h1 ψ hψ ι M B ρ P hQ Ω Pr gf gi hC
   have hsm : ∀ φ τ, SB φ → (∀ w, 0 < (τ w).im) → ∀ c : ℂ, 𝒟 (c • φ) τ = c * 𝒟 φ τ := fun φ τ hφ hτ c => by

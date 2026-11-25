@@ -21,6 +21,7 @@ import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.Tactic.TypeStar
 import Mathlib.Algebra.Module.Torsion.Prod
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.HostGeneratorPowFourTraceNormModEight
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SuperadditiveOfCellsCoverCone
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.IsMin2IffFinite, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.ExistsBalancedFormsDominating, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.ExistsFiniteBelowModTwo, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.IntEqZeroOfForallTwoPowDvd, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.ExistsPsdFormsCoverContactSet, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.IsPosDefAddAndMemPsdCone, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.MemRationalConeOfPerturbation, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.ContactSetSpansOfPosDef, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.PsdConeAddMem, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.PsdConeAddMemStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.PsdConeDescendsAlongSurjection, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.PsdConeExistsMaximalSupport, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.ContactSetSpannedOfCover, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.ExistsNatCombOfToRealMemRcone, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.MemConeOfModTwoLift, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.PsdConeFinitelyManyOrbits, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.VorFunHomogSuperadd, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.VoronoiFunctionIntegralPositive, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.VoronoiFanIsPolyhedral
@@ -494,24 +495,7 @@ namespace GlobalTheory.CompanionTheory.Ar.Fan
 
 theorem free_int_of_projective (O : Type) [CommRing O] [IsDomain O] [CharZero O] [Module.Finite ℤ O]
     (Y : Type) [AddCommGroup Y] [Module O Y] [Module.Finite O Y] [Module.Projective O Y] :
-    Module.Finite ℤ Y ∧ Module.Free ℤ Y := by
-  have hfin : Module.Finite ℤ Y := Module.Finite.trans O Y
-  obtain ⟨s, hs⟩ := Module.projective_def'.1 (inferInstance : Module.Projective O Y)
-  have hinj : Function.Injective s := Function.LeftInverse.injective (g := Finsupp.linearCombination O id) (fun y => by
-    simpa using LinearMap.congr_fun hs y)
-  have htf : Module.IsTorsionFree ℤ Y := by
-    refine Module.IsTorsionFree.of_smul_eq_zero ?_
-    intro n y h
-    by_contra hc
-    push_neg at hc
-    have h1 : ((n : O)) • y = 0 := by rw [Int.cast_smul_eq_zsmul]; exact h
-    have h2 : (n : O) • s y = 0 := by rw [← map_smul, h1, map_zero]
-    have hy : s y ≠ 0 := fun h0 => hc.2 (hinj (by rw [h0, map_zero]))
-    obtain ⟨a, ha⟩ := Finsupp.ne_iff.1 hy
-    have h3 := DFunLike.congr_fun h2 a
-    simp only [Finsupp.smul_apply, smul_eq_mul, Finsupp.coe_zero, Pi.zero_apply] at h3 ha
-    exact (mul_ne_zero (Int.cast_ne_zero.2 hc.1) ha) h3
-  exact ⟨hfin, Module.free_of_finite_type_torsion_free'⟩
+    Module.Finite ℤ Y ∧ Module.Free ℤ Y := finite_free_int_of_projective O Y
 
 theorem sum_nonneg_of_isPosDef {Y ι : Type} [AddCommGroup Y] [Fintype ι] (b : Module.Basis ι ℤ Y)
     {B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ} (h : IsPosDef B) {n : ℕ} (y : Fin n → Y) (c : Fin n → ℝ) :
@@ -548,7 +532,7 @@ theorem sum_nonneg_of_mem_psdCone (O : Type) [CommRing O] [IsDomain O] [CharZero
     {n : ℕ} (x : Fin n → X) (c : Fin n → ℝ) : 0 ≤ ∑ i, ∑ j, c i * c j * B (x i) (x j) := by
   obtain ⟨X₁, _, _, _, r, B₁, hr, -, h1, h2⟩ := hB
   have : Module.Finite O X₁ := Module.Finite.of_surjective r hr
-  obtain ⟨_, _⟩ := free_int_of_projective O X₁
+  obtain ⟨_, _⟩ := finite_free_int_of_projective O X₁
   simp only [h2]
   exact sum_nonneg_of_isPosDef (Module.Free.chooseBasis ℤ X₁) h1 (fun i => r (x i)) c
 
@@ -914,43 +898,8 @@ theorem free_int_of_torsion_eq_bot (M : Type) [AddCommGroup M] [Module O M] [Mod
 
 end DedekindLFunctions
 
-theorem add_mem_psdCone : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (B B' : X →ₗ[ℤ] X →ₗ[ℤ] ℝ), B ∈ psdCone (bar := bar) (X := X) → B' ∈ psdCone (bar := bar) (X := X) → B + B' ∈ psdCone (bar := bar) (X := X) := by
-  intro O _ _ _ _ bar X _ _ _ B B' hB hB'
-  obtain ⟨X₁, _, _, _, r₁, B₁, hr₁, hb₁, hd₁, he₁⟩ := hB
-  obtain ⟨X₂, _, _, _, r₂, B₂, hr₂, hb₂, hd₂, he₂⟩ := hB'
-  have : Module.Finite O X₁ := Module.Finite.of_surjective r₁ hr₁
-  have : Module.Finite O X₂ := Module.Finite.of_surjective r₂ hr₂
-  have ht₁ : Submodule.torsion O X₁ = ⊥ := IsDedekindDomain.flat_iff_torsion_eq_bot.1 inferInstance
-  have ht₂ : Submodule.torsion O X₂ = ⊥ := IsDedekindDomain.flat_iff_torsion_eq_bot.1 inferInstance
-  have : Module.Free ℤ X₁ := free_int_of_torsion_eq_bot O X₁ ht₁
-  have : Module.Free ℤ X₂ := free_int_of_torsion_eq_bot O X₂ ht₂
-  have : Module.Finite ℤ X₁ := Module.Finite.trans O X₁
-  have : Module.Finite ℤ X₂ := Module.Finite.trans O X₂
-  have hdef := isPosDef_orthSum (Module.Free.chooseBasis ℤ X₁) (Module.Free.chooseBasis ℤ X₂) hd₁ hd₂
-  let r : X →ₗ[O] X₁ × X₂ := r₁.prod r₂
-  let P := LinearMap.range r
-  have htP : Submodule.torsion O P = ⊥ := by
-    have ht : Submodule.torsion O (X₁ × X₂) = ⊥ := IsDedekindDomain.flat_iff_torsion_eq_bot.1 inferInstance
-    refine (Submodule.eq_bot_iff _).2 fun u hu => ?_
-    obtain ⟨a, hau⟩ := (Submodule.mem_torsion_iff u).1 hu
-    have h1 : (u : X₁ × X₂) ∈ Submodule.torsion O (X₁ × X₂) :=
-      (Submodule.mem_torsion_iff _).2 ⟨a, by simpa using congrArg Subtype.val hau⟩
-    rw [ht] at h1
-    exact Subtype.ext h1
-  have : Module.Flat O P := IsDedekindDomain.flat_iff_torsion_eq_bot.2 htP
-  have : Module.FinitePresentation O P := Module.finitePresentation_of_finite _ _
-  have hproj : Module.Projective O P := Module.Flat.projective_of_finitePresentation
-  let j : P →ₗ[ℤ] X₁ × X₂ := P.subtype.toAddMonoidHom.toIntLinearMap
-  refine ⟨P, inferInstance, inferInstance, hproj, r.rangeRestrict, (orthSum B₁ B₂).compl₁₂ j j,
-    r.surjective_rangeRestrict, ⟨fun y z => ?_, fun a y z => ?_⟩,
-    isPosDef_compl_injective hdef j Subtype.val_injective, fun a b => ?_⟩
-  · change B₁ _ _ + B₂ _ _ = B₁ _ _ + B₂ _ _
-    rw [hb₁.1, hb₂.1]
-  · change B₁ (a • _) _ + B₂ (a • _) _ = B₁ _ (bar a • _) + B₂ _ (bar a • _)
-    rw [hb₁.2, hb₂.2]
-    rfl
-  · change B a b + B' a b = B₁ (r₁ a) (r₁ b) + B₂ (r₂ a) (r₂ b)
-    rw [he₁, he₂]
+theorem add_mem_psdCone : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (B B' : X →ₗ[ℤ] X →ₗ[ℤ] ℝ), B ∈ psdCone (bar := bar) (X := X) → B' ∈ psdCone (bar := bar) (X := X) → B + B' ∈ psdCone (bar := bar) (X := X) :=
+  CoverSuper.add_mem_psdCone
 
 end GlobalTheory.CompanionTheory.Ar.Fan
 end -- clump:auto

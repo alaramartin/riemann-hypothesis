@@ -4,6 +4,7 @@ public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DiscreteSeriesUnitarySmoothBasicStatement
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.ContinuousMulMt
 import Mathlib.RingTheory.Finiteness.Lattice
+import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.TensorDecompositionInjectiveParameters
 
 @[expose] public section
 
@@ -22,9 +23,8 @@ namespace GlobalTheory.TensorKFinite
 
 variable {k r : ℕ} {ι : Type} [Fintype ι]
 
-theorem smMap_zero {R R' : Rep k r} {T : R.H → R'.H} (hT : SmMap R R' T) : T 0 = 0 := by
-  have h := hT.smul 0 0 R.smSub.zero_mem
-  simpa using h
+theorem smMap_zero {R R' : Rep k r} {T : R.H → R'.H} (hT : SmMap R R' T) : T 0 = 0 :=
+  TensOrth.SmMap_zero hT
 
 theorem kfin_of_family {R R' : Rep k r} (T : ι → R.H → R'.H) (hT : ∀ c, SmMap R R' (T c))
     (hK : ∀ v, R.KFin v → v ∈ R.sm)

@@ -4,6 +4,7 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GermConstantsEqAlongAffineSpaceSquare
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.IntegralAlmostAllPlaces
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorIntegerRingAlmostAllPlaces
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalGramFiberMeasuresAgreeAlmostAll
 
 @[expose] public section
 
@@ -84,9 +85,8 @@ theorem mem_latV_iff {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F
   ⟨fun h a i => (hO _).2 (h a i), fun h a i => (hO _).1 (h a i)⟩
 
 theorem mulVec_mem {T : Type} [CommRing T] (O : Subring T) {M : ℕ} (g : Matrix (Fin M) (Fin M) T)
-    (hg : ∀ i j, g i j ∈ O) (x : Fin M → T) (hx : ∀ i, x i ∈ O) (i : Fin M) : (g *ᵥ x) i ∈ O := by
-  simp only [Matrix.mulVec, dotProduct]
-  exact O.sum_mem fun j _ => O.mul_mem (hg i j) (hx j)
+    (hg : ∀ i j, g i j ∈ O) (x : Fin M → T) (hx : ∀ i, x i ∈ O) (i : Fin M) : (g *ᵥ x) i ∈ O :=
+  GoodIso.mulVec_mem O g hg x hx i
 
 theorem good_trans : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (t : F), t ≠ 0 → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∀ x y : Fin 1 → Fin M → Fv F v ⊗[F] E, x ∈ latV b v → y ∈ latV b v → gramR (Fv F v) σ J x = (hermScal (Fv F v) σ (algebraMap F _ t) : HermR (Fv F v) σ 1) → gramR (Fv F v) σ J y = gramR (Fv F v) σ J x → ∃ h : HA (Fv F v) σ J, actW (Fv F v) σ J h x = y ∧ ∀ (n : ℕ) (X : Fin n → Fin M → Fv F v ⊗[F] E), actW (Fv F v) σ J h X ∈ latV b v ↔ X ∈ latV b v := by
   intro F E _ _ _ _ _ σ h M J hJ t ht d b
@@ -150,9 +150,9 @@ theorem good_trans : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numbe
           ((g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E)) *ᵥ X a) := by
         rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
       rw [e]
-      exact mulVec_mem O _ hgiO _ (fun j => by rw [← hact]; exact hX a j) i
+      exact GoodIso.mulVec_mem O _ hgiO _ (fun j => by rw [← hact]; exact hX a j) i
     · intro hX a i
       rw [hact]
-      exact mulVec_mem O _ hgO _ (hX a) i
+      exact GoodIso.mulVec_mem O _ hgO _ (hX a) i
 
 end GlobalTheory.CompanionTheory.SW.GoodTrans

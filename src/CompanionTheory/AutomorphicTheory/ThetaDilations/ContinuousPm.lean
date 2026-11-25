@@ -46,6 +46,7 @@ import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DisjointSpanPerpLat
 
 @[expose] public section
 
@@ -64,7 +65,7 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
   (R : Type) [CommRing R] [Algebra F R]
 
 theorem exists_anti (h : IsCMExt F E σ) : ∃ δ : E, δ ≠ 0 ∧ σ δ = -δ := by
-  have hss : ∀ x, σ (σ x) = x := GlobalTheory.GaussMean.OneVec.sigma_sigma h
+  have hss : ∀ x, σ (σ x) = x := GlobalTheory.SelfDualLatticeCompare.conj_conj h
   by_contra hne
   push Not at hne
   have := h.2.1
@@ -239,7 +240,7 @@ theorem par_of_scalar_entry (F E : Type) [Field F] [NumberField F] [Field E] [Nu
       cT (σ : E →+* E) g * hypJ J * g = hypJ J → h.1.val = g.map (inclR (AF F)) →
       HA.mat (AF F) σ (hypJ J) h ∈ HFin (AF F) σ (hypJ J) := fun g h hg e =>
     ⟨_, (mkU (σ : E →+* E) (hyp_inv (Matrix.nonsing_inv_mul _ (Ne.isUnit hJ.2))) g hg).2, Units.ext e.symm⟩
-  have hss : ∀ x, (σ : E →+* E) ((σ : E →+* E) x) = x := GlobalTheory.GaussMean.OneVec.sigma_sigma hcm
+  have hss : ∀ x, (σ : E →+* E) ((σ : E →+* E) x) = x := GlobalTheory.SelfDualLatticeCompare.conj_conj hcm
   have hJE : cT (σ : E →+* E) J = J := by ext i j; exact hJ.1 i j
   refine finish s nn ι mm (fun w w' => sc (-(κ * (hf (w 0) (w' 0) - hf (w' 0) (w 0))))) (fun p u a => ⟨_, _, hval p u a, ?_⟩) ⟨⟨⟨?_, ?_⟩, ?_⟩, cn, ci, cm, ?_, ?_, ?_,
     ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩

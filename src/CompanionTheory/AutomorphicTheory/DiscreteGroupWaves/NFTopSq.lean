@@ -15,6 +15,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.TopFirstOfPa
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.VectorVanishesBigCell
 import Mathlib.CategoryTheory.Countable
 import Mathlib.Tactic.TypeStar
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.LevelZeroFormEqBigCellIntegralTopDensityCompact
 
 @[expose] public section
 
@@ -149,13 +150,13 @@ theorem V_bigPt_aesm (p : KB.Pl P Wp Wq) {H : B.Mat P.k P.r → (Wq →L[ℂ] Wp
       unfold U.headH
       exact ((continuous_const.matrix_mul ((Dx2.SL.cont_lowW 1).comp continuous_snd.snd.fst)).matrix_mul
         continuous_fst.matrix_diagonal).matrix_mul (Dx2.SL.cont_upper.comp continuous_snd.snd.snd)
-    exact ((Ux13.continuous_psiH U.betaU 1).comp continuous_snd).smul (hΦ.continuous.comp hZ)
+    exact ((Ux10.cont_psiH U.betaU 1).comp continuous_snd).smul (hΦ.continuous.comp hZ)
   have hm : StronglyMeasurable (fun c : Fin (P.r + 1) → ℂ =>
       U.PhiTop (p := P.r + 1) (s := 0) U.betaU 1 c Φ0 fun x => x.elim0) := by
     unfold U.PhiTop U.muXiH
     exact hcont.stronglyMeasurable.integral_prod_right'
   refine hm.aestronglyMeasurable.congr ?_
-  filter_upwards [ae_coords_ne_zero (P.r + 1)] with c hc
+  filter_upwards [GlobalTheory.ae_coords_ne_zero (P.r + 1)] with c hc
   exact (hV _ 1 c (PBJ.Dens.isLocPt_bigPt c hc) (PBJ.Dens.ptMatN_bigPt c).symm).symm
 
 theorem sqW_meas (p : KB.Pl P Wp Wq) (w : List C.Letter) (i : SqIx P w) :

@@ -11,6 +11,7 @@ import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.WittExt
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.LocalDensitiesBlockOneAlmostAll
 
 @[expose] public section
 
@@ -63,7 +64,7 @@ theorem good_mass : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Number
     have hg : gramR (Fv F v) σ (blockOne (algebraMap F E t) J)
         (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → Fv F v ⊗[F] E)) =
         gramR (Fv F v) σ (blockOne (algebraMap F E t) J) y :=
-      (StageGood.gram_first (Fv F v) σ J t).trans hy1.symm
+      (GoodStep.gram_mulVec_e0 (Fv F v) σ J t).trans hy1.symm
     obtain ⟨h, rfl⟩ := _root_.GlobalTheory.CompanionTheory.SW.WittTuples.exists_actW_eq_of_gramR_eq F E σ hCM (M + 1) _ hND (Fv F v) 1 _ y hg
       (by rw [hg]; exact hy2)
     rw [hΨ h]

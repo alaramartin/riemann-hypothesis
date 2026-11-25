@@ -637,7 +637,7 @@ theorem ooConv_of (hSch : SchurH) (hNIs : CompanionTheory.D.Upq.BesselFunctional
         (innerSL ℂ (l' (σ (γ⁻¹ * Matrix.of x) w0))).smulRight (l (σ (Matrix.of x) w0)))
         {x : Formalism.QuantumDeterminants.Mt k r | Matrix.of x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)} :=
       hop.comp mt_cont.continuousOn (fun x hx => hx)
-    have := hc.aestronglyMeasurable (μ := D.μG) uh_mem_measurableSet
+    have := hc.aestronglyMeasurable (μ := D.μG) PI.WBL.FSW.measurableSet_UH'
     rwa [Measure.restrict_eq_self_of_ae_mem (s := {x : Formalism.QuantumDeterminants.Mt k r | Matrix.of x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)}) hGc] at this
   refine ⟨hmeas, ?_⟩
   show ∫⁻ x, ‖(innerSL ℂ (l' (σ (γ⁻¹ * Matrix.of x) w0))).smulRight (l (σ (Matrix.of x) w0))‖ₑ ∂D.μG < ⊤
@@ -1252,7 +1252,7 @@ theorem vanishing_of_L2_equivariant {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bo
   let S : Set (Formalism.QuantumDeterminants.Mt k r) := {g | Matrix.of g ∈ K}
   let G : Formalism.QuantumDeterminants.Mt k r → ℝ≥0∞ :=
     S.indicator fun g => (‖F (Matrix.of g)‖₊ : ℝ≥0∞) ^ 2
-  have hSm : MeasurableSet S := uh_meas
+  have hSm : MeasurableSet S := PI.WBL.FSW.measurableSet_UH'
   have hGc : ContinuousOn (fun g : Formalism.QuantumDeterminants.Mt k r =>
       (‖F (Matrix.of g)‖₊ : ℝ≥0∞) ^ 2) S :=
     (ENNReal.continuous_pow 2).comp_continuousOn
@@ -1445,15 +1445,15 @@ theorem kFinForm : KFinForm := kFinForm_of beConv beBessel
 theorem zeroCase : ZeroCase := UnipotentHaarMeasurability.G.zeroCase_of beConv normIdSm schur_hermitian
 theorem zeroCaseDD : ZeroCaseDD := UnipotentHaarMeasurability.G.zeroCaseDD_of beConv normIdSm schur_hermitian
 theorem ooConv : OOConv :=
-  S3dx4.G.ooConv_of schur_hermitian normIdSm norm_inverse_bound growth_group_bound decDD beConv
+  S3dx4.G.ooConv_of schur_hermitian normIdSm norm_inverse_bound growth_group_bound G.double_coset_decomposition beConv
 theorem quadConv : QuadConv := by
   intro hIn k r Wp Wq _ _ _ _ _ _ _ _ D ε lam h H _ _ _ σ w0 u u' νq νq' hS1 hS2 l l' hbe hbe'
   exact ⟨fun γ hγ => S3dx4.G.quadA_of schur_hermitian normIdSm norm_inverse_bound growth_group_bound
-      decDD beConv hIn D hS1 hS2 hbe hbe' hγ,
-    S3dx4.G.quadB_of norm_inverse_bound growth_spherical_bound growth_group_bound decDD hIn D hS1 hbe⟩
+      G.double_coset_decomposition beConv hIn D hS1 hS2 hbe hbe' hγ,
+    S3dx4.G.quadB_of norm_inverse_bound growth_spherical_bound growth_group_bound G.double_coset_decomposition hIn D hS1 hbe⟩
 theorem bessel_nonvanishing_L2 : BesselNonvanishingL2 :=
   MatrixMultiplicationContinuity.G.bessel_nonvanishing_from_L2 schur_hermitian norm_inverse_bound growth_spherical_bound
-    growth_group_bound decDD beConv
+    growth_group_bound G.double_coset_decomposition beConv
 
 end CompanionTheory.D.Upq.BesselFunctionalConstruction
 end -- clump:auto

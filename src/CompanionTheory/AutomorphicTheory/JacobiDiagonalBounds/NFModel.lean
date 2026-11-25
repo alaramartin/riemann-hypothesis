@@ -8,6 +8,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJD
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.FrameOfAdmissibleWord
 import Mathlib.RingTheory.PiTensorProduct
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJDHat
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.SquareIntegrableGammaZetabarInv
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.StarStartConjugationIdentity
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.JacobiDiagonalBounds.StarLoweringConstant, CompanionTheory.AutomorphicTheory.JacobiDiagonalBounds.NFModel
@@ -111,13 +113,6 @@ theorem f6 : L.ζi * L.GG * (L.GGi * (L.ζbi * L.ζ)) = L.ζbi := by
 theorem f7 : L.ζi * L.GG * (L.ζbi * L.GGi) = L.ζi * L.ζbi := by
   rw [mul_assoc, (cl_comm L (cζbi L) (cGGi L)).eq, ← mul_assoc L.GG, L.GG_GGi, one_mul]
 
-theorem W_inv_mul_W : (L.GG * L.ζi * L.ζbi) * (L.ζ * L.ζb * L.GGi) = 1 := by
-  have h1 := (cl_comm L (cζbi L) (cζ L)).eq
-  calc (L.GG * L.ζi * L.ζbi) * (L.ζ * L.ζb * L.GGi) = L.GG * L.ζi * (L.ζbi * L.ζ) * L.ζb * L.GGi := by
-        simp only [mul_assoc]
-    _ = L.GG * (L.ζi * L.ζ) * (L.ζbi * L.ζb) * L.GGi := by rw [h1]; simp only [mul_assoc]
-    _ = 1 := by rw [L.ζi_ζ, L.ζbi_ζb, mul_one, mul_one, L.GG_GGi]
-
 theorem cW : L.ζ * L.ζb * L.GGi ∈ Subring.closure L.fns :=
   Subring.mul_mem _ (Subring.mul_mem _ (cζ L) (cζb L)) (cGGi L)
 
@@ -125,7 +120,7 @@ theorem cWi : L.GG * L.ζi * L.ζbi ∈ Subring.closure L.fns :=
   Subring.mul_mem _ (Subring.mul_mem _ (cGG L) (cζi L)) (cζbi L)
 
 theorem Wi_W_pow (n : ℕ) : (L.GG * L.ζi * L.ζbi) ^ n * (L.ζ * L.ζb * L.GGi) ^ n = 1 := by
-  rw [← (cl_comm L (cWi L) (cW L)).mul_pow, W_inv_mul_W, one_pow]
+  rw [← (cl_comm L (cWi L) (cW L)).mul_pow, TLA.M2.wti_wt, one_pow]
 
 theorem nabs_alt_alt : L.nabs * (L.ζ * L.ζb * L.GGi) =
     (L.ζ * L.ζb * L.GGi) * (L.nabs + L.TT • (L.ζbi * L.GGi)) := by
@@ -729,14 +724,14 @@ theorem model_star_c (hM : MA.IsModelLevel P (MA.DQ P) L) (l : Fin P.r) :
     star (L.p l) = -L.pb l ∧ star (L.c l) = L.cb l ∧ star (L.ci l) = L.cbi l := by
   obtain ⟨hp, hpb, hc, hci, hcb, hcbi, -⟩ := hM
   refine ⟨?_, ?_, ?_⟩
-  · rw [hp, hpb, MA.pA, MA.pbA, sc_star, MA.sc, MA.sc, ← map_neg]
+  · rw [hp, hpb, MA.pA, MA.pbA, MAx2.R2.star_sc, MA.sc, MA.sc, ← map_neg]
     congr 1
     refine Prod.ext rfl ?_
     show MulOpposite.op _ = -MulOpposite.op (-_)
     rw [← MulOpposite.op_neg, neg_neg]
     rfl
-  · rw [hc, hcb, MA.cA, sc_star]; rfl
-  · rw [hci, hcbi, MA.ciA, sc_star]; rfl
+  · rw [hc, hcb, MA.cA, MAx2.R2.star_sc]; rfl
+  · rw [hci, hcbi, MA.ciA, MAx2.R2.star_sc]; rfl
 
 theorem model_star_D (hM : MA.IsModelLevel P (MA.DQ P) L) : star L.Dr = L.Drb ∧ star L.Dri = L.Drbi := by
   constructor
@@ -909,7 +904,7 @@ def MulBy (a : MA.A P (MA.DQ P)) (φ : MA.Qp P.r P.TT → ℂ) : Prop :=
 theorem MulBy.mul {a b : MA.A P (MA.DQ P)} {φ ψ} (ha : MulBy a φ) (hb : MulBy b ψ) :
     MulBy (a * b) fun q => φ q * ψ q := fun f ρ q => by rw [Gauge.actA_mul, ha, hb, mul_assoc]
 
-theorem mulBy_one : MulBy (1 : MA.A P (MA.DQ P)) fun _ => 1 := fun f ρ q => by rw [jdh_actA_one, one_mul]
+theorem mulBy_one : MulBy (1 : MA.A P (MA.DQ P)) fun _ => 1 := fun f ρ q => by rw [MAx2.R2.act_one, one_mul]
 
 theorem MulBy.pow {a : MA.A P (MA.DQ P)} {φ} (ha : MulBy a φ) (n : ℕ) : MulBy (a ^ n) fun q => φ q ^ n := by
   induction n with
@@ -925,7 +920,7 @@ theorem mulBy_prod {ι : Type} (a : ι → MA.A P (MA.DQ P)) (φ : ι → MA.Qp 
 theorem MulBy.inv {a b : MA.A P (MA.DQ P)} {φ} (ha : MulBy a φ) (h : a * b = 1) (h0 : ∀ q, φ q ≠ 0) :
     MulBy b fun q => (φ q)⁻¹ := fun f ρ q => by
   have := ha (MA.actA P b f) ρ q
-  rw [← Gauge.actA_mul, h, jdh_actA_one] at this
+  rw [← Gauge.actA_mul, h, MAx2.R2.act_one] at this
   rw [this, ← mul_assoc, inv_mul_cancel₀ (h0 q), one_mul]
 
 theorem mulBy_fn (g gb : MA.SmQ P.r P.TT) : MulBy (MA.sc P (MA.DQ P) ((MA.DQ P).fnP g gb)) (MA.evQ P g) :=

@@ -21,6 +21,8 @@ import Mathlib.Tactic.TypeStar
 import Mathlib.AlgebraicGeometry.AffineTransitionLimit
 import Mathlib.Data.Finset.Functor
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianSchemeModelBaseChangeSubalgebra
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianDeRhamPoincareDualityOfCubeDual
+import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.IsIsoOfFlatOfClosedPoint
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.SmoothMorphisms.AbelianSchemeSpreadsOut, CompanionTheory.SpectralGeometry.LocalGlobalProofs.SmoothMorphisms.ExistsFgSmoothOfRelativeDimension, CompanionTheory.SpectralGeometry.LocalGlobalProofs.SmoothMorphisms.LineBundleSpreadsOutStatement, CompanionTheory.SpectralGeometry.LocalGlobalProofs.SmoothMorphisms.ExistsModelAbelianLb, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.KTrivModelOfTrivLocus
@@ -206,11 +208,6 @@ section Transport
 variable {S S' : Scheme.{0}} {b : S' ⟶ S} {G : Over S} [GrpObj G] {G' : Over S'} [GrpObj G']
   {φ : G'.left ⟶ G.left}
 
-theorem evc_lam {L : LB G.left} (hL : L.IsLB) (hP : (abelian₂ G L).IsLB) {Y : Over S} (a c : Y ⟶ G) :
-    evc hP a c = lam (cls L hL) a c := by
-  rw [evc, show cls _ hP = lam (cls L hL) (fst G G) (snd G G) from cls_cube_two hL _ _ hP, pull_lam, lift_fst,
-    lift_snd]
-
 theorem lam_eq (hφ : IsGrpPullback G' G b φ) {L : LB G.left} {L' : LB G'.left} (hL : L.IsLB) (hL' : L'.IsLB)
     (e : LBIso L' (L.pull φ)) {X : Scheme.{0}} {s : X ⟶ S'} {s₀ : X ⟶ S} (hs : s ≫ b = s₀)
     (x y : Over.mk s ⟶ G') (x₀ y₀ : Over.mk s₀ ⟶ G) (hx : x.left ≫ φ = x₀.left) (hy : y.left ≫ φ = y₀.left) :
@@ -227,7 +224,7 @@ theorem triv_lam_iff (hφ : IsGrpPullback G' G b φ) {L : LB G.left} {L' : LB G'
         (snd G (Over.mk (T.hom ≫ b)) ≫ pushP hφ (s := T.hom) rfl y)) := by
   have hP : (abelian₂ G L).IsLB := LB.isLB_linComb hL _ _
   have hP' : (abelian₂ G' L').IsLB := LB.isLB_linComb hL' _ _
-  rw [triv_ev_iff hP', triv_ev_iff hP, evc_lam hL', evc_lam hL]
+  rw [triv_ev_iff hP', triv_ev_iff hP, CubeDual.evc_lam hL', CubeDual.evc_lam hL]
   have key : CechPic.pull (trR hφ T).left (lam (cls L' hL') (fst G' T) (snd G' T ≫ y)) =
       lam (cls L hL) (fst G (Over.mk (T.hom ≫ b)))
         (snd G (Over.mk (T.hom ≫ b)) ≫ pushP hφ (s := T.hom) rfl y) := by
@@ -274,7 +271,7 @@ theorem kTriv_of_ker (hA : IsAbelianScheme A) {L : LB A.left} (hL : L.IsLB)
   have hD : (Out.translDiff A L x).IsLB := LB.isLB_linComb hL _ _
   have hM := pull_isLB hP (lift (fst A (Over.mk t)) (snd A (Over.mk t) ≫ x)).left
   have hcM : cls _ hM = lam (cls L hL) (fst A (Over.mk t)) (snd A (Over.mk t) ≫ x) := by
-    rw [cls_ev hP, evc_lam hL]
+    rw [cls_ev hP, CubeDual.evc_lam hL]
   refine triv_of_section_of_locally_triv _ _ (snd A (Over.mk t)).left (lift (1 : Over.mk t ⟶ A) (𝟙 _)).left
     (by rw [lift_left_snd]; rfl) ?_ _ hM ?_ ?_
   · exact fun U ↦ isIso_app_of_isAbelianScheme _ ((Over.pullback t).obj A) (isAbelianScheme_pullback A hA t) U
@@ -296,7 +293,7 @@ theorem kTriv_of_ker (hA : IsAbelianScheme A) {L : LB A.left} (hL : L.IsLB)
       rw [← cls_pull hD _ (pull_isLB hD _)]
       exact (cls_eq_zero_iff (pull_isLB hD _)).2 hc
     rw [cls_pull hM, e₂, map_sub, ← pull_comp, ← pull_comp]
-    rw [pull_eq_zero_of_mem _ _ ?_ z₁, pull_eq_zero_of_mem V' _ ?_ hz, sub_zero]
+    rw [PrimitiveOverValuationRing.pull_eq_zero_of_mem _ _ ?_ z₁, PrimitiveOverValuationRing.pull_eq_zero_of_mem V' _ ?_ hz, sub_zero]
     · exact fun z ↦ z.2.2
     · intro z
       have w : (lift (snd A (Over.mk t)) (fst A (Over.mk t))).left ≫ (fst (Over.mk t) A).left =
@@ -346,8 +343,8 @@ theorem kTrivModel_of_trivLocus : TrivLocus → KTrivModel := by
   have hBn : IsLocallyNoetherian B.left := LocallyOfFiniteType.isLocallyNoetherian B.hom
   have hN : (abelian₂ B M).IsLB := LB.isLB_linComb hM _ _
   obtain ⟨Z, i, hic, hiT⟩ := hT (Sp k) B B hB hBn (abelian₂ B M) hN
-    ((triv_ev_iff hN _ _).2 (by rw [evc_lam hM, lam_one_left]))
-  obtain ⟨e, he⟩ := (hiT (𝟙_ _) 1).1 ((triv_ev_iff hN _ _).2 (by rw [evc_lam hM, MonObj.comp_one, lam_one_right]))
+    ((triv_ev_iff hN _ _).2 (by rw [CubeDual.evc_lam hM, lam_one_left]))
+  obtain ⟨e, he⟩ := (hiT (𝟙_ _) 1).1 ((triv_ev_iff hN _ _).2 (by rw [CubeDual.evc_lam hM, MonObj.comp_one, lam_one_right]))
   have hZ : Z.hom = i.left ≫ B.hom := (Over.w i).symm
   have : QuasiCompact Z.hom := hZ ▸ inferInstance
   have : LocallyOfFiniteType Z.hom := hZ ▸ inferInstance

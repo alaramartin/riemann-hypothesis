@@ -3,6 +3,7 @@ module
 public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.EigenspaceCyclicDensity.LowKMultOneP
 public import Mathlib.LinearAlgebra.Eigenspace.Basic
 public import Mathlib.Analysis.InnerProductSpace.Spectrum
+import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.EigenspaceCyclicDensity.CreationOperators.DifferentialCommutesWeightOperator
 
 @[expose] public section
 
@@ -63,7 +64,8 @@ theorem mem_iSup_eigenspace {V : Type} [NormedAddCommGroup V] [InnerProductSpace
 
 theorem Ft_apply {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (ε : Fin n → Bool)
     (E : Fin n → Fin n → Module.End ℂ V) (c : Fin n) (x : Cn n V) (A : Finset (Pos n)) :
-    Ft ε E c x A = E c c (x A) + (wt (A.filter (cpt ε)) c : ℂ) • x A := rfl
+    Ft ε E c x A = E c c (x A) + (wt (A.filter (cpt ε)) c : ℂ) • x A :=
+  CompanionTheory.D.LK.Ft_apply ε E c x A
 
 theorem chain_mem_iSup {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (ε : Fin n → Bool)
     (E : Fin n → Fin n → Module.End ℂ V) (c : Fin n) (h : ∀ v : V, v ∈ ⨆ μ : ℂ, (E c c).eigenspace μ)
@@ -79,7 +81,7 @@ theorem chain_mem_iSup {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (ε 
     have hy' := Module.End.mem_eigenspace_iff.1 hy
     rw [Module.End.mem_eigenspace_iff]
     funext B
-    rw [Ft_apply]
+    rw [CompanionTheory.D.LK.Ft_apply]
     by_cases hB : B = A
     · subst hB
       simp [hy', add_smul]
@@ -112,7 +114,7 @@ theorem wtProj : CompanionTheory.D.LK.WtProj := by
       zero_mem' := fun A _ => rfl
       smul_mem' := fun c a ha A hA => by simp [ha A hA] }
   have hW : ∀ c, ∀ x ∈ W, Ft ε₀ E c x ∈ W := fun c x hx A hA => by
-    rw [Ft_apply, hx A hA]; simp
+    rw [CompanionTheory.D.LK.Ft_apply, hx A hA]; simp
   have key : ∀ s : Finset (Fin n), ∃ t' : Cn n V, (∀ c ∈ s, Ft ε₀ E c t' = (τ c : ℂ) • t') ∧ D t' = D t ∧
       t' ∈ W := by
     intro s

@@ -13,6 +13,7 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.Tactic.TypeStar
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTensMemLatO
 
 @[expose] public section
 
@@ -51,10 +52,8 @@ section Alg
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
 theorem trace_tmul [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] (r : R) (x : E) :
-    Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] x) = r * algebraMap F R (Algebra.trace F E x) := by
-  have : r ⊗ₜ[F] x = r • ((1 : R) ⊗ₜ[F] x) := by simp [TensorProduct.smul_tmul']
-  rw [this, map_smul, smul_eq_mul, Algebra.trace_apply, Algebra.trace_apply, ← Algebra.baseChange_lmul,
-    LinearMap.trace_baseChange]
+    Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] x) = r * algebraMap F R (Algebra.trace F E x) :=
+  LatVac.trace_tmul R r x
 
 theorem trace_sigma {σ : E →ₐ[F] E} (hinv : ∀ x, σ (σ x) = x) (x : E) :
     Algebra.trace F E (σ x) = Algebra.trace F E x :=
@@ -65,7 +64,7 @@ theorem trace_sigR [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R]
     (hinv : ∀ x, σ (σ x) = x) (y : R ⊗[F] E) :
     Algebra.trace R (R ⊗[F] E) (sigR R σ y) = Algebra.trace R (R ⊗[F] E) y := by
   induction y with
-  | tmul r e => rw [HaarCoord.sigR_tmul, trace_tmul, trace_tmul, trace_sigma hinv]
+  | tmul r e => rw [HaarCoord.sigR_tmul, LatVac.trace_tmul, LatVac.trace_tmul, trace_sigma hinv]
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
 
 def gramB (σ : E →ₐ[F] E) {d : ℕ} (b : Module.Basis (Fin d) F E) : Matrix (Fin d) (Fin d) F :=
@@ -194,7 +193,7 @@ theorem off_diag [FiniteDimensional F E] [CharZero F] {σ : E →ₐ[F] E} (hinv
   rw [smul_mul_assoc, map_smul, smul_eq_mul, Finset.mul_sum, map_sum]
   congr 1
   refine Finset.sum_congr rfl fun l _ => ?_
-  rw [mul_smul_comm, map_smul, Algebra.TensorProduct.tmul_mul_tmul, one_mul, trace_tmul, one_mul,
+  rw [mul_smul_comm, map_smul, Algebra.TensorProduct.tmul_mul_tmul, one_mul, LatVac.trace_tmul, one_mul,
     smul_eq_mul, mul_comm]
   rfl
 

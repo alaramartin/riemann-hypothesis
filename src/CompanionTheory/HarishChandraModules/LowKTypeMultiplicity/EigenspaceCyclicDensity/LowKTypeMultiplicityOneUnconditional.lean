@@ -26,10 +26,10 @@ namespace CompanionTheory.D.LK
 theorem hGenCO : GenCO := genCO_of koszul_differential_sq_zero (cover2_of (acycAbs_of koszul_differential_sq_zero))
 
 theorem hInj : Inj :=
-  inj_of (vanK_of (cok_of hGenCO) GlobalTheory.CompanionTheory.LKWtProj.wtProj (GlobalTheory.CompanionTheory.KWeightMajor.wtMajor_of DSIC.hLowSpan)) GlobalTheory.CompanionTheory.LKWtProj.wtProj koszul_differential_sq_zero
+  inj_of (vanK_of (cok_of hGenCO) GlobalTheory.CompanionTheory.LKWtProj.wtProj (GlobalTheory.CompanionTheory.KWeightMajor.wtMajor_of GlobalTheory.CompanionTheory.KLowSpan.lowSpan_holds)) GlobalTheory.CompanionTheory.LKWtProj.wtProj koszul_differential_sq_zero
 
 theorem hMultAlg : MultAlg :=
-  multAlg_of DSIC.hLowSpan DSIC.hHWMap GlobalTheory.CompanionTheory.LKDens.dens GlobalTheory.CompanionTheory.LKInvLift.invLift GlobalTheory.CompanionTheory.HCdecomp.hcdec hGenCO top_degree_cycle hInj
+  multAlg_of GlobalTheory.CompanionTheory.KLowSpan.lowSpan_holds DSIC.hHWMap GlobalTheory.CompanionTheory.LKDens.dens GlobalTheory.CompanionTheory.LKInvLift.invLift GlobalTheory.CompanionTheory.HCdecomp.hcdec hGenCO top_degree_cycle hInj
 
 theorem hKModExists : KModExists :=
   GlobalTheory.CompanionTheory.KModExists.kModExists DSIC.hSmMod CompanionTheory.D.gk.admitted.kFin_mem_smoothVecs _root_.UpperTheory.Reformulated.B.Gc1.kFinStab DSIC.hStabLink DSIC.hHWofType

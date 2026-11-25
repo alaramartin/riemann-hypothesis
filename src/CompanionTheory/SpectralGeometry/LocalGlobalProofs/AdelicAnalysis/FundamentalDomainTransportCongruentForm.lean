@@ -6,6 +6,7 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
 import Mathlib.Topology.Algebra.Group.Units
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SiegelWeilMeasureOfCongruentForm
 
 @[expose] public section
 
@@ -26,11 +27,6 @@ theorem actTup_ratTup {M n : ℕ} (g : GL (Fin M) E) (X : Fin n → Fin M → E)
   funext a i
   have h := RingHom.map_mulVec (inclR (F := F) R) (g : Matrix (Fin M) (Fin M) E) (X a) i
   exact h.symm
-
-theorem actTup_mul {M n : ℕ} (a b : GL (Fin M) (R ⊗[F] E)) (X : Fin n → Fin M → R ⊗[F] E) :
-    actTup R (a * b) X = actTup R a (actTup R b X) := by
-  funext c
-  simp [actTup, Matrix.mulVec_mulVec]
 
 end Alg
 
@@ -119,7 +115,7 @@ theorem GlobalTheory.CompanionTheory.SW.FTransfer.cntI_transfer : ∀ (F E : Typ
       have h1 := he1 (em.symm h)⁻¹
       rw [map_inv, hu] at h1
       simp only [actW]
-      rw [← actTup_ratTup, h1, ← actTup_mul, ← actTup_mul]
+      rw [← actTup_ratTup, h1, ← SWIsom.actTup_mul, ← SWIsom.actTup_mul]
       congr 1
       group
     let T : {X : Fin n → Fin M → E | (fun a => (g : Matrix (Fin M) (Fin M) E) *ᵥ X a) ∈ S} ≃ S :=

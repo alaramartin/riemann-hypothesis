@@ -7,6 +7,7 @@ public import Formalism.FormalDegreeBessel.FinalG
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.UhMeasurableSet
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.KoszulLowersPower
 import Mathlib.Topology.Algebra.Group.Units
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.HermitianLeviVectorBaseOrthogonal
 
 @[expose] public section
 
@@ -31,7 +32,7 @@ theorem haar_eq_smul {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {P : Mx k r
     (hν : PI.BesselPeriodGGP.IsHaarOn (GG k r) ν) :
     ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ ν = c • (Formalism.REAL.muG ε).map (phi ε P) := by
   have hE := Formalism.REAL.isClosedEmbeddingMatrix
-  have hC := Formalism.QuantumDeterminants.uHConj
+  have hC := Formalism.QuantumDeterminants.unitary_conjugation_holds
   obtain ⟨hσ, h0, hconc, hleft⟩ := hν
   have hm := phi_measurable (ε := ε) hE hP
   have hce := phi_closedEmbedding (ε := ε) hE hP
@@ -50,7 +51,7 @@ theorem haar_eq_smul {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool} {P : Mx k r
     have hu : Matrix.of (phi ε P u) ∈ GG k r := (phi_range_iff hE hC hP hH _).1 ⟨u, rfl⟩
     have h1 := hleft _ hu
     have hs' : MeasurableSet (phi ε P '' s) := hme.measurableSet_image.2 hs
-    conv_rhs => rw [← h1, Measure.map_apply (lmul_cont _).measurable hs']
+    conv_rhs => rw [← h1, Measure.map_apply (Formalism.FourierDecayAlt.P.B2x9.lmulM_cont _).measurable hs']
     congr 1
     ext x
     constructor

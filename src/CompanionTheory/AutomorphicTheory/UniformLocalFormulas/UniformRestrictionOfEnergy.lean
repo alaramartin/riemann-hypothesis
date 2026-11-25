@@ -27,6 +27,7 @@ import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ModularCharacterEqOneOnExpHer
 import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.RightRegularIsometricMultiplicative
 import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.LocFactorAll
 import Formalism.LocalToGlobal.SiegelLatticeTheory.WeightedGaugeFactors.FactsDS
+import Formalism.SharpRestriction.CuspSpanNormBounds.KappaEndpoints
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.UniformLocalFormulas.HilbertSchmidtDiagonalInvariant, CompanionTheory.AutomorphicTheory.UniformLocalFormulas.UniformRestrictionOfEnergy
@@ -102,11 +103,11 @@ theorem hilbert_schmidt_diagonal_invariant (X : HidaSetting D) (u u' : D.what₂
     hs2 (JvX X u u' v g') = hs2 (JvX X u u' v g) := by
   have hee : ∀ a b, hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (X.eR b)) = 0 := fun a b => by
     rw [show X.eR a = X.crd (X.eX a) from rfl, show X.eR b = X.crd (X.eX b) from rfl,
-      InfCut.UnitaryIsometries.hJ_rvX, X.ee, map_zero]
+      L2.SG.PoincareInHH.Cut.hJ_crd, X.ee, map_zero]
   have hez : ∀ (w : D.what₂.Word) a, hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR w)) = 0 :=
     fun w a => by
       rw [show X.eR a = X.crd (X.eX a) from rfl, show X.zR w = X.crd (X.zu w) from rfl,
-        InfCut.UnitaryIsometries.hJ_rvX, (X.zu_orth w a).1, map_zero]
+        L2.SG.PoincareInHH.Cut.hJ_crd, (X.zu_orth w a).1, map_zero]
   obtain ⟨s, s', hs, hs', heq⟩ := InfCut.UnitaryIsometries.diagDC_pair (X.B.I.ε v) 1 _ _ _ (Tw u) (Tw u')
     hee (hez u) (hez u') (InfCut.UnitaryIsometries.hermitian_z_z_eq_neg X v u) (InfCut.UnitaryIsometries.hermitian_z_z_eq_neg X v u') cv hc.1 hc.2 g g' hg hg'
   rw [heq]
@@ -114,11 +115,11 @@ theorem hilbert_schmidt_diagonal_invariant (X : HidaSetting D) (u u' : D.what₂
 
 def lamB (D : D7) (a : Fin D.R.rS) : ℝ := (D.host.rdE ^ (2 * (D.R.rS - a.val)))⁻¹
 
-theorem lamB_pos (D : D7) (a : Fin D.R.rS) : 0 < lamB D a := inv_pos.2 (pow_pos (_root_.Formalism.MainNotions.S.rdE_pos D) _)
+theorem lamB_pos (D : D7) (a : Fin D.R.rS) : 0 < lamB D a := inv_pos.2 (pow_pos (MainNotions.KappaEndpoints.pf_rd_pos D) _)
 
 theorem rho_sq (D : D7) (a : Fin (D.R.rS + 1)) (h : a.val < D.R.rS) : rhoF D a * rhoF D a = lamB D ⟨a.val, h⟩ := by
   unfold rhoF lamB
-  rw [← Real.rpow_add (_root_.Formalism.MainNotions.S.rdE_pos D), ← Real.rpow_natCast, ← Real.rpow_neg (_root_.Formalism.MainNotions.S.rdE_pos D).le]
+  rw [← Real.rpow_add (MainNotions.KappaEndpoints.pf_rd_pos D), ← Real.rpow_natCast, ← Real.rpow_neg (MainNotions.KappaEndpoints.pf_rd_pos D).le]
   congr 1
   push_cast [Nat.cast_sub h.le]
   ring
@@ -144,7 +145,7 @@ theorem place_pt (hB : WuBessel C) (u u' : D.what₂.Word) (τ : D.what₂.Tau)
   set q : Fin D.R.rS → ℂ := fun a => ((lamB D a : ℝ) : ℂ) * cv ⟨a.val, by have := a.2; omega⟩ with hq
   have hq0 : ∀ a, q a ≠ 0 := fun a => mul_ne_zero (Complex.ofReal_ne_zero.2 (lamB_pos D a).ne') (hc.1 _)
   set m := Formalism.QuantumDeterminants.bigCell D.R.k D.R.rS q (sec (cv ⟨D.R.rS, by omega⟩)) with hm
-  have hmU : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS) := Formalism.QuantumDeterminants.bigCellMem _ _ q _ hq0 hμ
+  have hmU : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS) := QuantumDeterminants.big_cell_mem_holds _ _ q _ hq0 hμ
   set g' : Formalism.REAL.UJ (X.B.I.ε (vOf X τ)) := ujOf' _ (transp_mem C τ hmU) with hg'
   have htr : trG (C.Q τ) (C.Qi τ) g' = m := by
     show C.Qi τ * (C.Q τ * m * C.Qi τ) * C.Q τ = m
@@ -152,7 +153,7 @@ theorem place_pt (hB : WuBessel C) (u u' : D.what₂.Word) (τ : D.what₂.Tau)
   have hZ : Zhat (X.B.I.ε (vOf X τ)) (frm X u 1 (vOf X τ)) (frm X u' 1 (vOf X τ)) (uMat g') = Matrix.diagonal cv := by
     ext a b
     have h1 := zhat_tr C u u' τ g' a b
-    rw [htr, hm, Formalism.QuantumDeterminants.bigCellZhat _ _ _ _ _ _ hz hz'] at h1
+    rw [htr, hm, QuantumDeterminants.big_cell_coordinate_holds _ _ _ _ _ _ hz hz'] at h1
     have hρ : ((rhoF D a * rhoF D b : ℝ) : ℂ) ≠ 0 :=
       Complex.ofReal_ne_zero.2 (mul_pos (_root_.Formalism.L2.SG.LoopTerm.rhoF_pos D a) (_root_.Formalism.L2.SG.LoopTerm.rhoF_pos D b)).ne'
     refine mul_left_cancel₀ hρ ?_
@@ -208,7 +209,7 @@ theorem kpl_pow (D : D7) : Kpl D ^ D.R.f = 2 ^ (D.R.f * (D.R.rS + 1)) *
     (Formalism.FourierDecayAlt.PN.abelian₂ D.host.rdE D.R.rS D.R.k D.R.f *
       D.host.rdE ^ (((D.R.f * D.R.rS * (D.R.rS + 1) * (8 * D.R.rS + 10) : ℕ) : ℝ) / 3)) := by
   have hk : 1 ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
-  have hrd := _root_.Formalism.MainNotions.S.rdE_pos D
+  have hrd := MainNotions.KappaEndpoints.pf_rd_pos D
   set r := D.R.rS
   set S : ℕ := ∑ j ∈ Finset.range r, 4 * (j + 1) * (2 * (j + 1) + D.R.k) with hS
   have h1 : ∏ a : Fin r, (lamB D a ^ (2 * (Formalism.QuantumDeterminants.Mdim D.R.k r a - 1)))⁻¹ = D.host.rdE ^ S := by
@@ -317,7 +318,7 @@ theorem uniform_restriction_of_energy (hF : LoopBCovN.CovNFormula) (hU : UniqOfP
       have h1 := (D.host.g_prime 1).pos
       unfold Formalism.MainNotions.S.Lat.gS
       positivity
-    have := _root_.Formalism.MainNotions.S.rdE_pos D
+    have := MainNotions.KappaEndpoints.pf_rd_pos D
     unfold MassDataConc.kapN
     positivity
   have hIC : B.IntC = IntC X u u' 1 := by
@@ -326,7 +327,7 @@ theorem uniform_restriction_of_energy (hF : LoopBCovN.CovNFormula) (hU : UniqOfP
     rw [if_pos hκ, div_mul_cancel₀ _ hκ.ne']
   rw [hIC] at hF1
   rw [hv] at hF2 hrdb
-  have hrd := _root_.Formalism.MainNotions.S.rdE_pos D
+  have hrd := MainNotions.KappaEndpoints.pf_rd_pos D
   have hIre : 0 ≤ Ire := by
     have h0 : 0 ≤ (B.c0 * B.c0')⁻¹ * IntC X u u' 1 := mul_nonneg (inv_nonneg.2 hc0.le) ENNReal.toReal_nonneg
     rw [hF1, hF2, ← mul_assoc, ← kpl_pow] at h0

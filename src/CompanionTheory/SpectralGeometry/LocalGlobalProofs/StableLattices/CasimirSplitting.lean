@@ -3,6 +3,7 @@ module
 public import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFunctors.IsSimpleFam
 import CompanionTheory.HarishChandraModules.BesselParameterIntegrals.SmoothCyclicVectors.PhMeas
 import Mathlib.RingTheory.PiTensorProduct
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.OrbitDerivatives.LieAlgebraHomomorphism
 
 @[expose] public section
 
@@ -53,25 +54,6 @@ theorem flip_facts {n : ℕ} (Hm Y : Matrix (Fin n) (Fin n) ℂ) (h1 : Hmᴴ = H
       Matrix.mul_one]
   · rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, h2, Matrix.one_mul]
 
-theorem reH_lie (Y : Mx k r) : InLieHpk k r (reH k r Y) := by
-  obtain ⟨h3, h4⟩ := flip_facts _ Y (hpk_herm k r) (hpk_sq k r)
-  show (reH k r Y)ᴴ * Formalism.QuantumDeterminants.Hpk k r + Formalism.QuantumDeterminants.Hpk k r * reH k r Y = 0
-  simp only [reH, Matrix.conjTranspose_smul, Matrix.conjTranspose_add, Matrix.conjTranspose_neg, Matrix.smul_mul,
-    Matrix.mul_smul, Matrix.add_mul, Matrix.mul_add, Matrix.neg_mul, Matrix.mul_neg, h3, h4]
-  have : star (1 / 2 : ℂ) = 1 / 2 := by simp
-  rw [this, ← smul_add]
-  abel_nf
-  simp
-
-theorem imH_lie (Y : Mx k r) : InLieHpk k r (imH k r Y) := by
-  obtain ⟨h3, h4⟩ := flip_facts _ Y (hpk_herm k r) (hpk_sq k r)
-  show (imH k r Y)ᴴ * Formalism.QuantumDeterminants.Hpk k r + Formalism.QuantumDeterminants.Hpk k r * imH k r Y = 0
-  simp only [imH, sub_neg_eq_add, Matrix.conjTranspose_smul, Matrix.conjTranspose_add, Matrix.smul_mul,
-    Matrix.mul_smul, Matrix.add_mul, Matrix.mul_add, h3, h4]
-  have : star (1 / (2 * Complex.I) : ℂ) = -(1 / (2 * Complex.I)) := by
-    simp
-  rw [this, neg_smul, add_comm (Yᴴ * _), neg_add_cancel]
-
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace in
 theorem diff_entry {F : FRep k r} (hF : F.OK) {X : Mx k r} (hX : InLieHpk k r X) (c d : F.ι) :
     HasDerivAt (fun t : ℝ => F.ρ (NormedSpace.exp ((t : ℂ) • X)) c d) (F.dR X c d) 0 := by
@@ -91,7 +73,7 @@ theorem dR_tens {F F' : FRep k r} (hF : F.OK) (hF' : F'.OK) {X : Mx k r} (hX : I
 
 theorem dC_tens {F F' : FRep k r} (hF : F.OK) (hF' : F'.OK) (Y : Mx k r) :
     (F.tens F').dC Y = F.dC Y ⊗ₖ (1 : Matrix F'.ι F'.ι ℂ) + (1 : Matrix F.ι F.ι ℂ) ⊗ₖ F'.dC Y := by
-  simp only [FRep.dC, dR_tens hF hF' (reH_lie Y), dR_tens hF hF' (imH_lie Y), Matrix.add_kronecker,
+  simp only [FRep.dC, dR_tens hF hF' (CompanionTheory.D.gk.FinalFormK.inLie_reH Y), dR_tens hF hF' (CompanionTheory.D.gk.FinalFormK.inLie_imH Y), Matrix.add_kronecker,
     Matrix.kronecker_add, Matrix.smul_kronecker, Matrix.kronecker_smul, smul_add]
   abel
 

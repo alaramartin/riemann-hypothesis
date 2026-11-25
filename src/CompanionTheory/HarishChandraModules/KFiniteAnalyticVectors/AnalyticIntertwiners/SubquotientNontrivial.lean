@@ -6,6 +6,7 @@ import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.RingTheory.Finiteness.Lattice
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.AnalyticVectors.ConjTransposeEqOfInG
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.SmoothA
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.CasChainB
 
 @[expose] public section
 
@@ -24,11 +25,8 @@ theorem mem_smD_of_isKFin [CompleteSpace H] (hσ : Formalism.MainNotions.S.IsURe
     (hirr : Formalism.MainNotions.S.IsIrredOn (Formalism.MainNotions.S.UJset ε) σ) {v : H} (hv : Formalism.MainNotions.S.IsKFin ε σ v) : v ∈ smD ε σ := by
   exact (mem_smD_iff ε σ v).mpr (CompanionTheory.D.gk.admitted.kFin_smooth n ε H σ hσ hirr v hv)
 
-theorem Jm_conjTranspose_self : (Jm ε)ᴴ = Jm ε := by
-  rw [Jm, Matrix.diagonal_conjTranspose]
-  congr 1
-  funext a
-  by_cases h : ε a = true <;> simp [h]
+theorem Jm_conjTranspose_self : (Jm ε)ᴴ = Jm ε :=
+  by intros; apply S7.Jm_conjTranspose <;> assumption
 
 theorem UJset_mul_mem {a b : Matrix (Fin n) (Fin n) ℂ} (ha : a ∈ Formalism.MainNotions.S.UJset ε) (hb : b ∈ Formalism.MainNotions.S.UJset ε) :
     a * b ∈ Formalism.MainNotions.S.UJset ε := by
@@ -164,8 +162,8 @@ theorem derivedActionSpan_isKStableOn (hσ : Formalism.MainNotions.S.IsURepOn (F
           Complex.I • dS σ (ReciprocityTheory.ChartRestriction.DS.S7.cpart2 ε (Matrix.single c d 1)) w :=
       smE_apply hσ' ⟨w, hS w hw⟩ c d
     rw [e, map_add (f := _), map_smul]
-    exact add_mem (part _ (SmDerA.inG_cpart1 ε _) w hw)
-      (Submodule.smul_mem _ _ (part _ (SmDerA.inG_cpart2 ε _) w hw))
+    exact add_mem (part _ (S7.ccb_inG_cpart1 ε _) w hw)
+      (Submodule.smul_mem _ _ (part _ (S7.ccb_inG_cpart2 ε _) w hw))
   have hle : derivedActionSpan S hS ≤ (derivedActionSpan S hS).comap ((σ g : H →L[ℂ] H) : H →ₗ[ℂ] H) := by
     refine iSup_le fun c => iSup_le fun d => ?_
     rintro _ ⟨⟨w, hw⟩, rfl⟩

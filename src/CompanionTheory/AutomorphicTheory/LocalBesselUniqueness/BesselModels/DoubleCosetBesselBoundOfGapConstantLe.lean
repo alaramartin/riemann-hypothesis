@@ -104,11 +104,6 @@ namespace CompanionTheory.D.Upq.BesselFunctionalConstruction
 
 open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData
 
-theorem inputs_holds : Inputs := by
-  have hDecay := CompanionTheory.FamilyDerivativeExpansion.DecS.decay_infinite_range
-  exact ⟨Formalism.L2.SG.BesselDiscreteSeries.decLow, hDecay,
-    CompanionTheory.D.gk.admitted.k_finite_smooth, trivial⟩
-
 end CompanionTheory.D.Upq.BesselFunctionalConstruction
 
 end
@@ -326,7 +321,7 @@ theorem exists_move {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {c : ℂ
       rw [show e * (e⁻¹ * (a * m * a⁻¹) * e) * e⁻¹ = (e * e⁻¹) * (a * m * a⁻¹) * (e * e⁻¹) by
         simp only [Matrix.mul_assoc], he1.1, Matrix.one_mul, Matrix.mul_one]
     rw [e3, h3] at h6
-    rw [e1, psi_constant, psi_constant]
+    rw [e1, PI.WBL.S5.psiConst, PI.WBL.S5.psiConst]
     exact h6.symm
 
 def cjE {b : Mx k r} (hb : b ∈ UH (Hpk k r)) : Mt k r ≃ₜ Mt k r where
@@ -441,8 +436,8 @@ variable {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ}
 
 theorem dDForm_scale (hS : Side k r ε lam h σ w0 z c u π μW μN μG νq) :
     DDForm z c π μW μN μG νq σ w0 :=
-  DDSmoothness.GC.discrete_form_one_side psi_constant schur_hermitian norm_inverse_bound
-    growth_spherical_bound growth_group_bound decDD beConv normIdSm beBessel shapeC inputs_holds
+  DDSmoothness.GC.discrete_form_one_side PI.WBL.S5.psiConst schur_hermitian norm_inverse_bound
+    growth_spherical_bound growth_group_bound G.double_coset_decomposition beConv normIdSm beBessel shapeC Lime.BM.inputs
     k r ε lam h H σ w0 Wp z c u π μW μN μG νq hS
 
 end Forms

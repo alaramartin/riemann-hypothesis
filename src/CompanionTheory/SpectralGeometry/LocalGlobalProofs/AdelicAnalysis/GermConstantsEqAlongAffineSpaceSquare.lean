@@ -1,6 +1,7 @@
 module
 
 public import Formalism.UnipotentAdelicQuotients.SWXSDefs
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicUnitaryHaarBiInvariant
 
 @[expose] public section
 
@@ -20,13 +21,9 @@ variable {A : Type} [CommRing A] {n : Type} [Fintype n] {σ : A →+* A} {J : Ma
 theorem hform_eq_dot (x y : n → A) : hform σ J x y = (σ ∘ x) ⬝ᵥ J *ᵥ y := by
   simp [hform, dotProduct, mulVec, Finset.mul_sum, mul_assoc]
 
-theorem comp_mulVec' (P : Matrix n n A) (x : n → A) : σ ∘ (P *ᵥ x) = P.map σ *ᵥ (σ ∘ x) := by
-  funext i
-  simp [mulVec, dotProduct]
-
 theorem hform_mulVec' (P Q : Matrix n n A) (x y : n → A) :
     hform σ J (P *ᵥ x) (Q *ᵥ y) = hform σ (cT σ P * J * Q) x y := by
-  rw [hform_eq_dot, hform_eq_dot, comp_mulVec', cT, ← mulVec_mulVec, ← mulVec_mulVec,
+  rw [hform_eq_dot, hform_eq_dot, AdelicUnimod.comp_mulVec, cT, ← mulVec_mulVec, ← mulVec_mulVec,
     dotProduct_mulVec _ (_ᵀ), vecMul_transpose]
 
 theorem hform_sub_left (x d y : n → A) (c : A) :
@@ -64,12 +61,8 @@ theorem qrMat_mulVec (d : n → A) (c : A) (z : n → A) :
   funext i
   simp [mul_comm, mul_left_comm]
 
-theorem ext_mulVec' {P Q : Matrix n n A} (h : ∀ z, P *ᵥ z = Q *ᵥ z) : P = Q := by
-  ext i j
-  simpa using congrFun (h (Pi.single j 1)) i
-
 theorem qrMat_mul (d : n → A) {c c' : A} (hc : c + c' = c * c' * hform σ J d d) :
-    qrMat σ J d c * qrMat σ J d c' = 1 := ext_mulVec' fun z => by
+    qrMat σ J d c * qrMat σ J d c' = 1 := AdelicUnimod.ext_mulVec fun z => by
   rw [← mulVec_mulVec, qrMat_mulVec, qrMat_mulVec, hform_sub_right, one_mulVec]
   funext i
   simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]

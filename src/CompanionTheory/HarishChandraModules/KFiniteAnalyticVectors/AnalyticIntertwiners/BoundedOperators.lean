@@ -3,6 +3,7 @@ module
 public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.AnalyticIntertwiners.PCDesc
 public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.AnalyticIntertwiners.AdmissibleVectors
 import Mathlib.RingTheory.PiTensorProduct
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DerivedAdjoint
 
 @[expose] public section
 
@@ -18,7 +19,7 @@ open Formalism.BasicNotions.TH (GrpData URep GKMod Mat upq KFin)
 variable {p q : ℕ} {T : GrpData p q}
 
 theorem inner_piC (πU : URep T) (g : T.G) (a b : πU.H) : ⟪πU.π g a, πU.π g b⟫_ℂ = ⟪a, b⟫_ℂ :=
-  (LinearIsometry.mk (πU.π g : πU.H →ₗ[ℂ] πU.H) (πU.isom g)).inner_map_map a b
+  by intros; apply GlobalTheory.RealPar.DerivedAdjoint.inner_map <;> assumption
 
 theorem pi_mulC (πU : URep T) (g h : T.G) (v : πU.H) : πU.π (g * h) v = πU.π g (πU.π h v) := by rw [map_mul]; rfl
 

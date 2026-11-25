@@ -274,7 +274,7 @@ theorem cf_bound {X : Obj k r} (hX : X.1.OK) {m : ℕ} (hD : Decay X.2 m) (hm : 
   obtain ⟨C', hC'⟩ := hX.growth
   refine ⟨|C'| * (|C| * nu X.2.R.σ Ws w), Ws, hW, fun x g => ?_⟩
   have hi : B.gN g.mat⁻¹ = B.gN g.mat := PI.PolynomialProperness.GN.gN_inv g.mem
-  have h1 : 1 ≤ B.gN g.mat := PI.PolynomialProperness.GN.gN_ge_one g.mem
+  have h1 : 1 ≤ B.gN g.mat := P.BetaSesquilinearity.gN_ge_one g.mem
   set N := B.gN g.mat with hN
   have hN0 : 0 < N := one_pos.trans_le h1
   have hNi : B.gN (g⁻¹).mat = N := hi

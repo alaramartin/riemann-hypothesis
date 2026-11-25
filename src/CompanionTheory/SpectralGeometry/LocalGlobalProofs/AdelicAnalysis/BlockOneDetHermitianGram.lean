@@ -4,6 +4,7 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SplitAnisotropic
 
 @[expose] public section
 
@@ -27,15 +28,7 @@ theorem blockOne_succ_succ (i j : Fin M) : blockOne t A i.succ j.succ = A i j :=
 end Entries
 
 theorem det_blockOne {K : Type} [CommRing K] {M : ℕ} (t : K) (A : Matrix (Fin M) (Fin M) K) :
-    (blockOne t A).det = t * A.det := by
-  rw [Matrix.det_succ_row_zero, Fin.sum_univ_succ]
-  have h0 : (blockOne t A).submatrix Fin.succ (Fin.succAbove (0 : Fin (M + 1))) = A := by
-    ext i j
-    simp [blockOne_succ_succ]
-  rw [h0, Finset.sum_eq_zero]
-  · simp [blockOne_zero_zero]
-  · intro j _
-    simp [blockOne_zero_succ]
+    (blockOne t A).det = t * A.det := AlgSplit.det_blockOne t A
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
@@ -104,7 +97,7 @@ theorem exists_consTup_of_gramE (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin 
 
 theorem block_alg : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (t : F), (blockOne (algebraMap F E t) J).det = algebraMap F E t * J.det ∧ ((∀ a b, σ (J b a) = J a b) → ∀ a b, σ (blockOne (algebraMap F E t) J b a) = blockOne (algebraMap F E t) J a b) ∧ (∀ (n : ℕ) (X : Fin n → Fin M → E), gramE σ (blockOne (algebraMap F E t) J) (consTup X) = blockOne (algebraMap F E t) (gramE σ J X)) ∧ (t ≠ 0 → ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E) (Y : Fin (n + 1) → Fin (M + 1) → E), Y 0 = Fin.cons 1 (fun _ => 0) → gramE σ (blockOne (algebraMap F E t) J) Y = blockOne (algebraMap F E t) T → ∃ X, gramE σ J X = T ∧ Y = consTup X) := by
   intro F E _ _ _ _ _ σ _ M J t
-  refine ⟨det_blockOne _ _, ?_, fun n X => gramE_consTup σ J _ X, ?_⟩
+  refine ⟨AlgSplit.det_blockOne _ _, ?_, fun n X => gramE_consTup σ J _ X, ?_⟩
   · intro hJ a b
     refine Fin.cases ?_ (fun a => ?_) a <;> refine Fin.cases ?_ (fun b => ?_) b
     · simp [blockOne_zero_zero]

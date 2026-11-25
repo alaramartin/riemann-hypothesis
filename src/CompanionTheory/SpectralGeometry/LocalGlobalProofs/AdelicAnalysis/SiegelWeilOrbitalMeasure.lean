@@ -20,6 +20,7 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ArchimedeanOrbitMeasures.PiDens
 import Mathlib.Topology.Compactness.Paracompact
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilStabilizerVolume.TopoPolish
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ProperActionOrbitMeasure, CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SiegelWeilOrbitalMeasure
@@ -128,7 +129,7 @@ theorem measurableEmbedding_orbitQuot {G V : Type} [Group G] [TopologicalSpace G
       rintro ⟨y, hy⟩
       obtain ⟨g, rfl⟩ := htr x₀ hx y hy
       exact ⟨g, rfl⟩
-    haveI : PolishSpace G := PI.AprimeInfA.polish_of_lcsc G
+    haveI : PolishSpace G := PI.VolStabW.TopoPolish.polish_of_lcsc G
     have hb := hoc.map_eq_borel hos
     let T : Set Z := Subtype.val ⁻¹' (orbitQuot act h1 hm x₀ '' S)
     have hT : MeasurableSet T := by

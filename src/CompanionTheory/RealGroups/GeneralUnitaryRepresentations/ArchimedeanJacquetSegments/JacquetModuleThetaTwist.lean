@@ -9,6 +9,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Irr
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalLanglandsOfIrreducibleAdmissible
 import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TransposeInverseInvolutionApply
 import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ZelevinskyJacquet.ZelevinskyCosocles.LUnlinkedComm
+import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.ComplementarySeries.SegmentJacquetSubquotients.SegRepOf
 
 @[expose] public section
 
@@ -113,11 +114,6 @@ def jacTheta {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (hd' : ∑ a,
     refine Submodule.subset_span ⟨⟨u, hu⟩, π (leviEmb k (stdBlocks (fun a => d (Fin.rev a)) hd') (thetaL d m)) v, ?_⟩
     simp
 
-theorem jm_congr {h N : ℕ} {y z : Fin h → IrrGL (k := k)} (hyz : y = z) (hy : ∑ a, (y a).1 = N) (hz : ∑ a, (z a).1 = N)
-    {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V) : jm y hy π = jm z hz π := by
-  subst hyz
-  rfl
-
 theorem jacquet_module_theta_twist (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hGK : GKLocal k) {h N : ℕ} (x : Fin h → IrrGL (k := k))
     (hd : ∑ a, (x a).1 = N) {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V) :
     jm x hd (π.comp (thetaW k N)) = jm (dualRev hA x) (sum_dualRev hA x hd) π := by
@@ -139,10 +135,10 @@ open JmTh
 theorem jmTheta (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
     GlobalTheory.BZSeg.JmTheta k := by
   intro N V _ _ π _ _ a b hd hd'
-  have hA := GlobalTheory.CompanionTheory.BZCuspPair.irrAdm
+  have hA := PositivityTheory.RgGu.SRC.SrMult.irrAdm
   have hGK : GKLocal k := _root_.GlobalTheory.CompanionTheory.GKLocalProof.gkLocal hA
   rw [jacquet_module_theta_twist hA hGK ![a, b] hd π]
-  refine jm_congr ?_ _ _ π
+  refine PositivityTheory.RgGu.SRC.SrRev.jmc ?_ _ _ π
   rw [dualRev_eq hA]
   funext i
   fin_cases i <;> rfl

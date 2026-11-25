@@ -5,6 +5,8 @@ import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramRightActionIdentities
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTensMemLatO
 
 @[expose] public section
 
@@ -16,17 +18,6 @@ open HeckeCharacterZeroLocus.SiegelWeilU
 open scoped TensorProduct Matrix
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
-
-theorem trace_tmul [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] (a : R) (e : E) :
-    Algebra.trace R (R ⊗[F] E) (a ⊗ₜ[F] e) = a * algebraMap F R (Algebra.trace F E e) := by
-  have h1 : Algebra.trace R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] e) = algebraMap F R (Algebra.trace F E e) := by
-    rw [Algebra.trace_apply, Algebra.trace_apply, ← LinearMap.trace_baseChange]
-    congr 1
-    ext y
-    simp [Algebra.TensorProduct.tmul_mul_tmul, LinearMap.baseChange_tmul]
-  have h2 : a ⊗ₜ[F] e = a • ((1 : R) ⊗ₜ[F] e) := by
-    simp [TensorProduct.smul_tmul']
-  rw [h2, map_smul, h1, smul_eq_mul]
 
 theorem expand {d : ℕ} (b : Module.Basis (Fin d) F E) (R : Type) [CommRing R] [Algebra F R]
     (u : R ⊗[F] E) :
@@ -52,7 +43,7 @@ theorem trace_entry [FiniteDimensional F E] (σ : E →ₐ[F] E) {d : ℕ} (b : 
   have : sigR R σ (((Algebra.TensorProduct.basis R b).repr u k) ⊗ₜ[F] b k) =
       ((Algebra.TensorProduct.basis R b).repr u k) ⊗ₜ[F] σ (b k) := by
     simp [sigR]
-  rw [this, Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, trace_tmul]
+  rw [this, Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, LatVac.trace_tmul]
   simp only [mul_one]
   ring
 
@@ -60,15 +51,10 @@ section CM
 
 variable [NumberField F] [NumberField E]
 
-theorem sig_sig {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
-  obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
-  apply τ.injective
-  rw [h.2.2.2, h.2.2.2, star_star]
-
 theorem trace_sig {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : E) :
     Algebra.trace F E (σ x) = Algebra.trace F E x :=
   Algebra.trace_eq_of_algEquiv
-    (AlgEquiv.ofAlgHom σ σ (AlgHom.ext (sig_sig h)) (AlgHom.ext (sig_sig h))) x
+    (AlgEquiv.ofAlgHom σ σ (AlgHom.ext (GramAlg.sigma_invol h)) (AlgHom.ext (GramAlg.sigma_invol h))) x
 
 theorem trGram_isSymm {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {M d : ℕ}
     {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) (b : Module.Basis (Fin d) F E) :
@@ -76,7 +62,7 @@ theorem trGram_isSymm {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {M d : ℕ}
   ext ⟨i, k⟩ ⟨j, l⟩
   simp only [Matrix.transpose_apply, trGram]
   rw [← trace_sig h (σ (b l) * J j i * b k)]
-  simp only [map_mul, sig_sig h, hJ.1]
+  simp only [map_mul, GramAlg.sigma_invol h, hJ.1]
   congr 1
   ring
 
@@ -100,7 +86,7 @@ theorem trGram_det_ne_zero {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {M d : ℕ}
     have he : e = ∑ k, (b.repr (σ e) k) • σ (b k) := by
       have h3 := congrArg σ (b.sum_repr (σ e))
 
-      rw [sig_sig h, map_sum] at h3
+      rw [GramAlg.sigma_invol h, map_sum] at h3
       exact h3.symm.trans (Finset.sum_congr rfl fun k _ => σ.toLinearMap.map_smul _ _)
     rw [he]
 

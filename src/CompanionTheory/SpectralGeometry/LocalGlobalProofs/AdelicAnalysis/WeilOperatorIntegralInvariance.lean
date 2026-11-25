@@ -3,6 +3,7 @@ module
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.CountData
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopology
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardAdelicCharacter
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesSelfDual
 
 @[expose] public section
 
@@ -12,10 +13,6 @@ open scoped ENNReal NNReal MatrixGroups
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.FstarPer
-
-theorem oh_mul {F : Type} [Field F] [NumberField F] {x y : A F} (hx : x ∈ Oh F) (hy : y ∈ Oh F) :
-    x * y ∈ Oh F :=
-  fun v => mul_mem (hx v) (hy v)
 
 theorem continuous_qf {F : Type} [Field F] [NumberField F] {ι : Type} [Fintype ι]
     (h : A F) (B : Matrix ι ι (A F)) : Continuous (qf h B) := by
@@ -34,7 +31,7 @@ theorem fstar_periodic : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpa
     by_cases hu : u ∈ tsupport φ
     · have h1 := hNK _ (Set.mem_image_of_mem _ hu)
       have h2 : (N : A F) * x * qf (hf F) (Bf B) u ∈ Oh F := by
-        have h3 := oh_mul hx h1
+        have h3 := SelfDual.oh_mul hx h1
         have h4 : (N : A F) * x * qf (hf F) (Bf B) u = x * ((N : A F) * qf (hf F) (Bf B) u) := by
           ring
         rwa [h4]

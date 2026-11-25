@@ -3,6 +3,7 @@ module
 public import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.KeepsMul
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Tactic.TypeStar
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FamilyFiltration
 
 @[expose] public section
 
@@ -109,16 +110,6 @@ theorem dom_span {β : Type*} (L R : β → M)
     exact mul_le_mul_of_nonneg_left (h₁ b) (by positivity)
 end
 
-theorem enorm_add_sq_le (a b : ℂ) : ‖a + b‖ₑ ^ 2 ≤ 2 * ‖a‖ₑ ^ 2 + 2 * ‖b‖ₑ ^ 2 := by
-  rw [← ofReal_norm, ← ofReal_norm, ← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _),
-    ← ENNReal.ofReal_pow (norm_nonneg _), ← ENNReal.ofReal_pow (norm_nonneg _)]
-  have h2 : (2 : ℝ≥0∞) = ENNReal.ofReal 2 := by simp
-  rw [h2, ← ENNReal.ofReal_mul (by norm_num), ← ENNReal.ofReal_mul (by norm_num),
-    ← ENNReal.ofReal_add (by positivity) (by positivity)]
-  apply ENNReal.ofReal_le_ofReal
-  have := pow_le_pow_left₀ (norm_nonneg _) (norm_add_le a b) 2
-  nlinarith [sq_nonneg (‖a‖ - ‖b‖)]
-
 theorem lint_add_lt {α : Type*} [MeasurableSpace α] {μ : Measure α} (f g : α → ℂ) (w : α → ℝ≥0∞)
     (hf : AEMeasurable (fun a => ‖f a‖ₑ ^ 2 * w a) μ)
     (hF : ∫⁻ a, ‖f a‖ₑ ^ 2 * w a ∂μ < ⊤) (hG : ∫⁻ a, ‖g a‖ₑ ^ 2 * w a ∂μ < ⊤) :
@@ -127,7 +118,7 @@ theorem lint_add_lt {α : Type*} [MeasurableSpace α] {μ : Measure α} (f g : �
         apply lintegral_mono
         intro a
         calc ‖f a + g a‖ₑ ^ 2 * w a ≤ (2 * ‖f a‖ₑ ^ 2 + 2 * ‖g a‖ₑ ^ 2) * w a := by
-              gcongr; exact enorm_add_sq_le _ _
+              gcongr; exact GlobalTheory.CompanionTheory.CoefFilt.enorm_add_sq_le _ _
           _ = 2 * (‖f a‖ₑ ^ 2 * w a) + 2 * (‖g a‖ₑ ^ 2 * w a) := by ring
     _ = 2 * ∫⁻ a, ‖f a‖ₑ ^ 2 * w a ∂μ + 2 * ∫⁻ a, ‖g a‖ₑ ^ 2 * w a ∂μ := by
         rw [lintegral_add_left' (hf.const_mul 2), lintegral_const_mul' _ _ (by simp),

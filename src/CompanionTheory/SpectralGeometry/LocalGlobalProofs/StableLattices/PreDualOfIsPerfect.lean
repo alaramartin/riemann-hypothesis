@@ -6,6 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAdditiveSw
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LiftLeftFst
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AdjointEndomorphismsCubeLBOfDenseFibres
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.CrystallinePull2SumCup
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.WeilPairingPullbackIff
 
 @[expose] public section
 
@@ -36,7 +37,7 @@ theorem pull_lam_of_left {S : Scheme.{0}} {G T T' : Over S} [GrpObj G] (c : Pic 
   have hab : u ≫ (a * b).left = (a' * b').left := by
     rw [Hom.mul_def, Hom.mul_def, Over.comp_left, Over.comp_left, ← Category.assoc]
     congr 1
-    apply GlobalTheory.AbDual.left_ext
+    apply Ar.WeilPull.left_ext
     · rw [Category.assoc, GlobalTheory.AbDual.lift_left_fst, GlobalTheory.AbDual.lift_left_fst, ha]
     · rw [Category.assoc, GlobalTheory.AbDual.lift_left_snd, GlobalTheory.AbDual.lift_left_snd, hb]
   have hu : ∀ X : Over S, (toUnit X).left = X.hom := fun X => by

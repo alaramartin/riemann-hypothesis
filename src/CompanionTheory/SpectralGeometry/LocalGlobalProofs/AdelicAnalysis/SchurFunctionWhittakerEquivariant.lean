@@ -410,7 +410,7 @@ def Hs (F : Type) [Field F] [NumberField F] (N : ℕ) : Set (A F) := {x | ∃ y 
 lemma hs_add {N : ℕ} {x y : A F} (hx : x ∈ Hs F N) (hy : y ∈ Hs F N) : x + y ∈ Hs F N := by
   obtain ⟨u, hu, rfl⟩ := hx
   obtain ⟨w, hw, rfl⟩ := hy
-  exact ⟨u + w, _root_.GlobalTheory.CompanionTheory.SW.Core.Scale.add_mem_Oh hu hw, by ring⟩
+  exact ⟨u + w, StdChar.add_mem_Oh hu hw, by ring⟩
 
 lemma hs_neg {N : ℕ} {x : A F} (hx : x ∈ Hs F N) : -x ∈ Hs F N := by
   obtain ⟨u, hu, rfl⟩ := hx
@@ -424,7 +424,7 @@ lemma hs_alg (N : ℕ) (r : 𝓞 F) : algebraMap F (A F) ((N : F) * (r : F)) ∈
 
 lemma hs_sub_oh {N : ℕ} {x : A F} (hx : x ∈ Hs F N) : x ∈ Oh F := by
   obtain ⟨u, hu, rfl⟩ := hx
-  exact oh_mul (oh_nat N) hu
+  exact SelfDual.oh_mul (CompanionTheory.PlacePermOperatorBicommutantSpan.oh_nat N) hu
 
 lemma hs_isOpen {N : ℕ} (hN : 0 < N) : IsOpen (Hs F N) :=
   (_root_.GlobalTheory.CompanionTheory.SW.Core.AfTop.finiteAdele_topology F).2.2.2.2.2.2.2.2.2 N hN
@@ -597,7 +597,7 @@ theorem density_main : ∀ (F : Type) [Field F] [NumberField F] [MeasurableSpace
       rw [Set.indicator_of_notMem hu, mul_zero]
   have hint : Integrable fs lf := by
     obtain ⟨N, hN, hper⟩ := _root_.GlobalTheory.CompanionTheory.SW.FstarPer.fstar_periodic F lf hlf h1 ψ hψ ι M B ρ P hQ' (indL a) (indL_SB ι ha)
-    obtain ⟨C, hC⟩ := _root_.GlobalTheory.CompanionTheory.SW.Core.norm_fstar_le_den F lf hlf h1 ψ hψ ι M B ρ P hQ' (indL a) (indL_SB ι ha)
+    obtain ⟨C, hC⟩ := CompanionTheory.PlacePermOperatorBicommutantSpan.fstar_decay F lf hlf h1 ψ hψ ι M B ρ P hQ' (indL a) (indL_SB ι ha)
     exact integrable_of_periodic lf hlf h1 fs hN (fun x hx y => (hper x hx).2 y) hM hC
   have hmh : mh = fun y => ((c : ℂ))⁻¹ * fs y := by
     funext y

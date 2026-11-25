@@ -4,6 +4,7 @@ public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.Eigenspa
 import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.EigenspaceCyclicDensity.CreationOperators.CreApply
 import Mathlib.RingTheory.PiTensorProduct
 import Mathlib.RingTheory.SimpleRing.Principal
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CapCommuteRtInfGL
 
 @[expose] public section
 
@@ -56,9 +57,8 @@ section Ring
 
 variable {R : Type} [Ring R] [Algebra ℂ R] (E : Fin n → Fin n → R) (an cr : Pos n → R)
 
-theorem self_neg {x : R} (h : x = -x) : x = 0 := by
-  have : (2 : ℂ) • x = 0 := by rw [two_smul]; exact add_eq_zero_iff_eq_neg.2 h
-  rw [← one_smul ℂ x, ← inv_mul_cancel₀ (two_ne_zero' ℂ), mul_smul, this, smul_zero]
+theorem self_neg {x : R} (h : x = -x) : x = 0 :=
+  GlobalTheory.QuantumMinorAdjacentSwap.eq_zero_of_eq_neg h
 
 theorem koszul_differential_sq (hE : KRel ε E) (h1 : ∀ a b i, Commute (E a b) (an i)) (haa : ∀ i j, an i * an j + an j * an i = 0) :
     (∑ i, cc ε i • (E i.1.1 i.1.2 * an i)) * (∑ i, cc ε i • (E i.1.1 i.1.2 * an i)) =
@@ -86,7 +86,7 @@ theorem koszul_differential_sq (hE : KRel ε E) (h1 : ∀ a b i, Commute (E a b)
     simp only [cc, eq_true ci, eq_true cj, if_true, true_and, mul_one, one_smul, mul_neg, ← sub_eq_add_neg, ← sub_mul, this]
     split_ifs <;> simp [sub_eq_add_neg, add_mul]
   rw [e, ← sub_eq_zero]
-  apply self_neg
+  apply GlobalTheory.QuantumMinorAdjacentSwap.eq_zero_of_eq_neg
   rw [eq_neg_iff_add_eq_zero]
   have s1 : ∑ i, ∑ j, U i j = ∑ i, ∑ j, U j i := Finset.sum_comm
   have s2 : ∑ i, ∑ j, T i j = ∑ i, ∑ j, T j i := Finset.sum_comm
@@ -154,7 +154,7 @@ theorem beta_sq (haa : ∀ i j, an i * an j + an j * an i = 0) (hcc : ∀ i j, c
   simp only [smul_mul_smul_comm, ex, smul_add, smul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib]
   have h3 : ∑ p : Pos n × Pos n × Pos n, ∑ q : Pos n × Pos n × Pos n,
       (t p * t q) • (cr p.2.2 * cr q.2.2 * ((an p.2.1 * an p.1) * (an q.2.1 * an q.1))) = 0 := by
-    apply self_neg
+    apply GlobalTheory.QuantumMinorAdjacentSwap.eq_zero_of_eq_neg
     conv_lhs => rw [Finset.sum_comm]
     simp only [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_

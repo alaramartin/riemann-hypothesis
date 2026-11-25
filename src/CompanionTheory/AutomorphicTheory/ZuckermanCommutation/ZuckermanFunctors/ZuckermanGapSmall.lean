@@ -4,6 +4,7 @@ public import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFu
 public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.IsDSOfIsDG
 public import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFunctors.ZuckermanLibraryBounds
 public import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFunctors.ZuckermanIngredients
+import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.PieriTensorDecomposition
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFunctors.Bridge, CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFunctors.ZuckermanGapSmall
@@ -21,23 +22,12 @@ namespace CompanionTheory.Zuck
 
 open BranchingSupport Formalism.FourierDecayAlt.ThreeDimData
 
-theorem n1_add_le' {n : ℕ} (x y : Fin n → ℤ) : n1 (x + y) ≤ n1 x + n1 y := by
-  unfold n1
-  rw [← Finset.sum_add_distrib]
-  exact Finset.sum_le_sum fun i _ => Int.natAbs_add_le _ _
-
 theorem n1_single_eq_natAbs {n : ℕ} (s : Fin n) (m : ℤ) : n1 (Pi.single s m) = m.natAbs := by
   unfold n1
   rw [Finset.sum_eq_single s]
   · simp
   · intro b _ hb; simp [hb]
   · simp
-
-theorem n1_eZ_eq_card_finset {n : ℕ} (I : Finset (Fin n)) : n1 (eZ I) = I.card := by
-  unfold n1 eZ
-  have : ∀ i : Fin n, (if i ∈ I then (1 : ℤ) else 0).natAbs = if i ∈ I then 1 else 0 := by
-    intro i; split_ifs <;> rfl
-  simp [this]
 
 theorem zuckG_of_sm {t : ∀ n : ℕ, (Fin n → Bool) → ℝ} (ht : ∀ n, 1 ≤ n → ∀ ε, t n ε ≤ 43 * (n : ℝ) ^ 3)
     (hZ : ZuckSm t) : BranchingSupport.ZuckG := by
@@ -54,7 +44,7 @@ theorem zuckG_of_sm {t : ∀ n : ℕ, (Fin n → Bool) → ℝ} (ht : ∀ n, 1 �
       have hl' : (l : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) := by exact_mod_cast hln
       refine (hZ k r ε _ (R ν) h hok.1 ⟨hR.hc, hR.ds⟩ hg).1 l _ (by linarith [hok.2.1]) (fun a c hac => ?_) fun I => ?_
       · have h5 := (hF (ν + Pi.single c (l : ℤ)) (by
-          have := n1_add_le' ν (Pi.single c (l : ℤ))
+          have := Gp91.GlobalTheory.TensExists.l1_add_le ν (Pi.single c (l : ℤ))
           rw [n1_single_eq_natAbs, Int.natAbs_natCast] at this
           omega)).hc.1 hac
         simp only [Pi.add_apply, Pi.single_eq_same, Pi.single_eq_of_ne hac.ne, add_zero, Int.cast_add,
@@ -66,8 +56,8 @@ theorem zuckG_of_sm {t : ∀ n : ℕ, (Fin n → Bool) → ℝ} (ht : ∀ n, 1 �
         have h8 : (l : ℝ) + 1 ≤ (x : ℝ) - y := by exact_mod_cast h7
         linarith
       · have h5 := hF (ν + eZ I.1) (by
-          have := n1_add_le' ν (eZ I.1)
-          rw [n1_eZ_eq_card_finset, I.2] at this
+          have := Gp91.GlobalTheory.TensExists.l1_add_le ν (eZ I.1)
+          rw [Gp91.GlobalTheory.TensExists.n1_eZ_eq_card, I.2] at this
           omega)
         have e : (fun a => lam a + (((ν + eZ I.1) a : ℤ) : ℝ)) = addSet (fun a => lam a + (ν a : ℝ)) I.1 := by
           funext a
@@ -85,7 +75,7 @@ theorem zuckG_of_sm {t : ∀ n : ℕ, (Fin n → Bool) → ℝ} (ht : ∀ n, 1 �
     obtain ⟨h, hg, hok⟩ := hR.gap
     refine (hZ k r ε _ (R ν) h hok.1 ⟨hR.hc, hR.ds⟩ hg).2 _ (by linarith [hok.2.1]) fun s => ?_
     have h5 := hF (ν - Pi.single s 1) (by
-      have := n1_add_le' ν (Pi.single s (-1))
+      have := Gp91.GlobalTheory.TensExists.l1_add_le ν (Pi.single s (-1))
       rw [n1_single_eq_natAbs, Pi.single_neg, ← sub_eq_add_neg] at this
       exact this.trans hl)
     have e : (fun a => lam a + (((ν - Pi.single s 1 : Fin (2 * r + k + 1) → ℤ) a : ℤ) : ℝ)) =

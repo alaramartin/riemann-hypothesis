@@ -5,6 +5,8 @@ public import CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.OpLocal
 import Formalism.FormalDegreeBessel.FinalG
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaSesquilinearity
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BigCellHermitian
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.IsAdmissibleSplittingCharPairMulTwist
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedPairingViaPhase
 
 @[expose] public section
 
@@ -88,8 +90,8 @@ theorem isDom_omB {k r : ℕ} (Bs : B.RealPlaceData k r Wp Wq) : Q.IsDom k r Bs.
     have hs : h * m ∈ Sset k r Bs.z := ⟨h, hh, m, hm.1, rfl⟩
     have hs' : h' * m' ∈ Sset k r Bs.z' := ⟨h', hh', m', hm'.1, rfl⟩
     refine ⟨?_, fun a => ?_⟩
-    · rw [gInv k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem _ hs _ hs' g]; exact hg.1
-    · rw [dInv k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem _ hs _ hs' g]; exact hg.2 a
+    · rw [group_inverse_holds k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem _ hs _ hs' g]; exact hg.1
+    · rw [diagonal_inverse_holds k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem _ hs _ hs' g]; exact hg.2 a
 
 variable {P : M.Par} {Bs : B.RealPlaceData P.k P.r Wp Wq}
 
@@ -120,7 +122,7 @@ theorem pInv_comp {o₁ κ₁ o₂ κ₂ : ℕ} {Θ₁ Θ₂ : B.DiffOp P.k P.r 
       ∀ J ∈ FFB P Bs, ∀ g ∈ B.GV P.k P.r ∩ Gauge.OmB Bs, B.opApply Θ J g = B.opApply Θ₁ (B.opApply Θ₂ J) g := by
   obtain ⟨Θ, hP, hl, hc⟩ := polyOp_comp h₁.1 h₂.1
   refine ⟨Θ, ⟨hP, hc Bs {g | 0 < Gf P.k P.r Bs.z Bs.z' g} (isOpen_lt continuous_const (BetaSesquilinearity.Gf_cont _ _)) h₁.2 h₂.2⟩,
-    fun J hJ g hg => hl _ J (BetaSesquilinearity.sCkOn_mono le_top (ck_of_smoothLev hJ.1)) g hg hg.1⟩
+    fun J hJ g hg => hl _ J (B5.ckOn_mono le_top (ck_of_smoothLev hJ.1)) g hg hg.1⟩
 
 variable {e : M.Ty P → ℂ → (Wq →L[ℂ] Wp)} {L : R.LevelData (MA.A P (MA.DQ P)) P.r} {o κ : ℕ}
 
@@ -155,7 +157,7 @@ theorem realF_act {b : MA.A P (MA.DQ P)} (hb : b ∈ Submonoid.closure (MA.bddSe
     apply List.map_congr_left
     intro t _
     simp only [Function.comp_apply]
-    rw [Gauge.actA_mul]
+    rw [MAx3.F.actA_mul]
 
 theorem realF_listsum {ι : Type} (l : List ι)
     (Φ : ι → (B.Mat P.k P.r → (Wq →L[ℂ] Wp)) → M.Ty P → MA.SmQ P.r P.TT)
@@ -193,7 +195,7 @@ theorem realX_add {X Y : MA.A P (MA.DQ P)} (hX : RealX P Bs e L o κ X) (hY : Re
 
 theorem realX_mul {b X : MA.A P (MA.DQ P)} (hb : b ∈ Submonoid.closure (MA.bddSet P L))
     (hX : RealX P Bs e L o κ X) : RealX P Bs e L o κ (b * X) :=
-  realF_congr (fun _ _ => Gauge.actA_mul _ _ _ _) (realF_act hb hX)
+  realF_congr (fun _ _ => MAx3.F.actA_mul _ _ _ _) (realF_act hb hX)
 
 theorem realX_smul (c : ℂ) {X : MA.A P (MA.DQ P)} (hX : RealX P Bs e L o κ X) : RealX P Bs e L o κ (c • X) := by
   rw [jdh_smul_eq]
@@ -221,7 +223,7 @@ theorem realX_of_isTr {X : MA.A P (MA.DQ P)} (h : IsTr P Bs e X) :
     subst ht
     exact ⟨Submonoid.one_mem _, h1⟩
   · simp only [List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, add_zero]
-    rw [jdh_actA_one, h2 J hJ]
+    rw [MAx2.R2.act_one, h2 J hJ]
 
 theorem realX_one : RealX P Bs e L 0 0 1 := by
   obtain ⟨Θ, h1, h2, h3⟩ := polyOp_one (k := P.k) (r := P.r) (Wp := Wp) (Wq := Wq)
@@ -283,11 +285,11 @@ theorem realX_prod (hpl : Q.IsPlace P Bs.z Bs.z' Bs.π Bs.π')
         realF_comp hpl (hts t ht).2 (hspan _ (hBdd a ha _ (hts t ht).1)))
     have hJ' : MA.actA P w.prod (Gauge.trJB P Bs e J) = _ := hJ J hJJ
     show MA.actA P (a :: w).prod (Gauge.trJB P Bs e J) = _
-    rw [List.prod_cons, Gauge.actA_mul, hJ', jdh_actA_listsum]
+    rw [List.prod_cons, MAx3.F.actA_mul, hJ', jdh_actA_listsum]
     congr 1
     apply List.map_congr_left
     intro t _
-    rw [Gauge.actA_mul]
+    rw [MAx3.F.actA_mul]
 
 end place
 

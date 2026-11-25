@@ -29,6 +29,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsEqAddO
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SuperadditiveOfCellsCoverCone
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsStarSubdivisionInvariantPolyhedralFan
 import Mathlib.Algebra.Order.Star.Int
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InRealConeCellOfInFaceOfCellFormCMField
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.IsStarOfClauses, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.StarDepthTwistedGalois, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.IsStarOfFiniteCover, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.StarIntegralValuesPolyhedral, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.BalancedFormDecompositionBound, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.StarDepthBoundedDenominator, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.StarDepthGapOnCell, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.StarFunctionOffCell, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.UniformCellBoundPolyhedralFan, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.StrictStarFunctionBounds, CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.ExistsStarSubdivision
@@ -67,9 +68,9 @@ theorem isStarOf_of_clauses : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [
   have key : ∀ (k : ℕ) (σ : Fin k → LinearMap.BilinForm ℤ X), IsCell bar ψ' σ → B ∈ rcone σ →
       ∀ j, InRCone σ (γ' j) := by
     rintro k σ hσ ⟨t, ht, hBt⟩ j
-    obtain ⟨kk, d, hk, hkd⟩ := inCone_of_strict hσ.strict hσ.linear hγ'.mem hγ'.nonneg (a := fun _ => 1) (b := t)
+    obtain ⟨kk, d, hk, hkd⟩ := DepthBdd.inCone_of_strict hσ.strict hσ.linear hγ'.mem hγ'.nonneg (a := fun _ => 1) (b := t)
       (fun _ => zero_le_one) ht ((linearOn_iff ψ' γ').1 hγ'.linear _ fun _ => zero_le_one) hBt j one_ne_zero
-    exact inRCone_of_nsmul hk hkd
+    exact Mark.FaceIn.inRCone_of_nsmul_eq hk hkd
   by_cases hc0 : ∃ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) ∧ InRCone δ β ∧ w.evalZ β = 1
   · obtain ⟨β₀, hβ₀, hβ₀p, hin, hw1⟩ := hc0
     have hne : β₀ ≠ 0 := by
@@ -539,7 +540,7 @@ theorem off_cell : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O]
     have hle := hsw.2.1 (u i) (hu i) (hun i)
     have hne : (N : ℝ) * ψ.evalZ (u i) ≠ ℓ (u i) := fun e => by
       obtain ⟨k, c, hk, e'⟩ := hsw.2.2 (u i) (hu i) (hun i) e
-      exact hi (GlobalTheory.PolFan.StarKey.OffCell.inRCone_of_nsmul hk e')
+      exact hi (Mark.FaceIn.inRCone_of_nsmul_eq hk e')
     have hlt : (N : ℤ) * z < ℓ (u i) := by
       have := lt_of_le_of_ne hle hne
       rw [hz] at this

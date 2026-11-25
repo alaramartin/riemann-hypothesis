@@ -5,6 +5,8 @@ public import Mathlib.Algebra.MvPolynomial.PDeriv
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.KummerLiftedCocycleImageEqPicardClass
 import Mathlib.RingTheory.PiTensorProduct
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.WordMonomial
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsJointHarmonicOfLoweringStableSubmodule
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsItWOfGlobIt
 
 @[expose] public section
 
@@ -18,37 +20,8 @@ namespace CompanionTheory.D.LK
 open Formalism.REAL GlobalTheory.CompanionTheory.DSVerma GlobalTheory.CompanionTheory.DSCover
 open CompanionTheory.D.DSIC (KRel NC)
 
-theorem deg_pderiv {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (k : ℕ) (h : f.totalDegree ≤ k + 1) :
-    (pderiv i f).totalDegree ≤ k := by
-  classical
-
-  rw [f.as_sum, map_sum]
-  refine totalDegree_finsetSum_le fun s hs => ?_
-  rw [pderiv_monomial]
-  by_cases h0 : s i = 0
-  · simp [h0]
-  · refine (totalDegree_monomial_le _ _).trans ?_
-    have e : s = (s - Finsupp.single i 1) + Finsupp.single i 1 := by
-      rw [tsub_add_cancel_of_le]
-      rw [Finsupp.single_le_iff]
-      omega
-    have e2 := congrArg Finsupp.degree e
-    rw [map_add (f := _), Finsupp.degree_single] at e2
-    have h3 := (le_totalDegree hs).trans h
-    change s.degree ≤ k + 1 at h3
-    change (s - Finsupp.single i 1).degree ≤ k
-    omega
-
-theorem pderiv_deg_zero {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (h : f.totalDegree ≤ 0) : pderiv i f = 0 := by
-  rw [totalDegree_eq_zero_iff_eq_C.1 (Nat.le_zero.1 h), pderiv_C]
-
 theorem deg_X_mul {σ : Type} (j : σ) (f : MvPolynomial σ ℂ) : (X j * f).totalDegree ≤ f.totalDegree + 1 :=
   (totalDegree_mul _ _).trans (by rw [totalDegree_X]; omega)
-
-theorem deg_X_pderiv {σ : Type} (j i : σ) (f : MvPolynomial σ ℂ) : (X j * pderiv i f).totalDegree ≤ f.totalDegree := by
-  cases h : f.totalDegree with
-  | zero => simp [pderiv_deg_zero i f h.le]
-  | succ k => exact (deg_X_mul _ _).trans (Nat.succ_le_succ (deg_pderiv i f k h.le))
 
 theorem generalized_verma_module_polynomial : Verma2 := by
   intro n ε
@@ -109,7 +82,7 @@ theorem generalized_verma_module_polynomial : Verma2 := by
     have hd : ∀ (i : NC ε) (a b : Fin n), (X i * dd ε a b f).totalDegree ≤ f.totalDegree := fun i a b => by
       unfold dd
       split_ifs
-      · exact deg_X_pderiv _ _ f
+      · exact GlobalTheory.Chain.RealIt.FockSrcDec.deg_X_pderiv _ _ f
       · simp
     rw [LinearMap.sum_apply]
     refine totalDegree_finsetSum_le fun i _ => ?_
@@ -172,12 +145,12 @@ theorem free_module_induction : FreeStep := by
   have hddl : ∀ a b (f : P) k, f.totalDegree ≤ k + 1 → (dd ε a b f).totalDegree ≤ k := fun a b f k h => by
     unfold dd
     split_ifs
-    · exact deg_pderiv _ _ _ h
+    · exact GlobalTheory.LowerHarm.deg_pderiv_succ _ _ _ h
     · simp
   have hdd0 : ∀ a b (f : P), f.totalDegree ≤ 0 → dd ε a b f = 0 := fun a b f h => by
     unfold dd
     split_ifs
-    · exact pderiv_deg_zero _ _ h
+    · exact GlobalTheory.LowerHarm.pderiv_of_deg_zero _ _ h
     · simp
   refine ⟨Z ⊗[ℂ] P, inferInstance, inferInstance, fun c e => (M c e).rTensor P + (M' c e).lTensor Z,
     χ ∘ₗ (TensorProduct.rid ℂ Z).toLinearMap ∘ₗ cc.lTensor Z, z₀ ⊗ₜ 1,

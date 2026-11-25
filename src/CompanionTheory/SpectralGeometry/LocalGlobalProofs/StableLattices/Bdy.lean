@@ -30,20 +30,6 @@ def fb {M n : ℕ} (d : Fin M → ℕ) (h : ∑ i, d i = n) (Y : ℂ) : FreeAlge
   (List.ofFn fun i : Fin M => qdet (fun p q : Fin (d i) => lt (stdBlocks d h ⟨i, p⟩) (stdBlocks d h ⟨i, q⟩))
     (Y + shift d i)).prod
 
-theorem map_qdet {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B] (ψ : A →ₐ[ℂ] B) {n : ℕ}
-    (X : Fin n → Fin n → A) (u : ℂ) : ψ (qdet X u) = qdet (fun p q => ψ (X p q)) u := by
-  unfold qdet qminor
-
-  rw [map_sum]
-  refine Finset.sum_congr rfl fun σ _ => ?_
-  rw [map_mul, map_list_prod, List.map_ofFn]
-  congr 1
-  · simp
-  · congr 2
-    funext k
-    simp [Function.comp, Tm]
-    split_ifs <;> simp
-
 abbrev lL {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End ℂ V)
     (l : Fin n × Fin n) : Module.End ℂ (Cn n V) := if lev l.1 = lev l.2 then lF E l.1 l.2 else 0
 

@@ -6,6 +6,8 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.RightDerivativeZeroOut
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Algebra.Ring.IsFormallyReal
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactExponentialSurjective
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SmallFundamentalSetRealUnipotent
+import Development.WeilBound.CoreStatements.OrbitDecayEstimates.CurveDerivativeDecay.HasDerivAtCurve
 
 @[expose] public section
 
@@ -142,8 +144,8 @@ theorem hs_three (hA : IsGrad ε A) (M : Matrix (Fin n) (Fin n) ℂ) :
   rw [e1, e2] at h2
   linarith
 
-theorem hs_smul (c : ℂ) (M : Matrix (Fin n) (Fin n) ℂ) : hs (c • M) = ‖c‖ ^ 2 * hs M := by
-  simp only [Formalism.REAL.hs, Matrix.smul_apply, smul_eq_mul, norm_mul, mul_pow, Finset.mul_sum]
+theorem hs_smul (c : ℂ) (M : Matrix (Fin n) (Fin n) ℂ) : hs (c • M) = ‖c‖ ^ 2 * hs M :=
+  NilLie.hs_smul c M
 
 theorem hs_conjTranspose (M : Matrix (Fin n) (Fin n) ℂ) : hs Mᴴ = hs M := by
   simp only [Formalism.REAL.hs, Matrix.conjTranspose_apply, norm_star]
@@ -171,15 +173,11 @@ theorem hs_proj_le {P : Matrix (Fin n) (Fin n) ℂ} (h1 : Pᴴ = P) (h2 : P * P 
   rw [hs_one, Matrix.one_mul, Matrix.one_mul] at this
   linarith [_root_.Formalism.REAL.frobenius_nonneg_matrix (1 - P)]
 
-theorem hs_eq_zero {M : Matrix (Fin n) (Fin n) ℂ} (h : hs M = 0) : M = 0 := by
-  ext i j
-  have h1 : ∀ a ∈ Finset.univ, 0 ≤ ∑ b, ‖M a b‖ ^ 2 := fun a _ => Finset.sum_nonneg fun _ _ => by positivity
-  have h2 := (Finset.sum_eq_zero_iff_of_nonneg h1).1 h i (Finset.mem_univ _)
-  have h3 := (Finset.sum_eq_zero_iff_of_nonneg fun _ _ => by positivity).1 h2 j (Finset.mem_univ _)
-  simpa using h3
+theorem hs_eq_zero {M : Matrix (Fin n) (Fin n) ℂ} (h : hs M = 0) : M = 0 :=
+  CompanionTheory.Lime.T3.eq_zero_of_hs h
 
 theorem hs_pos {M : Matrix (Fin n) (Fin n) ℂ} (h : M ≠ 0) : 0 < hs M :=
-  lt_of_le_of_ne (_root_.Formalism.REAL.frobenius_nonneg_matrix M) fun e => h (hs_eq_zero e.symm)
+  lt_of_le_of_ne (_root_.Formalism.REAL.frobenius_nonneg_matrix M) fun e => h (CompanionTheory.Lime.T3.eq_zero_of_hs e.symm)
 
 theorem one_le_hs {P : Matrix (Fin n) (Fin n) ℂ} (h2 : P * P = P) (h0 : P ≠ 0) : 1 ≤ hs P := by
   have h := _root_.Formalism.REAL.frobenius_mul_le P P

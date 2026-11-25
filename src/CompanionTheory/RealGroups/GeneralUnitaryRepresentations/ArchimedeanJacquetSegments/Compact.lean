@@ -5,6 +5,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqOfHasValue
 import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGeneralLinearGroup
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsLocallyConstantModulus
 import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.PairwiseDisjointCell
 
 @[expose] public section
 
@@ -69,7 +70,7 @@ theorem rc_of_KO (q : parab k (blk2 d)) (hq : (q : GL (Fin (d + d)) k) ∈ KO k 
       exact h2 _ _
   letI : MeasurableSpace (GL (Fin d) k) := borel _
   have hdet (a : Fin 2) : nabs k (Matrix.GeneralLinearGroup.det (leviProj k (blk2 d) q a)) = 1 :=
-    GlobalTheory.LGrp.nabs_det_of_mem_KO (hK a)
+    GlobalTheory.GLDoubling.nabs_det_of_mem_KO (hK a)
   simp only [rc, hdet, inv_one, mul_one]
 
 theorem exists_pw (x : GL (Fin (d + d)) k) :

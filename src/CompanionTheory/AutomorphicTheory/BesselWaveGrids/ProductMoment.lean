@@ -57,7 +57,7 @@ theorem fixes_wedge (hj : j ≤ r) {z : Fin (2 * r + k + 1) → ℂ} (hz : Forma
     intro i a
     have := congrFun (congrFun hF i) a
     simpa [Matrix.mul_apply, Formalism.QuantumDeterminants.Fm, mulVec, dotProduct] using this
-  rw [GlobalTheory.TopMinorWedge.cmp_mulVec_wedge]
+  rw [GlobalTheory.TensLen.cmp_mulVec_wedge]
   refine GlobalTheory.FlagFix.wedge_eq_of_mul _ _
     (U.submatrix (Fin.castLE (by omega : j + 1 ≤ r + 1)) (Fin.castLE (by omega : j + 1 ≤ r + 1)))
     (fun c a h => hU0 _ _ h) (fun c => hU1 _) fun i a => ?_
@@ -76,7 +76,7 @@ theorem herm_wedge (hj : j ≤ r) (z z' : Fin (2 * r + k + 1) → ℂ) (g : Mx k
     Formalism.QuantumDeterminants.herm (cmp (j + 1) (Formalism.QuantumDeterminants.Hpk k r)) (cmp (j + 1) g *ᵥ wedge (fvL hj z')) (wedge (fvL hj z)) =
       ((Formalism.QuantumDeterminants.Zhat k r z z' g).submatrix (Fin.castLE (by omega : j + 1 ≤ r + 1))
         (Fin.castLE (by omega : j + 1 ≤ r + 1))).det := by
-  rw [Formalism.QuantumDeterminants.herm, GlobalTheory.TopMinorWedge.cmp_mulVec_wedge, GlobalTheory.TopMinorWedge.cmp_mulVec_wedge,
+  rw [Formalism.QuantumDeterminants.herm, GlobalTheory.TensLen.cmp_mulVec_wedge, GlobalTheory.TensLen.cmp_mulVec_wedge,
     GlobalTheory.TopMinorWedge.star_wedge_dot]
   rfl
 

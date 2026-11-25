@@ -20,7 +20,7 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 theorem isProbabilityMeasure_prH : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (μ : Measure (HA (AF F) σ J)) (𝓕 : Set (HA (AF F) σ J)), IsHaarH F E σ M J μ → IsFDH F E σ M J μ 𝓕 → IsProbabilityMeasure (prH μ 𝓕) := by
   intro F E _ _ _ _ _ σ hσ M J hJ μ 𝓕 hμ h𝓕
-  have hfin : μ 𝓕 < ⊤ := ((_root_.GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hσ M J hJ).2 μ hμ).2 𝓕 h𝓕
+  have hfin : μ 𝓕 < ⊤ := ((CompanionTheory.SWFin.finVol F E σ hσ M J hJ).2 μ hμ).2 𝓕 h𝓕
   obtain ⟨hlc, hsc, ht2⟩ := (GlobalTheory.CompanionTheory.AdeleTop.adele_top F).1
   obtain ⟨htg, hlcH, hscH, ht2H, hbor, -⟩ := _root_.GlobalTheory.CompanionTheory.SW.TopH.topH_props F E σ hσ M J hJ (AF F)
   have hcount : Countable (HFinIn (AF F) σ J) := (_root_.GlobalTheory.CompanionTheory.SW.rational_countable_discrete F E σ hσ M J hJ).1

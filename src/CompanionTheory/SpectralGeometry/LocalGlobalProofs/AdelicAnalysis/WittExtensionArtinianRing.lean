@@ -8,6 +8,7 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GramRightMulActionLaws
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianMatricesLocallyCompactBorel
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.WittExtensionDiagonalGramTuples
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DisjointSpanPerpLat
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.HermitianDiagonalizeOverReducedTensor, CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.UnitChoiceOfIsArtinianRingIsReduced, CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.WittExtensionArtinianRing
@@ -440,7 +441,7 @@ theorem exists_diagonal_congr : ∀ (F E : Type) [Field F] [NumberField F] [Fiel
   intro F E _ _ _ _ _ σ h R _ _ _ _ n S hS hdet
   have h2 : Module.finrank F E = 2 := h.2.2.1
   have h' : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ := h
-  have hσ := GlobalTheory.GaussMean.OneVec.sigma_sigma h'
+  have hσ := SelfDualLatticeCompare.conj_conj h'
   haveI : FiniteDimensional F E := Module.finite_of_finrank_pos (by omega)
   have hs : ∀ z : R ⊗[F] E, sigR R σ (sigR R σ z) = z := fun z => by
     induction z using TensorProduct.induction_on with

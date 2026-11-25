@@ -5,6 +5,7 @@ import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.RingTheory.Henselian
 import Mathlib.RingTheory.RegularLocalRing.Defs
 import Mathlib.RingTheory.SimpleRing.Principal
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.RationalGramAdelicCompactFinite
 
 @[expose] public section
 
@@ -97,15 +98,7 @@ theorem sigma_sigma {F E : Type} [Field F] [NumberField F] [Field E] [NumberFiel
 theorem sigma_hE_self {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
     [Algebra F E] {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {M : ℕ}
     {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) (y : Fin M → E) :
-    σ (hE σ J y y) = hE σ J y y := by
-
-  simp only [hE, hform, map_sum, map_mul]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-  have h1 : (σ : E →+* E) (y j) = σ (y j) := rfl
-  have h2 : (σ : E →+* E) (y i) = σ (y i) := rfl
-  rw [h1, h2, sigma_sigma hσ, hJ.1 i j]
-  ring
+    σ (hE σ J y y) = hE σ J y y := @FinQ.hE_self_fixed F E _ _ _ _ _ σ hσ M J hJ y
 
 theorem ofF_gram_iff : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
     [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),

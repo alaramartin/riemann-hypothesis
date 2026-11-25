@@ -11,6 +11,7 @@ import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.B
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.HaarCompactGrowth.GrowthSphericalBound
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.SchurDecayBounds.BeBesselOf
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.SchurDecayBounds.SchurH
+import CompanionTheory.AutomorphicTheory.SchurLimitBounds.SchurOrthogonality.SchurH
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.BesselModels.AtFormAdm, CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.BesselModels.DDForm, CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.BesselModels.AtFormAdmOne
@@ -160,15 +161,15 @@ namespace CompanionTheory.Lime.BM
 open Formalism.FourierDecayAlt.P CompanionTheory.D.Upq
 
 theorem shape (hU : UniqGap) : Shape := by
-  exact shape_of hU PI.WBL.S5.psiConst PI.WBL.NIS.schurH BesselFunctionalConstruction.beConv BesselFunctionalConstruction.normIdSm BesselFunctionalConstruction.beBessel
+  exact shape_of hU PI.WBL.S5.psiConst LimBd.SchurHpk.threeDimData_schurH BesselFunctionalConstruction.beConv BesselFunctionalConstruction.normIdSm BesselFunctionalConstruction.beBessel
 
 theorem dDFormOne (hU : UniqGap) : DDFormOne := by
-  exact Formalism.FourierDecayAlt.P.DDSmoothness.BM.discrete_form_one_side PI.WBL.S5.psiConst PI.WBL.NIS.schurH
-    Formalism.FourierDecayAlt.P.norm_inverse_bound Formalism.FourierDecayAlt.P.growth_spherical_bound Formalism.FourierDecayAlt.P.growth_group_bound BesselFunctionalConstruction.decDD BesselFunctionalConstruction.beConv
+  exact Formalism.FourierDecayAlt.P.DDSmoothness.BM.discrete_form_one_side PI.WBL.S5.psiConst LimBd.SchurHpk.threeDimData_schurH
+    Formalism.FourierDecayAlt.P.norm_inverse_bound Formalism.FourierDecayAlt.P.growth_spherical_bound Formalism.FourierDecayAlt.P.growth_group_bound G.double_coset_decomposition BesselFunctionalConstruction.beConv
     BesselFunctionalConstruction.normIdSm BesselFunctionalConstruction.beBessel (shape hU)
 
 theorem atFormAdmOne (hU : UniqGap) : AtFormAdmOne := by
-  exact Formalism.FourierDecayAlt.P.UnipotentHaarMeasurability.BM.smooth_admissible_form_one_side PI.WBL.NIS.schurH BesselFunctionalConstruction.beConv BesselFunctionalConstruction.normIdSm
+  exact Formalism.FourierDecayAlt.P.UnipotentHaarMeasurability.BM.smooth_admissible_form_one_side LimBd.SchurHpk.threeDimData_schurH BesselFunctionalConstruction.beConv BesselFunctionalConstruction.normIdSm
     BesselFunctionalConstruction.beBessel (shape hU) BesselFunctionalConstruction.kFinForm BesselFunctionalConstruction.zeroCase BesselFunctionalConstruction.zeroCaseDD
 
 end CompanionTheory.Lime.BM

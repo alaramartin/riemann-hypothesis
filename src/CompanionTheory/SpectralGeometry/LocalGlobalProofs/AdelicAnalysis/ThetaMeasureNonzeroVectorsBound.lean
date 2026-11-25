@@ -122,7 +122,7 @@ theorem cntI_nonzero_lt_top : ∀ (F E : Type) [Field F] [NumberField F] [Field 
       cntI σ J μ 𝓕 {X : Fin 1 → Fin M → E | gramE σ J X = fun _ _ => algebraMap F E t} Φ < ⊤ := by
     intro t ht
     exact _root_.GlobalTheory.CompanionTheory.SW.CountGen.finite_count F E σ hCM M J hJ
-      (fun M' _ J' hJ' => GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hCM M' J' hJ') t ht μ 𝓕 hH hFD Ω hΩ
+      (fun M' _ J' hJ' => CompanionTheory.SWFin.finVol F E σ hCM M' J' hJ') t ht μ 𝓕 hH hFD Ω hΩ
 
   have hfinset : ∀ T : Finset F, (∀ t ∈ T, t ≠ 0) →
       cntI σ J μ 𝓕 {X : Fin 1 → Fin M → E | (X ≠ 0 ∧ gramE σ J X = 0) ∨
@@ -233,7 +233,7 @@ theorem count_le (hpack : ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (M : ℕ)
 
 theorem cnt_large : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → 3 ≤ M → ∀ (μ : Measure (HA (AF F) σ J)) (𝓕 : Set (HA (AF F) σ J)), IsHaarH F E σ M J μ → IsFDH F E σ M J μ 𝓕 → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (N : ℕ) (r₀ : ℝ), 0 < N → 0 < r₀ → ∃ C : ℝ, ∀ r : ℝ, r₀ ≤ r → cntI σ J μ 𝓕 {X : Fin 1 → Fin M → E | X ≠ 0} (Set.indicator (box b N r) (fun _ => (1 : ℝ≥0∞))) ≤ ENNReal.ofReal (C * r ^ (2 * Module.finrank ℚ F * M)) := by
   intro F E _ _ _ _ _ σ hσ M J hJ hM μ 𝓕 hμ h𝓕 d b N r₀ hN h0
-  have hvol : μ 𝓕 < ⊤ := ((finVol_unitaryGroup F E σ hσ M J hJ).2 μ hμ).2 𝓕 h𝓕
+  have hvol : μ 𝓕 < ⊤ := ((CompanionTheory.SWFin.finVol F E σ hσ M J hJ).2 μ hμ).2 𝓕 h𝓕
   have hcomp : IsCompact (box b N r₀ : Set (Fin 1 → Fin M → AF F ⊗[F] E)) :=
     (_root_.GlobalTheory.CompanionTheory.SW.BoxF.box_facts F E σ hσ d b 1 M).1 N r₀ hN
   have hcnt := _root_.GlobalTheory.CompanionTheory.SW.CntFin.cntI_nonzero_lt_top F E σ hσ M J hJ hM μ 𝓕 hμ h𝓕 _ hcomp
@@ -349,9 +349,6 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.ThetaCnt
 
-theorem lintegral_thetaMeas : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (μ : Measure (HA (AF F) σ J)) (𝓕 : Set (HA (AF F) σ J)), IsHaarH F E σ M J μ → IsFDH F E σ M J μ 𝓕 → ∀ (n : ℕ) (S : Set (Fin n → Fin M → E)) (Φ : (Fin n → Fin M → AF F ⊗[F] E) → ℝ≥0∞), Measurable Φ → ∫⁻ Y, Φ Y ∂(thetaMeas σ J μ 𝓕 S) = (μ 𝓕)⁻¹ * cntI σ J μ 𝓕 S Φ :=
-  CompanionTheory.PlacePermOperatorBicommutantSpan.thetacnt
-
 end GlobalTheory.CompanionTheory.SW.ThetaCnt
 end -- clump:auto
 end -- clump:auto
@@ -405,7 +402,7 @@ theorem mean_count_box : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [N
   have hval : thetaMeas σ J μ 𝓕 {X : Fin 1 → Fin M → E | X ≠ 0} (box b N r) =
       (μ 𝓕)⁻¹ * cntI σ J μ 𝓕 {X : Fin 1 → Fin M → E | X ≠ 0}
         (Set.indicator (box b N r) (fun _ => (1 : ℝ≥0∞))) := by
-    have h := _root_.GlobalTheory.CompanionTheory.SW.ThetaCnt.lintegral_thetaMeas F E σ hCM M J hJ μ 𝓕 hμ h𝓕 1 {X : Fin 1 → Fin M → E | X ≠ 0}
+    have h := CompanionTheory.PlacePermOperatorBicommutantSpan.thetacnt F E σ hCM M J hJ μ 𝓕 hμ h𝓕 1 {X : Fin 1 → Fin M → E | X ≠ 0}
       (Set.indicator (box b N r) (fun _ => (1 : ℝ≥0∞))) (measurable_const.indicator hmeas)
     rw [lintegral_indicator_const hmeas, one_mul] at h
     exact h

@@ -293,7 +293,7 @@ theorem theta_stage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
   let Γ₁ : Subgroup (HA (AF F) σ J) := HFinIn (AF F) σ J
   haveI hc' : Countable Γ := hc
   haveI hc₁' : Countable Γ₁ := hc₁
-  have hfin : μ₁ 𝓕₁ < ⊤ := ((finVol_unitaryGroup F E σ hσ M J hJ).2 μ₁ hμ₁).2 𝓕₁ h𝓕₁
+  have hfin : μ₁ 𝓕₁ < ⊤ := ((CompanionTheory.SWFin.finVol F E σ hσ M J hJ).2 μ₁ hμ₁).2 𝓕₁ h𝓕₁
   obtain ⟨ι, hιc, -, hιrange, hιF, hιcons⟩ :=
     StabFirst.stab_first F E σ hσ M J hJ t ht (AF F)
   have hmul : ∀ (g h : HA (AF F) σ (blockOne (algebraMap F E t) J)) {k : ℕ}
@@ -407,12 +407,12 @@ theorem theta_stage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
           actW (AF F) σ _ g⁻¹ (consTup X) :=
         (act (n + 1)).1.comp (continuous_const.prodMk continuous_consTup)
       exact this.measurable
-    rw [hyp g⁻¹, _root_.GlobalTheory.CompanionTheory.SW.ThetaLint.theta_lint_eq F E σ hσ M J hJ μ₁ 𝓕₁ hμ₁ h𝓕₁ n _ _ hm]
+    rw [hyp g⁻¹, CompanionTheory.PlacePermOperatorBicommutantSpan.theta_lint F E σ hσ M J hJ μ₁ 𝓕₁ hμ₁ h𝓕₁ n _ _ hm]
     congr 1
     refine lintegral_congr fun u => tsum_congr fun X => ?_
     rw [mul_inv_rev, hmul, ← map_inv ι, hιcons]
-  rw [_root_.GlobalTheory.CompanionTheory.SW.ThetaLint.theta_lint_eq F E σ hσ (M + 1) _ hJb μ 𝓕 hμ h𝓕 (n + 1) _ Φ hΦ,
-    _root_.GlobalTheory.CompanionTheory.SW.ThetaLint.theta_lint_eq F E σ hσ (M + 1) _ hJb μ 𝓕 hμ h𝓕 1 _ Ψ hΨ]
+  rw [CompanionTheory.PlacePermOperatorBicommutantSpan.theta_lint F E σ hσ (M + 1) _ hJb μ 𝓕 hμ h𝓕 (n + 1) _ Φ hΦ,
+    CompanionTheory.PlacePermOperatorBicommutantSpan.theta_lint F E σ hσ (M + 1) _ hJb μ 𝓕 hμ h𝓕 1 _ Ψ hΨ]
   congr 1
   calc _ = ∫⁻ h in 𝓕, ∑' q, φ (r q * h) ∂μ := lintegral_congr hA
     _ = _ := key

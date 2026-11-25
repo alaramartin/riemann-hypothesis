@@ -17,6 +17,8 @@ import Mathlib.Algebra.AffineMonoid.UniqueSums
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Tactic.TypeStar
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.HasCharSub
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteModuleGradedQuantumDet
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CapelliAbstractCharacter
 
 @[expose] public section
 
@@ -125,11 +127,7 @@ theorem coef_mem {M : Type*} [AddCommGroup M] [Module ℂ M] (P : Submodule ℂ 
   simpa [p, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow, hj, ℓ'] using e3
 
 theorem qdet_mem {A : Type} [Ring A] [Algebra ℂ A] (B : Subalgebra ℂ A) {m : ℕ} (E : Fin m → Fin m → A)
-    (hE : ∀ a b, E a b ∈ B) (u : ℂ) : qdet E u ∈ B := by
-  have := GlobalTheory.CapelliUniv.qdet_map B.val (fun a b => (⟨E a b, hE a b⟩ : B)) u
-  simp only [Subalgebra.coe_val] at this
-  rw [this]
-  exact (qdet (fun a b => (⟨E a b, hE a b⟩ : B)) u).2
+    (hE : ∀ a b, E a b ∈ B) (u : ℂ) : qdet E u ∈ B := @LeviHC.MidBlock.qdet_mem A _ _ B m E hE u
 
 section Grade
 
@@ -526,22 +524,6 @@ open GlobalTheory.CompanionTheory.Dblock.CentreBlocks (sumPoly sumPoly_monic sum
 
 variable {Z : Type} [AddCommGroup Z] [Module ℂ Z]
 
-theorem aeval_mem (I : Submodule ℂ Z) (T : Module.End ℂ Z) (hI : ∀ x ∈ I, T x ∈ I) (p : ℂ[X]) (x : Z) (hx : x ∈ I) :
-    aeval T p x ∈ I := by
-  induction p using Polynomial.induction_on with
-  | C a =>
-    have : aeval T (C a) x = a • x := by simp [Module.algebraMap_end_apply]
-    rw [this]
-    exact I.smul_mem a hx
-  | add p q hp hq =>
-    rw [map_add (f := _), LinearMap.add_apply]
-    exact I.add_mem hp hq
-  | monomial k a ih =>
-    have h1 : aeval T (C a * X ^ (k + 1)) = T * aeval T (C a * X ^ k) := by
-      rw [show (C a * X ^ (k + 1) : ℂ[X]) = X * (C a * X ^ k) by ring, map_mul, aeval_X]
-    rw [h1, Module.End.mul_apply]
-    exact hI _ ih
-
 theorem exists_eig_of_poly (I : Submodule ℂ Z) (T : Module.End ℂ Z) (hI : ∀ x ∈ I, T x ∈ I) :
     ∀ (m : ℕ) (q : ℂ[X]), q.natDegree = m → q ≠ 0 → ∀ x ∈ I, x ≠ 0 → aeval T q x = 0 →
       ∃ r : ℂ, ∃ y ∈ I, y ≠ 0 ∧ T y = r • y := by
@@ -566,7 +548,7 @@ theorem exists_eig_of_poly (I : Submodule ℂ Z) (T : Module.End ℂ Z) (hI : �
       omega
     by_cases hy : aeval T q₁ x = 0
     · exact ih q₁ hdeg hq₁ x hx hx0 hy
-    · refine ⟨r, _, aeval_mem I T hI q₁ x hx, hy, ?_⟩
+    · refine ⟨r, _, Formalism.FourierDecayAlt.P.CapelliAbstractCharacter.aeval_mem I T hI q₁ x hx, hy, ?_⟩
       rw [map_mul, map_sub, aeval_X, aeval_C, Module.End.mul_apply, LinearMap.sub_apply] at hqx
       simpa [Module.algebraMap_end_apply, sub_eq_zero] using hqx
 

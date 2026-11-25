@@ -14,6 +14,7 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorIntegerRingAlmostAllPlaces
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 import Mathlib.RingTheory.PiTensorProduct
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SelfDualFrameConjIntegralSmulOfIntegral
 
 @[expose] public section
 
@@ -34,12 +35,6 @@ theorem map_eq_self {V : Type} [AddCommGroup V] [TopologicalSpace V] [LocallyCom
     { toFun := e, invFun := f, left_inv := hfe, right_inv := hef, map_add' := he }
   exact (_root_.GlobalTheory.CompanionTheory.SW.HaarTransport.map_addEquiv_haar V V μ μ e' hec hfc).2 L L hLc hLo hLn
     (fun x => ⟨fun h => by simpa [e', hfe] using hfL _ h, heL x⟩) rfl
-
-theorem mul_entry_mem {K : Type} [CommRing K] (O : Subring K) {n : ℕ}
-    {A B : Matrix (Fin n) (Fin n) K} (hA : ∀ i j, A i j ∈ O) (hB : ∀ i j, B i j ∈ O) (i j : Fin n) :
-    (A * B) i j ∈ O := by
-  rw [Matrix.mul_apply]
-  exact O.sum_mem fun k _ => O.mul_mem (hA i k) (hB k j)
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
@@ -115,7 +110,7 @@ theorem mass_eq_of_integral (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) {M : ℕ
       cT (sigR (Fv F v) σ) h * A * h ∈
         (latV (M := n) (n := n) b v : Set (Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))) := by
     intro h hh A hA a i
-    refine (hO _).1 (mul_entry_mem O (mul_entry_mem O ?_ ?_) hh a i)
+    refine (hO _).1 (ConjIntegral.mul_int O (ConjIntegral.mul_int O ?_ ?_) hh a i)
     · intro p q
       exact hσ _ (hh q p)
     · intro p q

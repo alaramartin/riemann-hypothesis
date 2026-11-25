@@ -22,6 +22,7 @@ import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.
 import Mathlib.Algebra.AffineMonoid.UniqueSums
 import Mathlib.Algebra.Module.StablyFree.Basic
 import Mathlib.Tactic.TypeStar
+import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.QnHermHaar
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.InfinitesimalCharacterPaths.HasCharPath, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.BaseFamilyAlt, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FamilyInduction, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.JacquetDegree, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.JacquetLocallyFinite, CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LabelTracking, CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.MatrixCoefficientDecay.InfinitesimalCharacterPaths.ExhaustionLabels
@@ -183,12 +184,6 @@ theorem inv_mul_of_inUJ {g : Matrix (Fin n) (Fin n) ℂ} (hg : Formalism.REAL.in
   rw [Matrix.inv_eq_left_inv h]
   exact h
 
-theorem exp_hasSum (X : Matrix (Fin n) (Fin n) ℂ) :
-    HasSum (fun k : ℕ => ((k.factorial : ℂ)⁻¹) • X ^ k) (NormedSpace.exp X) := by
-  let _ := Matrix.linftyOpNormedRing (n := Fin n) (α := ℂ)
-  let _ := Matrix.linftyOpNormedAlgebra (R := ℂ) (n := Fin n) (α := ℂ)
-  exact NormedSpace.exp_series_hasSum_exp' (𝕂 := ℂ) X
-
 theorem exp_mul_eig (A P : Matrix (Fin n) (Fin n) ℂ) (lam τ : ℂ) (h : A * P = lam • P) :
     NormedSpace.exp (τ • A) * P = Complex.exp (τ * lam) • P := by
   have hp : ∀ k : ℕ, (τ • A) ^ k * P = (τ * lam) ^ k • P := by
@@ -199,7 +194,7 @@ theorem exp_mul_eig (A P : Matrix (Fin n) (Fin n) ℂ) (lam τ : ℂ) (h : A * P
       rw [pow_succ', mul_assoc, ih, mul_smul_comm, smul_mul_assoc, h, smul_smul, smul_smul, pow_succ']
       congr 1
       ring
-  have h1 := (exp_hasSum (τ • A)).mul_right P
+  have h1 := (PI.QnHermHaar.tst_exp_hasSum_linfty (τ • A)).mul_right P
   have h2 : HasSum (fun k : ℕ => (((k.factorial : ℂ)⁻¹) • (τ * lam) ^ k) • P) (Complex.exp (τ * lam) • P) := by
     have h3 := NormedSpace.exp_series_hasSum_exp' (𝕂 := ℂ) (τ * lam)
     rw [← Complex.exp_eq_exp_ℂ] at h3
@@ -1132,31 +1127,6 @@ theorem act_A (X : GMod n) (B : GradBasis A) : actM X.E A = trB X B 2 - trB X B 
   simp [dz, trB]
   abel
 
-theorem rho_eq (B : GradBasis A) : rhoA A = (B.j : ℝ) * ((n : ℝ) - B.j) := by
-  have htr : Matrix.trace ((1 / 2 : ℂ) • (A * A + A)) = (B.j : ℂ) := by
-    have hA := B.eq
-    set d : Fin n → ℂ := fun p => ((![-1, 0, 1] : Fin 3 → ℂ) ((stdBlocks (dims n B.j) B.hj).symm p).1) with hd
-    have h2 : A * A + A = B.U * Matrix.diagonal (fun p => d p * d p + d p) * B.Ui := by
-      have e : (B.U * Matrix.diagonal d * B.Ui) * (B.U * Matrix.diagonal d * B.Ui) =
-          B.U * (Matrix.diagonal d * Matrix.diagonal d) * B.Ui := by
-        calc _ = B.U * Matrix.diagonal d * (B.Ui * B.U) * Matrix.diagonal d * B.Ui := by
-              simp only [Matrix.mul_assoc]
-          _ = _ := by rw [B.hUi]; simp only [Matrix.mul_assoc, Matrix.mul_one]
-      calc A * A + A = (B.U * Matrix.diagonal d * B.Ui) * (B.U * Matrix.diagonal d * B.Ui) +
-            B.U * Matrix.diagonal d * B.Ui := by rw [← hA]
-        _ = _ := by
-          rw [e, ← Matrix.add_mul, ← Matrix.mul_add, Matrix.diagonal_mul_diagonal, Matrix.diagonal_add]
-    rw [Matrix.trace_smul, h2, Matrix.trace_mul_comm, ← Matrix.mul_assoc, B.hUi, Matrix.one_mul,
-      Matrix.trace_diagonal, sum_blocks B]
-    have e : ∀ (i : Fin 3) (k : Fin (dims n B.j i)),
-        d (stdBlocks (dims n B.j) B.hj ⟨i, k⟩) = (![-1, 0, 1] : Fin 3 → ℂ) i := fun i k => by
-      simp [hd]
-    simp only [e, Finset.sum_const, Finset.card_univ, Fintype.card_fin]
-    simp [dims]
-    ring
-  simp only [rhoA, htr]
-  simp
-
 theorem modExp0 (j : ℕ) (h : 2 * j ≤ n) : (modExp (fun i => Fin (dims n j i)) 0 : ℂ) = (n : ℂ) - j := by
   have : ((n - 2 * j : ℕ) : ℂ) = (n : ℂ) - 2 * j := by push_cast [Nat.cast_sub h]; ring
   unfold modExp
@@ -1186,7 +1156,7 @@ theorem eig_mod (B : GradBasis A) (χ : Fin n → ℂ) (W' : Submodule ℂ (Modu
         (dims n B.j 2 : ℂ) * (modExp (fun i => Fin (dims n B.j i)) 2 : ℂ) / 2) • φ) -
       (φ ∘ₗ trB X B 0 - (∑ s ∈ univ.filter (fun s => L s = 0), χ s +
         (dims n B.j 0 : ℂ) * (modExp (fun i => Fin (dims n B.j i)) 0 : ℂ) / 2) • φ) := by
-    rw [act_A X B, rho_eq B, modExp0 B.j hj, modExp2 B.j hj]
+    rw [act_A X B, RgStartOne.rhoA_eq B, modExp0 B.j hj, modExp2 B.j hj]
     have d0 : dims n B.j 0 = B.j := rfl
     have d2 : dims n B.j 2 = B.j := rfl
     rw [d0, d2]
@@ -1397,12 +1367,6 @@ theorem deg_swap (χ : Fin n → ℂ) (L : Fin n → Fin 3) {r s : Fin n} (h : �
     deg χ (L ∘ Equiv.swap r s) = deg χ L := by
   simp only [deg, sum_filter_swap χ L h]
 
-theorem isLabel_swap {j : ℕ} {L : Fin n → Fin 3} (h : IsLabel j L) (r s : Fin n) :
-    IsLabel j (L ∘ Equiv.swap r s) := by
-  intro a
-  rw [← h a]
-  exact Finset.card_equiv (Equiv.swap r s) (by simp)
-
 theorem moved_labels (χ₀ : Fin n → ℂ) (j : ℕ) : ∀ (ss : List (Fin n)) (χ : Fin n → ℂ) (Λ : Set (Fin n → Fin 3)),
     GoodPath χ ss → (∀ r s, r ≠ s → χ r = χ s → χ r = χ₀ r ∧ χ s = χ₀ s) →
     (∀ L ∈ Λ, IsLabel j L ∧ (deg χ₀ L).re < 0) →
@@ -1417,7 +1381,7 @@ theorem moved_labels (χ₀ : Fin n → ℂ) (j : ℕ) : ∀ (ss : List (Fin n))
     refine ih (χ + Pi.single t 1) (move χ Λ t) hg.2 (tie_step hT hg.1) ?_ L hL
     rintro _ ⟨L₀, hL₀, r, hr, rfl⟩
     obtain ⟨hl, hd⟩ := hΛ L₀ hL₀
-    refine ⟨isLabel_swap hl r t, ?_⟩
+    refine ⟨RgTransport.isLabel_swap hl r t, ?_⟩
     by_cases hrt : r = t
     · subst hrt
       simpa using hd

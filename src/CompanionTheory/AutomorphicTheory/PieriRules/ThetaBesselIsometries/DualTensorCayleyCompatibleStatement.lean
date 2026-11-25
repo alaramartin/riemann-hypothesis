@@ -7,6 +7,7 @@ public import CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries
 public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FrechetContinuousContinuousOnOrbitHasDerivAt
 
 -- This file was produced by scripts/clump.py from the modules listed below.
 -- Members: CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DualTensorCapelliIntertwine, CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DualTensorCayleyCompatible, CompanionTheory.AutomorphicTheory.PieriRules.ThetaBesselIsometries.DualTensorCayleyCompatibleStatement
@@ -68,7 +69,7 @@ theorem hasDerivAt_inv_exp_entry (X : Mx k r) (j c : Fin (2 * r + k + 1)) :
 
 theorem lie_part₁ (Y : Mx k r) :
     InLieHpk k r ((1 / 2 : ℂ) • (Y + -(Formalism.QuantumDeterminants.Hpk k r * Yᴴ * Formalism.QuantumDeterminants.Hpk k r))) := by
-  have hI := Gp91.GlobalTheory.CWDeriv.hInvol k r
+  have hI := _root_.GlobalTheory.CWDeriv.hInvol k r
   have h := (AAInvW.ana_hpartMem hI Y).1
   rw [AAInvW.ana_hpart1_eq hI] at h
   rw [← sub_eq_add_neg]
@@ -76,7 +77,7 @@ theorem lie_part₁ (Y : Mx k r) :
 
 theorem lie_part₂ (Y : Mx k r) :
     InLieHpk k r ((1 / (2 * Complex.I)) • (Y - -(Formalism.QuantumDeterminants.Hpk k r * Yᴴ * Formalism.QuantumDeterminants.Hpk k r))) := by
-  have hI := Gp91.GlobalTheory.CWDeriv.hInvol k r
+  have hI := _root_.GlobalTheory.CWDeriv.hInvol k r
   have h := (AAInvW.ana_hpartMem hI Y).2.1
   rw [AAInvW.ana_hpart2_eq hI] at h
   rw [sub_neg_eq_add]

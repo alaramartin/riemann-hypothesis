@@ -47,7 +47,7 @@ theorem theta_int : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Number
   have hm : ∀ X, Measurable fun h : HA (AF F) σ J => actW (AF F) σ J h⁻¹ X := fun X =>
     ((hact n).1.comp (continuous_inv.prodMk continuous_const)).measurable
   have : Countable E := Countable.of_equiv _ (Module.finBasis ℚ E).equivFun.symm.toEquiv
-  have hfin := ((_root_.GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hcm M J hJ).2 μ hμ).2 𝓕 h𝓕
+  have hfin := ((SWFin.finVol F E σ hcm M J hJ).2 μ hμ).2 𝓕 h𝓕
   have hi : (μ 𝓕)⁻¹ ≠ 0 := ENNReal.inv_ne_zero.2 hfin.ne
   have : μ.IsHaarMeasure := hμ
   let Γ : Subgroup (HA (AF F) σ J) := HFinIn (AF F) σ J
@@ -89,7 +89,7 @@ theorem theta_inv : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Number
   refine ⟨fun h => ?_, ?_⟩
   · have hm : Measurable (actW (AF F) σ J h : (Fin n → Fin M → _) → _) :=
       (ac.comp (continuous_const.prodMk continuous_id)).measurable
-    have hfin := ((_root_.GlobalTheory.CompanionTheory.SW.finVol_unitaryGroup F E σ hcm M J hJ).2 μ hμ).2 𝓕 h𝓕
+    have hfin := ((SWFin.finVol F E σ hcm M J hJ).2 μ hμ).2 𝓕 h𝓕
     have : μ.IsHaarMeasure := hμ
     let Γ : Subgroup (HA (AF F) σ J) := HFinIn (AF F) σ J
     have : Countable Γ := (_root_.GlobalTheory.CompanionTheory.SW.rational_countable_discrete F E σ hcm M J hJ).1

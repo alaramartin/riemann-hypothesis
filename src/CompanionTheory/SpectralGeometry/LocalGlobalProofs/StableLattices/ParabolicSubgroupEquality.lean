@@ -5,6 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaDecomp
 import Mathlib.RingTheory.Coalgebra.IsFrobenius
 import Mathlib.RingTheory.HopfAlgebra.Basic
 import Mathlib.Topology.Sheaves.Presheaf
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.FlagFacts
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviMaxCompactClosedSubgroups
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeCountingBound.ArchPlace
 
 @[expose] public section
 
@@ -29,17 +32,11 @@ theorem mem_Vm {x : Fin n → ℂ} : x ∈ Vm A ↔ ∃ z, Pm A *ᵥ z = x := by
 theorem mem_Wm {y : Fin n → ℂ} : y ∈ Wm A ↔ Pp A *ᵥ y = 0 := by
   simp only [Wm, LinearMap.mem_ker, Matrix.toLin'_apply, Pp]
 
-theorem anti (hA : IsGrad ε A) : Formalism.REAL.Jm ε * A = -(A * Formalism.REAL.Jm ε) := by
-  have h := hA.1
-  unfold Formalism.REAL.inG at h
-  rw [hA.2.1] at h
-  exact eq_neg_of_add_eq_zero_right h
-
 theorem Pm_conj (hA : IsGrad ε A) : (Pm A)ᴴ = Pm A := by
   simp [Pm, Matrix.conjTranspose_smul, Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, hA.2.1]
 
 theorem Pm_J (hA : IsGrad ε A) : Pm A * Formalism.REAL.Jm ε = Formalism.REAL.Jm ε * Pp A := by
-  have h := anti hA
+  have h := GradFlag.J_mul hA
   have h2 : Formalism.REAL.Jm ε * (A * A) = A * A * Formalism.REAL.Jm ε := by
     rw [← Matrix.mul_assoc, h, Matrix.neg_mul, Matrix.mul_assoc, h, Matrix.mul_neg, neg_neg, Matrix.mul_assoc]
   simp only [Pm, Pp, Matrix.smul_mul, Matrix.mul_smul, Matrix.add_mul, Matrix.mul_add, h, h2, sub_eq_add_neg, Matrix.neg_mul]
@@ -89,7 +86,7 @@ theorem isoFlag (hA : IsGrad ε A) : IsIsoFlag ε (fun _ : Fin 1 => rk A) (W A) 
 theorem keeps_of_stable (g : Formalism.REAL.UJ ε) {S : Submodule ℂ (Fin n → ℂ)} (h : ∀ y ∈ S, uMat g *ᵥ y ∈ S) :
     Keeps (uMat g) S :=
   Submodule.eq_of_le_of_finrank_eq (by rintro _ ⟨y, hy, rfl⟩; exact h y hy)
-    (GlobalTheory.RealIwasawa.finrank_map_toLin _ _ (GlobalTheory.RealIwasawa.uMat_inv_mul g) S)
+    (GlobalTheory.RealIwasawa.finrank_map_toLin _ _ (FlagLeviGroup.uMat_inv_mul g) S)
 
 theorem stable_of_keeps {g : Matrix (Fin n) (Fin n) ℂ} {S : Submodule ℂ (Fin n → ℂ)} (h : Keeps g S) :
     ∀ y ∈ S, g *ᵥ y ∈ S := fun y hy => by
@@ -116,13 +113,13 @@ theorem flagM_stable_Wm (hA : IsGrad ε A) {m : Formalism.REAL.UJ ε} (hm : m �
     (hy : y ∈ Wm A) : uMat m *ᵥ y ∈ Wm A := by
   refine (mem_Wm_iff hA _).2 fun x hx => ?_
   have hx' : uMat m⁻¹ *ᵥ x ∈ Vm A :=
-    GlobalTheory.RealIwasawa.inv_stable _ _ (GlobalTheory.RealIwasawa.uMat_inv_mul m) (Vm A)
+    GlobalTheory.RealIwasawa.inv_stable _ _ (FlagLeviGroup.uMat_inv_mul m) (Vm A)
       (fun z hz => flagM_stable_Vm hm hz) x hx
   have e : x = uMat m *ᵥ (uMat m⁻¹ *ᵥ x) := by
-    rw [Matrix.mulVec_mulVec, GlobalTheory.RealIwasawa.uMat_mul_inv, Matrix.one_mulVec]
+    rw [Matrix.mulVec_mulVec, FlagLeviGroup.uMat_mul_inv, Matrix.one_mulVec]
   have h0 := (mem_Wm_iff hA y).1 hy _ hx'
   rw [e, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
-    GlobalTheory.RealIwasawa.uMat_form]
+    PI.UnitaryGroupMassFormula.LCG.ap_inUJ]
   exact h0
 
 theorem psubEq : PSubEq := by
